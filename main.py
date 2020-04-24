@@ -3,10 +3,12 @@ from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
 from scheduler.Random import *
 from stats.Stats import *
+import os
 import pickle
+import shutil
 
 # Global constants
-NUM_SIM_STEPS = 20
+NUM_SIM_STEPS = 200
 HOSTS = 10
 CONTAINERS = 10
 TOTAL_POWER = 1000
@@ -61,16 +63,19 @@ def stepSimulation(workload, scheduler, env, stats):
 	stats.saveStats(deployed, migrations, destroyed, selected, decision)
 
 def saveStats(stats, datacenter, workload):
-	filename = "logs/" + datacenter.__class__.__name__
-	filename += "_" + workload.__class__.__name__
-	filename += "_" + str(NUM_SIM_STEPS) 
-	filename += "_" + str(HOSTS)
-	filename += "_" + str(CONTAINERS)
-	filename += "_" + str(TOTAL_POWER)
-	filename += "_" + str(ROUTER_BW)
-	filename += "_" + str(INTERVAL_TIME)
-	filename += "_" + str(NEW_CONTAINERS)
-	with open(filename+'.pk', 'wb') as handle:
+	dirname = "logs/" + datacenter.__class__.__name__
+	dirname += "_" + workload.__class__.__name__
+	dirname += "_" + str(NUM_SIM_STEPS) 
+	dirname += "_" + str(HOSTS)
+	dirname += "_" + str(CONTAINERS)
+	dirname += "_" + str(TOTAL_POWER)
+	dirname += "_" + str(ROUTER_BW)
+	dirname += "_" + str(INTERVAL_TIME)
+	dirname += "_" + str(NEW_CONTAINERS)
+	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
+	os.mkdir(dirname)
+	stats.generateGraphs(dirname)
+	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
 	    pickle.dump(stats, handle)
 
 if __name__ == '__main__':

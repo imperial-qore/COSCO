@@ -1,4 +1,7 @@
 import numpy as np
+import matplotlib.pyplot as plt
+plt.style.use(['science'])
+plt.rcParams["text.usetex"] = False
 
 class Stats():
 	def __init__(self, Environment, WorkloadModel, Datacenter, Scheduler):
@@ -20,6 +23,7 @@ class Stats():
 		hostinfo = dict()
 		hostinfo['interval'] = self.env.interval
 		hostinfo['cpu'] = [host.getCPU() for host in self.env.hostlist]
+		hostinfo['numcontainers'] = [len(self.env.getContainersOfHost(i)) for i,host in enumerate(self.env.hostlist)]
 		hostinfo['power'] = [host.getPower() for host in self.env.hostlist]
 		hostinfo['baseips'] = [host.getBaseIPS() for host in self.env.hostlist]
 		hostinfo['ipsavailable'] = [host.getIPSAvailable() for host in self.env.hostlist]
@@ -102,3 +106,33 @@ class Stats():
 		self.saveAllContainerInfo()
 		self.saveMetrics(destroyed, migrations)
 		self.saveSchedulerInfo(selectedcontainers, decision)
+
+	########################################################################################################
+
+	def generateGraphsWithInterval(self, dirname, listinfo, metric, metric2=None):
+		fig, axes = plt.subplots(len(listinfo[0][metric]), 1, sharex=True,figsize=(4, 5))
+		title = 'host_' + metric + '_with_interval' 
+		totalIntervals = len(listinfo)
+		x = list(range(totalIntervals))
+		metric_with_interval = []; metric2_with_interval = []
+		ylimit = 0; ylimit2 = 0
+		for hostID in range(len(listinfo[0][metric])):
+			metric_with_interval.append([listinfo[interval][metric][hostID] for interval in range(totalIntervals)])
+			ylimit = max(ylimit, max(metric_with_interval[-1]))
+			if metric2:
+				metric2_with_interval.append([listinfo[interval][metric2][hostID] for interval in range(totalIntervals)])
+				ylimit2 = max(ylimit, max(metric2_with_interval[-1]))
+		for hostID in range(len(listinfo[0][metric])):
+			axes[hostID].set_ylim(0, max(ylimit, ylimit2))
+			axes[hostID].plot(x, metric_with_interval[hostID])
+			if metric2:
+				axes[hostID].plot(x, metric2_with_interval[hostID])
+			axes[hostID].set_ylabel('Host '+str(hostID))
+		plt.tight_layout(pad=0)
+		plt.savefig(dirname + '/' + title + '.pdf')
+
+	def generateGraphs(self, dirname):
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'cpu')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'numcontainers')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'power')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'baseips', 'apparentips')
