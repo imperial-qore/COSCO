@@ -73,7 +73,7 @@ class Stats():
 		containerinfo['disk'] = [(c.getDisk() if c.active else 0) for c in allCreatedContainers]
 		containerinfo['hostalloc'] = [(c.getHostID() if c.active else -1) for c in allCreatedContainers]
 		containerinfo['active'] = [(c.active) for c in allCreatedContainers]
-		self.activecontainerinfo.append(containerinfo)
+		self.allcontainerinfo.append(containerinfo)
 
 	def saveMetrics(self, destroyed, migrations):
 		metrics = dict()
@@ -109,9 +109,9 @@ class Stats():
 
 	########################################################################################################
 
-	def generateGraphsWithInterval(self, dirname, listinfo, metric, metric2=None):
+	def generateGraphsWithInterval(self, dirname, listinfo, obj, metric, metric2=None):
 		fig, axes = plt.subplots(len(listinfo[0][metric]), 1, sharex=True,figsize=(4, 5))
-		title = 'host_' + metric + '_with_interval' 
+		title = obj + '_' + metric + '_with_interval' 
 		totalIntervals = len(listinfo)
 		x = list(range(totalIntervals))
 		metric_with_interval = []; metric2_with_interval = []
@@ -132,7 +132,9 @@ class Stats():
 		plt.savefig(dirname + '/' + title + '.pdf')
 
 	def generateGraphs(self, dirname):
-		self.generateGraphsWithInterval(dirname, self.hostinfo, 'cpu')
-		self.generateGraphsWithInterval(dirname, self.hostinfo, 'numcontainers')
-		self.generateGraphsWithInterval(dirname, self.hostinfo, 'power')
-		self.generateGraphsWithInterval(dirname, self.hostinfo, 'baseips', 'apparentips')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'cpu')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'numcontainers')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'power')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'baseips', 'apparentips')
+		self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'ips', 'apparentips')
+		self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'hostalloc')

@@ -8,7 +8,7 @@ import pickle
 import shutil
 
 # Global constants
-NUM_SIM_STEPS = 200
+NUM_SIM_STEPS = 20
 HOSTS = 10
 CONTAINERS = 10
 TOTAL_POWER = 1000
