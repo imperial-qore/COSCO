@@ -9,7 +9,7 @@ import math
 class PMRaspberryPi(PM):
 	def __init__(self):
 		super().__init__()
-		self.powerlist = [1.57, 1.59, 1.61, 1.62, 1.65, 1.66, 1.69, 1.71, 1.72, 1.74, 1.75]
+		self.powerlist = [0.45, 0.78, 0.90, 1.03, 1.65, 1.66, 1.69, 1.71, 1.72, 1.74, 1.75]
 
 	# cpu consumption in 100
 	def power(self):

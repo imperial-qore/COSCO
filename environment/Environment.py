@@ -5,7 +5,7 @@ class Environment():
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds
-	def __init__(self, TotalPower, RouterBw, Scheduler, ContainerLimit, HostLimit, IntervalTime, hostinit, containerinit):
+	def __init__(self, TotalPower, RouterBw, Scheduler, ContainerLimit, HostLimit, IntervalTime, hostinit):
 		self.totalpower = TotalPower
 		self.totalbw = RouterBw
 		self.hostlimit = HostLimit
@@ -16,8 +16,8 @@ class Environment():
 		self.containerlist = []
 		self.intervaltime = IntervalTime
 		self.interval = 0
-		self.addContainerListInit(containerinit)
-		self.addHostlistInit(hostlist)
+		self.inactiveContainers = []
+		self.addHostlistInit(hostinit)
 
 	def addHostInit(self, IPS, RAM, Disk, Bw, Powermodel):
 		assert len(self.hostlist) < self.hostlimit
@@ -30,27 +30,27 @@ class Environment():
 			self.addHostInit(IPS, RAM, Disk, Bw, Powermodel)
 
 	def addContainerInit(self, CreationID, IPSModel, RAMModel, DiskModel):
-		assert len(self.containerlist) < self.containerlimit
 		container = Container(len(self.containerlist), CreationID, IPSModel, RAMModel, DiskModel, self, HostID = -1)
 		self.containerlist.append(container)
 
 	def addContainerListInit(self, containerList):
-		containerList = containerList[:min(len(containerlist), self.containerlimit)]
-		for CreationID, IPSModel, RAMModel, DiskModel in containerList:
+		deployed = containerList[:min(len(containerlist), self.containerlimit)]
+		for CreationID, IPSModel, RAMModel, DiskModel in deployed:
 			self.addContainerInit(CreationID, IPSModel, RAMModel, DiskModel)
 		self.containerlist += [None] * (self.containerlimit - len(self.containerlist))
-		return len(containerList)
+		return [container.creationID for container in deployed]
 
 	def addContainer(self, CreationID, IPSModel, RAMModel, DiskModel):
-		assert self.getNumActiveContainers() < self.containerlimit
 		container = Container(len(self.containerlist), CreationID, IPSModel, RAMModel, DiskModel, self, HostID = -1)
 		for i,c in enumerate(self.containerlist):
 			if c == None or not c.active:
 				self.containerlist[i] = container
 
 	def addContainerList(self, containerList):
-		for CreationID, IPSModel, RAMModel, DiskModel in containerList:
+		deployed = containerList[:min(len(containerlist), self.containerlimit)]
+		for CreationID, IPSModel, RAMModel, DiskModel in deployed:
 			self.addContainer(CreationID, IPSModel, RAMModel, DiskModel)
+		return [container.creationID for container in deployed]
 
 	def getContainersofHost(self, hostID):
 		containers = []
@@ -95,12 +95,13 @@ class Environment():
 		for (cid, hid) in decision:
 			assert self.getContainerByID(cid).getHostID() == -1
 			allocbw = min(self.getHostByID(hid).bwCap.downlink, routerBwToEach)
-			container.allocate(hid, allocbw)
+			container.allocAndExecute(hid, allocbw)
 
 	def destroyCompletedContainers(self):
 		for container in self.containerlist:
 			if container.getIPS() == 0:
 				container.destroy()
+				self.inactiveContainers.append(container)
 
 	def getNumActiveContainers(self):
 		num = 0 
@@ -121,4 +122,4 @@ class Environment():
 			currentHost = self.getHostByID(currentHostID)
 			targetHost = self.getHostByID(hid)
 			allocbw = min(targetHost.bwCap.downlink, currentHost.bwCap.uplink, routerBwToEach)
-			container.allocate(hid, allocbw)
+			container.allocateAndExecute(hid, allocbw)

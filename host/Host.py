@@ -14,17 +14,19 @@ class Host():
 		self.diskCap = Disk
 		self.bwCap = Bw
 		self.powermodel = Powermodel
+		self.powermodel.allocHost(self)
 		self.powermodel.host = self
 		self.env = Environment
 
 	def getPower(self):
-		return self.powermodel.power(self.getCPU())
+		return self.powermodel.power()
 
 	def getCPU(self):
-		ips = self.getCurrentIPS()
+		ips = self.getApparentIPS()
 		return 100 * (ips / self.ipsCap)
 
-	def getCurrentIPS(self):
+	def getBaseIPS(self):
+		# Get base ips count as sum of min ips of all containers
 		ips = 0
 		containers = self.env.getContainersOfHost(self.id)
 		for containerID in containers:
@@ -32,8 +34,20 @@ class Host():
 		assert ips <= self.ipsCap
 		return ips
 
+	def getApparentIPS(self):
+		# Give containers remaining IPS for faster execution
+		ips = 0
+		containers = self.env.getContainersOfHost(self.id)
+		for containerID in containers:
+			ips += self.env.getContainerByID(containerID).getApparentIPS()
+		assert ips <= self.ipsCap
+		return ips
+
 	def getIPSAvailable(self):
-		return self.ipsCap - self.getCurrentIPS()
+		# IPS available is ipsCap - baseIPS
+		# When containers allocated, existing ips can be allocated to
+		# the containers
+		return self.ipsCap - self.getBaseIPS()
 
 	def getCurrentRAM(self):
 		size, read, write = 0, 0, 0
