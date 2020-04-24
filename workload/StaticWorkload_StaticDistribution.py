@@ -1,4 +1,7 @@
 import numpy as np
+from container.IPSModels.IPSMConstant import *
+from container.RAMModels.RMConstant import *
+from container.DiskModels.DMConstant import *
 
 class SWSD():
 	def __init__(self, num_worloads):
@@ -17,7 +20,7 @@ class SWSD():
 			RAMModel = RMConstant(100*ramMultiplier, 50*ramMultiplier, 20*ramMultiplier)
 			diskMultiplier = np.random.randint(1,3)
 			DiskModel = DMConstant(300*diskMultiplier, 100*diskMultiplier, 120*diskMultiplier)
-			workloadlist.append(CreationID, IPSModel, RAMModel, DiskModel)
+			workloadlist.append((CreationID, interval, IPSModel, RAMModel, DiskModel))
 			self.creation_id += 1
 		self.createdContainers += workloadlist
 		self.deployedContainers += [False] * len(workloadlist)
@@ -25,12 +28,12 @@ class SWSD():
 
 	def getUndeployedContainers(self):
 		undeployed = []
-		for container in self.createdContainers:
-			if not self.deployedContainers[container.creationID]:
-				undeployed.append(container)
+		for i,deployed in enumerate(self.deployedContainers):
+			if not deployed:
+				undeployed.append(self.createdContainers[i])
 		return undeployed
 
-	def updateDeployedContainers(creationIDs):
+	def updateDeployedContainers(self, creationIDs):
 		for cid in creationIDs:
 			assert not self.deployedContainers[cid]
 			self.deployedContainers[cid] = True

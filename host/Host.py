@@ -1,6 +1,6 @@
-from .Disk import *
-from .RAM import *
-from .Bw import *
+from host.Disk import *
+from host.RAM import *
+from host.Bandwidth import *
 
 class Host():
 	# IPS = Instructions per second capacity

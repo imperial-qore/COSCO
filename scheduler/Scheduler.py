@@ -12,7 +12,7 @@ class Scheduler():
 	def placement(self, containerlist):
 		pass
 
-	def getMigrationFromHost(hostID, decision):
+	def getMigrationFromHost(self, hostID, decision):
 		containerIDs = []
 		for (cid, _) in decision:
 			hid = self.getContainerByID(cid).getHostID()
@@ -20,7 +20,7 @@ class Scheduler():
 				containerIDs.append(cid)
 		return containerIDs
 
-	def getMigrationToHost(hostID, decision):
+	def getMigrationToHost(self, hostID, decision):
 		containerIDs = []
 		for (cid, hid) in decision:
 			if hid == hostID:

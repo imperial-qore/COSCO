@@ -1,5 +1,5 @@
-from ..host.Host import *
-from ..container.Container import *
+from host.Host import *
+from container.Container import *
 
 class Environment():
 	# Total power in watt
@@ -26,31 +26,37 @@ class Environment():
 
 	def addHostlistInit(self, hostList):
 		assert len(hostList) == self.hostlimit
-		for IPS, RAM, Disk, Bw, Powermode in hostList:
+		for IPS, RAM, Disk, Bw, Powermodel in hostList:
 			self.addHostInit(IPS, RAM, Disk, Bw, Powermodel)
 
-	def addContainerInit(self, CreationID, IPSModel, RAMModel, DiskModel):
-		container = Container(len(self.containerlist), CreationID, IPSModel, RAMModel, DiskModel, self, HostID = -1)
+	def addContainerInit(self, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel):
+		container = Container(len(self.containerlist), CreationID, CreationInterval, IPSModel, RAMModel, DiskModel, self, HostID = -1)
 		self.containerlist.append(container)
+		return container
 
-	def addContainerListInit(self, containerList):
-		deployed = containerList[:min(len(containerlist), self.containerlimit)]
-		for CreationID, IPSModel, RAMModel, DiskModel in deployed:
-			self.addContainerInit(CreationID, IPSModel, RAMModel, DiskModel)
+	def addContainerListInit(self, containerInfoList):
+		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit)]
+		deployedContainers = []
+		for CreationID, CreationInterval, IPSModel, RAMModel, DiskModel in deployed:
+			dep = self.addContainerInit(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel)
+			deployedContainers.append(dep)
 		self.containerlist += [None] * (self.containerlimit - len(self.containerlist))
-		return [container.creationID for container in deployed]
+		return [container.id for container in deployedContainers]
 
-	def addContainer(self, CreationID, IPSModel, RAMModel, DiskModel):
+	def addContainer(self, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel):
 		container = Container(len(self.containerlist), CreationID, IPSModel, RAMModel, DiskModel, self, HostID = -1)
 		for i,c in enumerate(self.containerlist):
 			if c == None or not c.active:
 				self.containerlist[i] = container
+		return container
 
-	def addContainerList(self, containerList):
-		deployed = containerList[:min(len(containerlist), self.containerlimit)]
-		for CreationID, IPSModel, RAMModel, DiskModel in deployed:
-			self.addContainer(CreationID, IPSModel, RAMModel, DiskModel)
-		return [container.creationID for container in deployed]
+	def addContainerList(self, containerInfoList):
+		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit)]
+		deployedContainers = []
+		for CreationID, CreationInterval, IPSModel, RAMModel, DiskModel in deployed:
+			dep = self.addContainerInit(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel)
+			deployedContainers.append(dep)
+		return [container.creationID for container in deployedContainers]
 
 	def getContainersofHost(self, hostID):
 		containers = []
@@ -59,17 +65,19 @@ class Environment():
 				container.append(container)
 		return containers
 
-	def getContainerByID(self, constainerID):
+	def getContainerByID(self, containerID):
 		return self.containerlist[containerID]
+
+	def getContainerByCID(self, creationID):
+		for c in self.constainerlist + self.inactiveContainers:
+			if c and c.creationID == creationID:
+				return c
 
 	def getHostByID(self, hostID):
 		return self.hostlist[hostID]
 
-	def getSelection(self):
-		return self.scheduler.selection()
-
-	def getPlacement(self, containerlist):
-		return self.scheduler.placement(containerlist)
+	def getCreationIDs(self, containerIDs):
+		return [self.containerlist[cid].creationID for cid in containerIDs]
 
 	def getPlacementPossible(self, containerID, hostID):
 		container = self.containerlist[containerID]
@@ -88,20 +96,33 @@ class Environment():
 				diskreadreq <= diskreadav and \
 				diskwritereq <= diskwriteav)
 
-	def allocateInit(self):
+	def addContainersInit(self, containerInfoListInit):
 		self.interval += 1
-		decision = self.getPlacement(self.containerlist)
+		deployed = self.addContainerListInit(containerInfoListInit)
+		return deployed
+
+	def allocateInit(self, decision):
+		migrated = []
 		routerBwToEach = self.totalbw / len(decision)
 		for (cid, hid) in decision:
-			assert self.getContainerByID(cid).getHostID() == -1
-			allocbw = min(self.getHostByID(hid).bwCap.downlink, routerBwToEach)
-			container.allocAndExecute(hid, allocbw)
+			container = self.getContainerByID(cid)
+			assert container.getHostID() == -1
+			numberAllocToHost = self.scheduler.getMigrationToHost(hid, decision)
+			allocbw = min(self.getHostByID(hid).bwCap.downlink / numberAllocToHost, routerBwToEach)
+			if container.getHostID() == hid  or self.getPlacementPossible(cid, hid):
+				if container.getHostID() != hid:
+					migrated.append((cid, hid))
+				container.allocAndExecute(hid, allocbw)
+		return migrated
 
 	def destroyCompletedContainers(self):
-		for container in self.containerlist:
+		destroyed = []
+		for i,container in enumerate(self.containerlist):
 			if container.getIPS() == 0:
 				container.destroy()
+				self.containerlist[i] = None
 				self.inactiveContainers.append(container)
+				destroyed.append(container)
 
 	def getNumActiveContainers(self):
 		num = 0 
@@ -109,17 +130,24 @@ class Environment():
 			if container.active: num += 1
 		return num
 
-	def simulationStep(self, newContainerlist):
+	def addContainers(self, newContainerList):
 		self.interval += 1
-		self.destroyCompletedContainers()
-		self.addContainerList(newContainerlist)
-		selectedContainers = self.getSelection()
-		decision = self.getPlacement(selectedContainers)
+		destroyed = self.destroyCompletedContainers()
+		deployed = self.addContainerList(newContainerlist)
+		return deployed
+
+	def simulationStep(self, newContainerlist, decision):
 		routerBwToEach = self.totalbw / len(decision)
 		for (cid, hid) in decision:
 			assert self.getContainerByID(cid).getHostID() == -1
 			currentHostID = self.getContainerByID(cid).getHostID()
 			currentHost = self.getHostByID(currentHostID)
 			targetHost = self.getHostByID(hid)
-			allocbw = min(targetHost.bwCap.downlink, currentHost.bwCap.uplink, routerBwToEach)
-			container.allocateAndExecute(hid, allocbw)
+			migrateFromNum = self.scheduler.getMigrationFromHost(currentHostID, decision)
+			migrateToNum = self.scheduler.getMigrationToHost(hid, decision)
+			allocbw = min(targetHost.bwCap.downlink / migrateToNum, currentHost.bwCap.uplink / migrateFromNum, routerBwToEach)
+			if container.getHostID() == hid  or self.getPlacementPossible(cid, hid):
+				if container.getHostID() != hid:
+					migrated.append((cid, hid))
+				container.allocAndExecute(hid, allocbw)
+		return deployed, mirgated, destroyed
