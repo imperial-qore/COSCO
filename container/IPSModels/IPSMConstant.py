@@ -11,7 +11,7 @@ class IPSMConstant(IPSM):
 		self.completedInstructions = 0
 
 	def getIPS(self):
-		if self.container.env.interval <= self.duration or self.completedInstructions >= self.totalInstructions:
+		if self.container.env.interval - self.container.createAt <= self.duration or self.completedInstructions < self.totalInstructions:
 			return self.constant_ips
 		return 0
 

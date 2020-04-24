@@ -9,13 +9,13 @@ class SimpleFog():
 	def __init__(self, num_hosts):
 		self.num_hosts = num_hosts
 		self.types = {
-			'IPS' : [1000, 2000, 4000],
-			'RAMSize' : [100, 400, 800],
-			'RAMRead' : [100, 200, 300],
-			'RAMWrite' : [100, 200, 300],
-			'DiskSize' : [1000, 4000, 8000],
-			'DiskRead' : [100, 200, 300],
-			'DiskWrite' : [100, 200, 300],
+			'IPS' : [10000, 20000, 40000],
+			'RAMSize' : [1000, 4000, 8000],
+			'RAMRead' : [1000, 2000, 3000],
+			'RAMWrite' : [1000, 2000, 3000],
+			'DiskSize' : [10000, 40000, 80000],
+			'DiskRead' : [1000, 2000, 3000],
+			'DiskWrite' : [1000, 2000, 3000],
 			'BwUp' : [1000, 2000, 5000],
 			'BwDown': [2000, 4000, 10000],
 			'Power' : [1]

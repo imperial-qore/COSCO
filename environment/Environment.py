@@ -35,7 +35,7 @@ class Environment():
 		return container
 
 	def addContainerListInit(self, containerInfoList):
-		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit-len(self.containerlist))]
+		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit-self.getNumActiveContainers())]
 		deployedContainers = []
 		for CreationID, CreationInterval, IPSModel, RAMModel, DiskModel in deployed:
 			dep = self.addContainerInit(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel)
@@ -51,7 +51,7 @@ class Environment():
 				return container
 
 	def addContainerList(self, containerInfoList):
-		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit-len(self.containerlist))]
+		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit-self.getNumActiveContainers())]
 		deployedContainers = []
 		for CreationID, CreationInterval, IPSModel, RAMModel, DiskModel in deployed:
 			dep = self.addContainer(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel)
@@ -109,7 +109,7 @@ class Environment():
 			assert container.getHostID() == -1
 			numberAllocToHost = len(self.scheduler.getMigrationToHost(hid, decision))
 			allocbw = min(self.getHostByID(hid).bwCap.downlink / numberAllocToHost, routerBwToEach)
-			if container.getHostID() == hid  or self.getPlacementPossible(cid, hid):
+			if self.getPlacementPossible(cid, hid):
 				if container.getHostID() != hid:
 					migrations.append((cid, hid))
 				container.allocateAndExecute(hid, allocbw)
@@ -138,7 +138,10 @@ class Environment():
 		return deployed, destroyed
 
 	def getActiveContainerList(self):
-		return [1 if c else 0 for c in self.containerlist]
+		return [c.getHostID() if c and c.active else -1 for c in self.containerlist]
+
+	def getContainersInHosts(self):
+		return [len(self.getContainersOfHost(host)) for host in range(self.hostlimit)]
 
 	def simulationStep(self, decision):
 		routerBwToEach = self.totalbw / len(decision)
@@ -151,7 +154,7 @@ class Environment():
 			migrateFromNum = len(self.scheduler.getMigrationFromHost(currentHostID, decision))
 			migrateToNum = len(self.scheduler.getMigrationToHost(hid, decision))
 			allocbw = min(targetHost.bwCap.downlink / migrateToNum, currentHost.bwCap.uplink / migrateFromNum, routerBwToEach)
-			if container.getHostID() == hid  or self.getPlacementPossible(cid, hid):
+			if self.getPlacementPossible(cid, hid):
 				if container.getHostID() != hid:
 					migrations.append((cid, hid))
 				container.allocateAndExecute(hid, allocbw)

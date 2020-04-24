@@ -6,7 +6,7 @@ from stats.Stats import *
 import pickle
 
 # Global constants
-NUM_SIM_STEPS = 100
+NUM_SIM_STEPS = 20
 HOSTS = 10
 CONTAINERS = 10
 TOTAL_POWER = 1000
@@ -34,6 +34,9 @@ def initalizeEnvironment():
 	workload.updateDeployedContainers(env.getCreationIDs(deployed)) # Update workload deployed using creation IDs
 	decision = scheduler.placement(deployed) # Decide placement using container ids
 	migrations = env.allocateInit(decision) # Schedule containers
+	print("Deployed:", len(deployed), "of", len(newcontainerinfos))
+	print("Containers in host:", env.getContainersInHosts())
+	print("Schedule:", env.getActiveContainerList())
 
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
@@ -46,9 +49,14 @@ def stepSimulation(workload, scheduler, env, stats):
 	workload.updateDeployedContainers(env.getCreationIDs(deployed)) # Update workload deployed using creation IDs
 	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.placement(selected) # Decide placement for selected container ids
-	print(env.getActiveContainerList())
-	print(selected, decision)
 	migrations = env.simulationStep(decision) # Schedule containers
+	print("Deployed containers' creation IDs:", env.getCreationIDs(deployed))
+	print("Deployed:", len(deployed), "of", len(newcontainerinfos), [i[0] for i in newcontainerinfos])
+	print("Destroyed:", len(destroyed), "of", env.getNumActiveContainers())
+	print("Containers in host:", env.getContainersInHosts())
+	print("Schedule:", env.getActiveContainerList())
+	print(decision)
+	print()
 
 	stats.saveStats(deployed, migrations, destroyed, selected, decision)
 
