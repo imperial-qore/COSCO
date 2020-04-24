@@ -7,5 +7,5 @@ class DMConstant(DM):
 		self.constant_read = constant_read
 		self.constant_write = constant_write
 
-	def diskIO(self):
+	def disk(self):
 		return self.constant_size, self.constant_read, self.constant_write

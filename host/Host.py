@@ -30,7 +30,7 @@ class Host():
 		ips = 0
 		containers = self.env.getContainersOfHost(self.id)
 		for containerID in containers:
-			ips += self.env.getContainerByID(containerID).getIPS()
+			ips += self.env.getContainerByID(containerID).getBaseIPS()
 		assert ips <= self.ipsCap
 		return ips
 

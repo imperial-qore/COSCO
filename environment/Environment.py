@@ -35,7 +35,7 @@ class Environment():
 		return container
 
 	def addContainerListInit(self, containerInfoList):
-		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit)]
+		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit-len(self.containerlist))]
 		deployedContainers = []
 		for CreationID, CreationInterval, IPSModel, RAMModel, DiskModel in deployed:
 			dep = self.addContainerInit(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel)
@@ -44,32 +44,32 @@ class Environment():
 		return [container.id for container in deployedContainers]
 
 	def addContainer(self, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel):
-		container = Container(len(self.containerlist), CreationID, IPSModel, RAMModel, DiskModel, self, HostID = -1)
 		for i,c in enumerate(self.containerlist):
 			if c == None or not c.active:
+				container = Container(i, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel, self, HostID = -1)
 				self.containerlist[i] = container
-		return container
+				return container
 
 	def addContainerList(self, containerInfoList):
-		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit)]
+		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit-len(self.containerlist))]
 		deployedContainers = []
 		for CreationID, CreationInterval, IPSModel, RAMModel, DiskModel in deployed:
-			dep = self.addContainerInit(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel)
+			dep = self.addContainer(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel)
 			deployedContainers.append(dep)
-		return [container.creationID for container in deployedContainers]
+		return [container.id for container in deployedContainers]
 
-	def getContainersofHost(self, hostID):
+	def getContainersOfHost(self, hostID):
 		containers = []
 		for container in self.containerlist:
-			if container.hostID == hostID:
-				container.append(container)
+			if container and container.hostid == hostID:
+				containers.append(container.id)
 		return containers
 
 	def getContainerByID(self, containerID):
 		return self.containerlist[containerID]
 
 	def getContainerByCID(self, creationID):
-		for c in self.constainerlist + self.inactiveContainers:
+		for c in self.containerlist + self.inactiveContainers:
 			if c and c.creationID == creationID:
 				return c
 
@@ -82,12 +82,12 @@ class Environment():
 	def getPlacementPossible(self, containerID, hostID):
 		container = self.containerlist[containerID]
 		host = self.hostlist[hostID]
-		ipsreq = container.getIPS()
+		ipsreq = container.getBaseIPS()
 		ramsizereq, ramreadreq, ramwritereq = container.getRAM()
-		disksizereq, diskreadreq, diskwritereq = containerID.getDisk()
+		disksizereq, diskreadreq, diskwritereq = container.getDisk()
 		ipsavailable = host.getIPSAvailable()
 		ramsizeav, ramreadav, ramwriteav = host.getRAMAvailable()
-		disksizeav, diskreadav, diskwwriteav = host.getDiskAvailable()
+		disksizeav, diskreadav, diskwriteav = host.getDiskAvailable()
 		return (ipsreq <= ipsavailable and \
 				ramsizereq <= ramsizeav and \
 				ramreadreq <= ramreadav and \
@@ -102,52 +102,57 @@ class Environment():
 		return deployed
 
 	def allocateInit(self, decision):
-		migrated = []
+		migrations = []
 		routerBwToEach = self.totalbw / len(decision)
 		for (cid, hid) in decision:
 			container = self.getContainerByID(cid)
 			assert container.getHostID() == -1
-			numberAllocToHost = self.scheduler.getMigrationToHost(hid, decision)
+			numberAllocToHost = len(self.scheduler.getMigrationToHost(hid, decision))
 			allocbw = min(self.getHostByID(hid).bwCap.downlink / numberAllocToHost, routerBwToEach)
 			if container.getHostID() == hid  or self.getPlacementPossible(cid, hid):
 				if container.getHostID() != hid:
-					migrated.append((cid, hid))
-				container.allocAndExecute(hid, allocbw)
-		return migrated
+					migrations.append((cid, hid))
+				container.allocateAndExecute(hid, allocbw)
+		return migrations
 
 	def destroyCompletedContainers(self):
 		destroyed = []
 		for i,container in enumerate(self.containerlist):
-			if container.getIPS() == 0:
+			if container and container.getBaseIPS() == 0:
 				container.destroy()
 				self.containerlist[i] = None
 				self.inactiveContainers.append(container)
 				destroyed.append(container)
+		return destroyed
 
 	def getNumActiveContainers(self):
 		num = 0 
 		for container in self.containerlist:
-			if container.active: num += 1
+			if container and container.active: num += 1
 		return num
 
 	def addContainers(self, newContainerList):
 		self.interval += 1
 		destroyed = self.destroyCompletedContainers()
-		deployed = self.addContainerList(newContainerlist)
-		return deployed
+		deployed = self.addContainerList(newContainerList)
+		return deployed, destroyed
 
-	def simulationStep(self, newContainerlist, decision):
+	def getActiveContainerList(self):
+		return [1 if c else 0 for c in self.containerlist]
+
+	def simulationStep(self, decision):
 		routerBwToEach = self.totalbw / len(decision)
+		migrations = []
 		for (cid, hid) in decision:
-			assert self.getContainerByID(cid).getHostID() == -1
+			container = self.getContainerByID(cid)
 			currentHostID = self.getContainerByID(cid).getHostID()
 			currentHost = self.getHostByID(currentHostID)
 			targetHost = self.getHostByID(hid)
-			migrateFromNum = self.scheduler.getMigrationFromHost(currentHostID, decision)
-			migrateToNum = self.scheduler.getMigrationToHost(hid, decision)
+			migrateFromNum = len(self.scheduler.getMigrationFromHost(currentHostID, decision))
+			migrateToNum = len(self.scheduler.getMigrationToHost(hid, decision))
 			allocbw = min(targetHost.bwCap.downlink / migrateToNum, currentHost.bwCap.uplink / migrateFromNum, routerBwToEach)
 			if container.getHostID() == hid  or self.getPlacementPossible(cid, hid):
 				if container.getHostID() != hid:
-					migrated.append((cid, hid))
-				container.allocAndExecute(hid, allocbw)
-		return deployed, mirgated, destroyed
+					migrations.append((cid, hid))
+				container.allocateAndExecute(hid, allocbw)
+		return migrations

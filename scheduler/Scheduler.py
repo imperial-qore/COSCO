@@ -15,7 +15,7 @@ class Scheduler():
 	def getMigrationFromHost(self, hostID, decision):
 		containerIDs = []
 		for (cid, _) in decision:
-			hid = self.getContainerByID(cid).getHostID()
+			hid = self.env.getContainerByID(cid).getHostID()
 			if hid == hostID:
 				containerIDs.append(cid)
 		return containerIDs

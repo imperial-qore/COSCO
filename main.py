@@ -3,6 +3,7 @@ from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
 from scheduler.Random import *
 from stats.Stats import *
+import pickle
 
 # Global constants
 NUM_SIM_STEPS = 100
@@ -32,26 +33,26 @@ def initalizeEnvironment():
 	deployed = env.addContainersInit(newcontainerinfos) # Deploy new containers and get container IDs
 	workload.updateDeployedContainers(env.getCreationIDs(deployed)) # Update workload deployed using creation IDs
 	decision = scheduler.placement(deployed) # Decide placement using container ids
-	migrated = env.allocateInit(decision) # Schedule containers
-	env.allocateInit()
+	migrations = env.allocateInit(decision) # Schedule containers
 
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
-	stats.saveStats(deployed, migrated, [], containerlist, containerlist, decision)
-	return workload, scheduler, env, stats
+	stats.saveStats(deployed, migrations, [], deployed, decision)
+	return datacenter, workload, scheduler, env, stats
 
 def stepSimulation(workload, scheduler, env, stats):
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
-	deployed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
+	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
 	workload.updateDeployedContainers(env.getCreationIDs(deployed)) # Update workload deployed using creation IDs
-	selected = scheduler.selected() # Select container IDs for migration
+	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.placement(selected) # Decide placement for selected container ids
-	migrated = env.allocateInit(decision) # Schedule containers
-	env.allocateInit()
+	print(env.getActiveContainerList())
+	print(selected, decision)
+	migrations = env.simulationStep(decision) # Schedule containers
 
-	stats.saveStats(deployed, migrated, destroyed, newcontainers, selectedcontainers, decision)
+	stats.saveStats(deployed, migrations, destroyed, selected, decision)
 
-def saveStats(stats):
+def saveStats(stats, datacenter, workload):
 	filename = "logs/" + datacenter.__class__.__name__
 	filename += "_" + workload.__class__.__name__
 	filename += "_" + str(NUM_SIM_STEPS) 
@@ -66,10 +67,10 @@ def saveStats(stats):
 
 if __name__ == '__main__':
 
-	workload, scheduler, env, stats = initalizeEnvironment()
+	datacenter, workload, scheduler, env, stats = initalizeEnvironment()
 
 	for step in range(NUM_SIM_STEPS):
 		stepSimulation(workload, scheduler, env, stats)
 
-	saveStats(stats)
+	saveStats(stats, datacenter, workload)
 
