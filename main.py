@@ -73,7 +73,7 @@ def saveStats(stats, datacenter, workload):
 	dirname += "_" + str(ROUTER_BW)
 	dirname += "_" + str(INTERVAL_TIME)
 	dirname += "_" + str(NEW_CONTAINERS)
-	if not os.path.exists("logs"): os.mkdir(logs)
+	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
 	stats.generateGraphs(dirname)
