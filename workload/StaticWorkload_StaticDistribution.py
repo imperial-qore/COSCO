@@ -15,7 +15,7 @@ class SWSD():
 		for i in range(self.num_worloads):
 			CreationID = self.creation_id
 			ipsMultiplier = np.random.randint(1,5)
-			IPSModel = IPSMConstant(1000*ipsMultiplier, 1500*ipsMultiplier, 3*ipsMultiplier, interval + 4*ipsMultiplier)
+			IPSModel = IPSMConstant(1000*ipsMultiplier, 1500*ipsMultiplier, 4*ipsMultiplier, interval + 3*ipsMultiplier)
 			ramMultiplier = np.random.randint(1,5)
 			RAMModel = RMConstant(100*ramMultiplier, 50*ramMultiplier, 20*ramMultiplier)
 			diskMultiplier = np.random.randint(1,3)

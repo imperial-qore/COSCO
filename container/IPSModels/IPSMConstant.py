@@ -7,10 +7,10 @@ class IPSMConstant(IPSM):
 		self.max_ips = max_ips
 		self.SLA = SLA
 		self.duration = duration
-		self.totalInstructions = constant_ips * duration
 		self.completedInstructions = 0
 
 	def getIPS(self):
+		self.totalInstructions = self.constant_ips * self.duration * self.container.env.intervaltime
 		if self.container.env.interval - self.container.createAt <= self.duration or self.completedInstructions < self.totalInstructions:
 			return self.constant_ips
 		return 0

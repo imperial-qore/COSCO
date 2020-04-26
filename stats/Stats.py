@@ -27,6 +27,7 @@ class Stats():
 		hostinfo['power'] = [host.getPower() for host in self.env.hostlist]
 		hostinfo['baseips'] = [host.getBaseIPS() for host in self.env.hostlist]
 		hostinfo['ipsavailable'] = [host.getIPSAvailable() for host in self.env.hostlist]
+		hostinfo['ipscap'] = [host.ipsCap for host in self.env.hostlist]
 		hostinfo['apparentips'] = [host.getApparentIPS() for host in self.env.hostlist]
 		hostinfo['ram'] = [host.getCurrentRAM() for host in self.env.hostlist]
 		hostinfo['ramavailable'] = [host.getRAMAvailable() for host in self.env.hostlist]
@@ -121,13 +122,14 @@ class Stats():
 			ylimit = max(ylimit, max(metric_with_interval[-1]))
 			if metric2:
 				metric2_with_interval.append([listinfo[interval][metric2][hostID] for interval in range(totalIntervals)])
-				ylimit2 = max(ylimit, max(metric2_with_interval[-1]))
+				ylimit2 = max(ylimit2, max(metric2_with_interval[-1]))
 		for hostID in range(len(listinfo[0][metric])):
 			axes[hostID].set_ylim(0, max(ylimit, ylimit2))
 			axes[hostID].plot(x, metric_with_interval[hostID])
 			if metric2:
 				axes[hostID].plot(x, metric2_with_interval[hostID])
 			axes[hostID].set_ylabel(obj[0].capitalize()+" "+str(hostID))
+			axes[hostID].grid(b=True, which='both', color='#888888', linestyle='-')
 		plt.tight_layout(pad=0)
 		plt.savefig(dirname + '/' + title + '.pdf')
 
@@ -136,5 +138,6 @@ class Stats():
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'numcontainers')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'power')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'baseips', 'apparentips')
+		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'ipscap', 'apparentips')
 		self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'ips', 'apparentips')
 		self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'hostalloc')
