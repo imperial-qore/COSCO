@@ -131,6 +131,13 @@ class Environment():
 			if container and container.active: num += 1
 		return num
 
+	def getSelectableContainers(self):
+		selectable = []
+		for container in self.containerlist:
+			if container and container.getHostID() != -1:
+				selectable.append(container.id)
+		return selectable
+
 	def addContainers(self, newContainerList):
 		self.interval += 1
 		destroyed = self.destroyCompletedContainers()

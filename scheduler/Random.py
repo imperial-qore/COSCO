@@ -7,14 +7,14 @@ class RandomScheduler(Scheduler):
 		super().__init__()
 
 	def selection(self):
-		containerlist = self.env.containerlist
-		selectedCount = np.random.randint(0, self.env.getNumActiveContainers()) + 1
-		selectedIDs = []; allIDs = list(range(len(containerlist)))
+		selectableIDs = self.env.getSelectableContainers()
+		selectedCount = np.random.randint(0, len(selectableIDs)) + 1
+		selectedIDs = []; 
 		while len(selectedIDs) < selectedCount:
-			idChoice = np.random.choice(allIDs)
+			idChoice = np.random.choice(selectableIDs)
 			if self.env.containerlist[idChoice]:
 				selectedIDs.append(idChoice)
-				allIDs.remove(idChoice)
+				selectableIDs.remove(idChoice)
 		return selectedIDs
 
 	def placement(self, containerIDs):
