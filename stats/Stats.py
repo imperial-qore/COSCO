@@ -127,7 +127,7 @@ class Stats():
 			axes[hostID].plot(x, metric_with_interval[hostID])
 			if metric2:
 				axes[hostID].plot(x, metric2_with_interval[hostID])
-			axes[hostID].set_ylabel('Host '+str(hostID))
+			axes[hostID].set_ylabel(obj[0].capitalize()+" "+str(hostID))
 		plt.tight_layout(pad=0)
 		plt.savefig(dirname + '/' + title + '.pdf')
 
