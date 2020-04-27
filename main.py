@@ -1,20 +1,20 @@
 from environment.Datacenter.SimpleFog import *
 from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
-from scheduler.Random import *
+from scheduler.Threshold_MMT_Random import *
 from stats.Stats import *
 import os
 import pickle
 import shutil
 
 # Global constants
-NUM_SIM_STEPS = 20
+NUM_SIM_STEPS = 100
 HOSTS = 10
-CONTAINERS = 10
+CONTAINERS = 20
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
-NEW_CONTAINERS = 2
+NEW_CONTAINERS = 3
 
 def initalizeEnvironment():
 	# Initialize simple fog datacenter
@@ -24,7 +24,7 @@ def initalizeEnvironment():
 	workload = SWSD(NEW_CONTAINERS)
 	
 	# Initialize random scheduler
-	scheduler = RandomScheduler()
+	scheduler = TMRScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -58,7 +58,7 @@ def stepSimulation(workload, scheduler, env, stats):
 	print("Deployed:", len(deployed), "of", len(newcontainerinfos), [i[0] for i in newcontainerinfos])
 	print("Destroyed:", len(destroyed), "of", env.getNumActiveContainers())
 	print("Containers in host:", env.getContainersInHosts())
-	print("Schedule:", env.getActiveContainerList())
+	print("Host allocation:", [(c.getHostID() if c else -1)for c in env.containerlist])
 	print(decision)
 	print()
 

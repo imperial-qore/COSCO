@@ -151,8 +151,9 @@ class Environment():
 		return [len(self.getContainersOfHost(host)) for host in range(self.hostlimit)]
 
 	def simulationStep(self, decision):
-		routerBwToEach = self.totalbw / len(decision)
+		routerBwToEach = self.totalbw / len(decision) if len(decision) > 0 else self.totalbw
 		migrations = []
+		containerIDsAllocated = []
 		for (cid, hid) in decision:
 			container = self.getContainerByID(cid)
 			currentHostID = self.getContainerByID(cid).getHostID()
@@ -161,8 +162,11 @@ class Environment():
 			migrateFromNum = len(self.scheduler.getMigrationFromHost(currentHostID, decision))
 			migrateToNum = len(self.scheduler.getMigrationToHost(hid, decision))
 			allocbw = min(targetHost.bwCap.downlink / migrateToNum, currentHost.bwCap.uplink / migrateFromNum, routerBwToEach)
-			if self.getPlacementPossible(cid, hid):
-				if container.getHostID() != hid:
-					migrations.append((cid, hid))
+			if hid != self.containerlist[cid].hostid and self.getPlacementPossible(cid, hid):
+				migrations.append((cid, hid))
 				container.allocateAndExecute(hid, allocbw)
+				containerIDsAllocated.append(cid)
+		for i,container in enumerate(self.containerlist):
+			if container and i != containerIDsAllocated:
+				container.execute(0)
 		return migrations

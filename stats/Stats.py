@@ -111,7 +111,7 @@ class Stats():
 	########################################################################################################
 
 	def generateGraphsWithInterval(self, dirname, listinfo, obj, metric, metric2=None):
-		fig, axes = plt.subplots(len(listinfo[0][metric]), 1, sharex=True,figsize=(4, 5))
+		fig, axes = plt.subplots(len(listinfo[0][metric]), 1, sharex=True,figsize=(4, 0.5*len(listinfo[0][metric])))
 		title = obj + '_' + metric + '_with_interval' 
 		totalIntervals = len(listinfo)
 		x = list(range(totalIntervals))
@@ -129,9 +129,34 @@ class Stats():
 			if metric2:
 				axes[hostID].plot(x, metric2_with_interval[hostID])
 			axes[hostID].set_ylabel(obj[0].capitalize()+" "+str(hostID))
-			axes[hostID].grid(b=True, which='both', color='#888888', linestyle='-')
+			axes[hostID].grid(b=True, which='both', color='#eeeeee', linestyle='-')
 		plt.tight_layout(pad=0)
 		plt.savefig(dirname + '/' + title + '.pdf')
+
+	def generateMetricsWithInterval(self, dirname):
+		fig, axes = plt.subplots(8, 1, sharex=True, figsize=(4, 5))
+		x = list(range(len(self.metrics)))
+		for i,metric in enumerate(['numdestroyed', 'nummigrations', 'energytotalinterval', 'avgresponsetime',\
+			 'avgmigrationtime', 'slaviolations', 'slaviolationspercentage', 'waittime']):
+			metric_with_interval = [self.metrics[i][metric] for i in range(len(self.metrics))] if metric != 'waittime' else \
+				[sum(self.metrics[i][metric]) for i in range(len(self.metrics))]
+			axes[i].plot(x, metric_with_interval)
+			axes[i].set_ylabel(metric, fontsize=5)
+			axes[i].grid(b=True, which='both', color='#eeeeee', linestyle='-')
+			print("Summation ", metric, " = ", sum(metric_with_interval))
+		plt.tight_layout(pad=0)
+		plt.savefig(dirname + '/' + 'Metrics' + '.pdf')
+
+	def generateWorkloadWithInterval(self, dirname):
+		fig, axes = plt.subplots(5, 1, sharex=True, figsize=(4, 5))
+		x = list(range(len(self.workloadinfo)))
+		for i,metric in enumerate(['totalcontainers', 'newcontainers', 'deployed', 'migrations', 'inqueue']):
+			metric_with_interval = [self.workloadinfo[i][metric] for i in range(len(self.workloadinfo))]
+			axes[i].plot(x, metric_with_interval)
+			axes[i].set_ylabel(metric)
+			axes[i].grid(b=True, which='both', color='#eeeeee', linestyle='-')
+		plt.tight_layout(pad=0)
+		plt.savefig(dirname + '/' + 'Workload' + '.pdf')
 
 	def generateGraphs(self, dirname):
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'cpu')
@@ -141,3 +166,5 @@ class Stats():
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'ipscap', 'apparentips')
 		self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'ips', 'apparentips')
 		self.generateGraphsWithInterval(dirname, self.activecontainerinfo, 'container', 'hostalloc')
+		self.generateMetricsWithInterval(dirname)
+		self.generateWorkloadWithInterval(dirname)
