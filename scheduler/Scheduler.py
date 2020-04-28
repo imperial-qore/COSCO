@@ -42,3 +42,26 @@ class Scheduler():
 			mmtContainerID = containerIDs[ramSize.index(min(ramSize))]
 			selectedVMIDs.append(mmtContainerID)
 		return selectedVMIDs
+
+	def FirstFitPlacement(self, containerIDs):
+		selectedhost = []
+		hostlist = self.env.hostlist
+		i = 0;
+		for cid in containerIDs:
+			if len(hostlist) != i:
+				selectedhost.append((cid, i))
+				i += 1
+		return selectedhost
+
+	def LeastFulPlacement(self, containerIDs):
+		selectedhost = []
+		hostIPS = []
+		hosts = self.env.hostlist
+		for i, host in enumerate(hosts):
+			hostIPS.append(host.getIPSAvailable())
+		for cid in containerIDs:
+			if len(hostIPS):
+				minhost = min(hostIPS)
+				selectedhost.append((cid, hostIPS.index(minhost)))
+				hostIPS.remove(minhost)
+		return selectedhost
