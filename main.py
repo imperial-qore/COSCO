@@ -1,4 +1,5 @@
 from environment.Datacenter.SimpleFog import *
+from scheduler.MaxFul_RandomPlacement import MaRScheduler
 from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
 from scheduler.Threshold_MMT_Random import *

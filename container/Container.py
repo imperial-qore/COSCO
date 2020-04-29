@@ -44,6 +44,9 @@ class Container():
 
 	def getHost(self):
 		return self.env.getHostByID(self.hostid)
+	#@shivupoojar
+	def getContaonerIPS(self):
+		return self.ipsmodel.getMaxIPS()
 
 	def allocate(self, hostID, allocBw):
 		# Migrate if different host
