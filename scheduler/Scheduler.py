@@ -45,7 +45,7 @@ class Scheduler():
             selectedVMIDs.append(mmtContainerID)
         return selectedVMIDs
 
-    def MaxFulSel(self):
+    def MaxUseSel(self):
         selectedIDs = []
         for hostID,host in enumerate(self.env.hostlist):
             containerIDs = self.env.getContainersOfHost(hostID)

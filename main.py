@@ -1,5 +1,5 @@
 from environment.Datacenter.SimpleFog import *
-from scheduler.MaxFul_RandomPlacement import MaRScheduler
+from scheduler.MaxUseSel_RandomPlacement import MaRScheduler
 from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
 from scheduler.Threshold_MMT_Random import *
@@ -25,7 +25,8 @@ def initalizeEnvironment():
 	workload = SWSD(NEW_CONTAINERS)
 	
 	# Initialize random scheduler
-	scheduler = TMRScheduler()
+	#scheduler = TMRScheduler()
+	scheduler = MaRScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

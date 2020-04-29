@@ -8,7 +8,7 @@ class MaRScheduler(Scheduler):
         super().__init__()
 
     def selection(self):
-        selectedIDs = self.MaxFulSel()
+        selectedIDs = self.MaxUseSel()
         return selectedIDs
 
     def placement(self, containerIDs):
