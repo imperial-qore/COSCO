@@ -76,3 +76,16 @@ class Scheduler():
                 selectedhost.append((cid, hostIPS.index(minhost)))
                 hostIPS.remove(minhost)
         return selectedhost
+
+    def MaxFulPlacement(self, containerIDs):
+        selectedhost = []
+        hostIPS = []
+        hosts = self.env.hostlist
+        for i, host in enumerate(hosts):
+            hostIPS.append(host.getIPSAvailable())
+        for cid in containerIDs:
+            if len(hostIPS):
+                minhost = max(hostIPS)
+                selectedhost.append((cid, hostIPS.index(minhost)))
+                hostIPS.remove(minhost)
+        return selectedhost
