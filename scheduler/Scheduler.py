@@ -29,12 +29,21 @@ class Scheduler():
                 containerIDs.append(cid)
         return containerIDs
 
+    # Host selection
+
     def ThresholdHostSelection(self):
         selectedHostIDs = []
         for i, host in enumerate(self.env.hostlist):
             if host.getCPU() > 70:
                 selectedHostIDs.append(i)
         return selectedHostIDs
+
+    def LRSelection(self, utilHistory):
+        selectedhost = []
+        #### do computation here
+        return selectedhost
+
+    # Container Selection
 
     def MMTVMSelection(self, selectedHostIDs):
         selectedVMIDs = []
@@ -53,6 +62,8 @@ class Scheduler():
                 containerIPS = [self.env.containerlist[cid].getBaseIPS() for cid in containerIDs]
                 selectedIDs.append(containerIDs[containerIPS.index(max(containerIPS))])
         return selectedIDs
+
+    # Container placement
 
     def FirstFitPlacement(self, containerIDs):
         selectedhost = []
@@ -89,3 +100,4 @@ class Scheduler():
                 selectedhost.append((cid, hostIPS.index(minhost)))
                 hostIPS.remove(minhost)
         return selectedhost
+
