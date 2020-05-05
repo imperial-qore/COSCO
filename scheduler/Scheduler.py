@@ -48,12 +48,12 @@ class Scheduler():
             _, estimates = loess(x, hostL[-LOCAL_REGRESSION_BANDWIDTH:], poly_degree=1, alpha=0.6)
             weights = estimates['b'].values[-1]
             predictedCPU = weights[0] + weights[1] * (LOCAL_REGRESSION_BANDWIDTH + 1)
-            if 1.2 * predictedCPU >= 100:
+            if LOCAL_REGRESSION_CPU_MULTIPLIER * predictedCPU >= 100:
                 selectedHostIDs.append(i)
         return selectedHostIDs
 
     def RLRSelection(self, utilHistory):
-        if (len(utilHistory) < 10):
+        if (len(utilHistory) < LOCAL_REGRESSION_BANDWIDTH):
             return self.ThresholdHostSelection()
         selectedHostIDs = []; x = list(range(LOCAL_REGRESSION_BANDWIDTH))
         for i,host in enumerate(self.env.hostlist):
@@ -61,7 +61,7 @@ class Scheduler():
             _, estimates = loess(x, hostL[-LOCAL_REGRESSION_BANDWIDTH:], poly_degree=1, alpha=0.6, robustify=True)
             weights = estimates['b'].values[-1]
             predictedCPU = weights[0] + weights[1] * (LOCAL_REGRESSION_BANDWIDTH + 1)
-            if 1.2 * predictedCPU >= 100:
+            if LOCAL_REGRESSION_CPU_MULTIPLIER * predictedCPU >= 100:
                 selectedHostIDs.append(i)
         return selectedHostIDs
 
