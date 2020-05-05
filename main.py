@@ -1,4 +1,5 @@
 from environment.Datacenter.SimpleFog import *
+from scheduler.LR_MMT import LRMMTScheduler
 from scheduler.MaxUseSel_RandomPlacement import MaRScheduler
 from scheduler.RandomSel_MaxFulPlacement import RSMP
 from workload.StaticWorkload_StaticDistribution import *
@@ -28,7 +29,8 @@ def initalizeEnvironment():
 	# Initialize random scheduler
 	#scheduler = TMRScheduler()
 	#scheduler = MaRScheduler()
-	scheduler= RSMP()
+	scheduler=LRMMTScheduler()
+	#scheduler= RSMP()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

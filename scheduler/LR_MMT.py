@@ -11,7 +11,7 @@ class LRMMTScheduler(Scheduler):
 		hostUtils = []
 		for host in self.env.hostlist:
 			hostUtils.append(host.getCPU())
-		self.utilHistory.append()
+		self.utilHistory.append(hostUtils)
 
 	def selection(self):
 		selectedHostIDs = self.LRSelection(self.utilHistory)
