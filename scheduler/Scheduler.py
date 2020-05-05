@@ -41,7 +41,6 @@ class Scheduler():
 
     def getMaxContMigrationTime(self,host):
         containerIDs = self.env.getContainersOfHost(host)
-        print("Containers in host",len(containerIDs))
         if len(containerIDs):
             ramSize = [self.env.containerlist[cid].getContainerSize() for cid in containerIDs]
             maxSize = containerIDs[ramSize.index(max(ramSize))]
@@ -68,17 +67,14 @@ class Scheduler():
         for i,host in enumerate(self.env.hostlist):
             for j in range(len(utils)):
                 hostL.append(utils[j][i])
-            print(hostL)
             if bool(self.getLR(hostL,i)):
                 selectedId.append(i)
         return selectedId
 
     def LRSelection(self, utilHistory):
         selectedhost=self.getOverloadededHosts(utilHistory)
-        print("Selected overloaded host",selectedhost)
         for hostid in selectedhost:
             containId=self.env.getContainersOfHost(hostid)
-            print("containers in Host",hostid, containId)
         return selectedhost
 
     # Container Selection
