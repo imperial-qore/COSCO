@@ -67,58 +67,65 @@ class Scheduler():
 
     # Container Selection
 
-    def MMTVMSelection(self, selectedHostIDs):
-        selectedVMIDs = []
+    def RandomContainerSelection(self):
+        selectableIDs = self.env.getSelectableContainers()
+        selectedCount = np.random.randint(0, len(selectableIDs)) + 1
+        selectedIDs = []; 
+        while len(selectedIDs) < selectedCount:
+            idChoice = np.random.choice(selectableIDs)
+            if self.env.containerlist[idChoice]:
+                selectedIDs.append(idChoice)
+                selectableIDs.remove(idChoice)
+        return selectedIDs
+
+    def MMTContainerSelection(self, selectedHostIDs):
+        selectedContainerIDs = []
         for hostID in selectedHostIDs:
             containerIDs = self.env.getContainersOfHost(hostID)
             ramSize = [self.env.containerlist[cid].getContainerSize() for cid in containerIDs]
             mmtContainerID = containerIDs[ramSize.index(min(ramSize))]
-            selectedVMIDs.append(mmtContainerID)
-        return selectedVMIDs
+            selectedContainerIDs.append(mmtContainerID)
+        return selectedContainerIDs
 
-    def MaxUseSel(self):
-        selectedIDs = []
-        for hostID, host in enumerate(self.env.hostlist):
+    def MaxUseContainerSelection(self, selectedHostIDs):
+        selectedContainerIDs = []
+        for hostID in selectedHostIDs:
             containerIDs = self.env.getContainersOfHost(hostID)
             if len(containerIDs):
                 containerIPS = [self.env.containerlist[cid].getBaseIPS() for cid in containerIDs]
-                selectedIDs.append(containerIDs[containerIPS.index(max(containerIPS))])
-        return selectedIDs
+                selectedContainerIDs.append(containerIDs[containerIPS.index(max(containerIPS))])
+        return selectedContainerIDs
 
     # Container placement
 
+    def RandomPlacement(self, containerIDs):
+        decision = []
+        for cid in containerIDs:
+            decision.append((cid, np.random.randint(0, len(self.env.hostlist))))
+        return decision
+
     def FirstFitPlacement(self, containerIDs):
-        selectedhost = []
-        hostlist = self.env.hostlist
-        i = 0;
+        decision = []
         for cid in containerIDs:
-            if len(hostlist) != i:
-                selectedhost.append((cid, i))
-                i += 1
-        return selectedhost
+            for hostID in range(len(self.env.hostlist)):
+                if self.env.getPlacementPossible(cid, hostID):
+                    decision.append((cid, hostID))
+        return decision
 
-    def LeastFulPlacement(self, containerIDs):
-        selectedhost = []
-        hostIPS = []
-        hosts = self.env.hostlist
-        for i, host in enumerate(hosts):
-            hostIPS.append(host.getIPSAvailable())
+    def LeastFullPlacement(self, containerIDs):
+        decision = []
+        hostIPSs = [(self.env.hostlist[i].getCPU(), i) for i in range(len(self.env.hostlist))]
         for cid in containerIDs:
-            if len(hostIPS):
-                minhost = min(hostIPS)
-                selectedhost.append((cid, hostIPS.index(minhost)))
-                hostIPS.remove(minhost)
-        return selectedhost
+            leastFullHost = min(hostIPSs)
+            decision.append((cid, leastFullHost[1]))
+            hostIPSs.remove(leastFullHost)
+        return decision
 
-    def MaxFulPlacement(self, containerIDs):
-        selectedhost = []
-        hostIPS = []
-        hosts = self.env.hostlist
-        for i, host in enumerate(hosts):
-            hostIPS.append(host.getIPSAvailable())
+    def MaxFullPlacement(self, containerIDs):
+        decision = []
+        hostIPSs = [(self.env.hostlist[i].getCPU(), i) for i in range(len(self.env.hostlist))]
         for cid in containerIDs:
-            if len(hostIPS):
-                minhost = max(hostIPS)
-                selectedhost.append((cid, hostIPS.index(minhost)))
-                hostIPS.remove(minhost)
-        return selectedhost
+            leastFullHost = min(hostIPSs)
+            decision.append((cid, leastFullHost[1]))
+            hostIPSs.remove(leastFullHost)
+        return decision

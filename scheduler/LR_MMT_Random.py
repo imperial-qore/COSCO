@@ -2,7 +2,7 @@ from .Scheduler import *
 import numpy as np
 from copy import deepcopy
 
-class LRMMTScheduler(Scheduler):
+class LRMMTRScheduler(Scheduler):
 	def __init__(self):
 		super().__init__()
 		self.utilHistory = []
@@ -16,11 +16,8 @@ class LRMMTScheduler(Scheduler):
 	def selection(self):
 		self.updateUtilHistory()
 		selectedHostIDs = self.LRSelection(self.utilHistory)
-		selectedVMIDs = self.MMTVMSelection(selectedHostIDs)
+		selectedVMIDs = self.MMTContainerSelection(selectedHostIDs)
 		return selectedVMIDs
 
 	def placement(self, containerIDs):
-		decision = []
-		for cid in containerIDs:
-			decision.append((cid, np.random.randint(0, len(self.env.hostlist))))
-		return decision
+		return self.RandomPlacement(containerIDs)

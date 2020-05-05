@@ -1,5 +1,5 @@
 from environment.Datacenter.SimpleFog import *
-from scheduler.LR_MMT import LRMMTScheduler
+from scheduler.LR_MMT_Random import LRMMTRScheduler
 from scheduler.MaxUseSel_RandomPlacement import MaRScheduler
 from scheduler.RandomSel_MaxFulPlacement import RSMP
 from workload.StaticWorkload_StaticDistribution import *
@@ -23,14 +23,13 @@ def initalizeEnvironment():
 	# Initialize simple fog datacenter
 	datacenter = SimpleFog(HOSTS)
 
-	# Initialize static workload
+	# Initialize workload
+	''' Can be SWSD '''
 	workload = SWSD(NEW_CONTAINERS)
 	
-	# Initialize random scheduler
-	#scheduler = TMRScheduler()
-	#scheduler = MaRScheduler()
-	scheduler=LRMMTScheduler()
-	#scheduler= RSMP()
+	# Initialize scheduler
+	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR '''
+	scheduler = LRMMTRScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
