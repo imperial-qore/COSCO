@@ -109,7 +109,7 @@ class Scheduler():
         for cid in containerIDs:
             for hostID in range(len(self.env.hostlist)):
                 if self.env.getPlacementPossible(cid, hostID):
-                    decision.append((cid, hostID))
+                    decision.append((cid, hostID)); break
         return decision
 
     def LeastFullPlacement(self, containerIDs):

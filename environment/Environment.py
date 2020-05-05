@@ -167,6 +167,6 @@ class Environment():
 				container.allocateAndExecute(hid, allocbw)
 				containerIDsAllocated.append(cid)
 		for i,container in enumerate(self.containerlist):
-			if container and i != containerIDsAllocated:
+			if container and i not in containerIDsAllocated:
 				container.execute(0)
 		return migrations

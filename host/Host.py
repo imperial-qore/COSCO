@@ -40,8 +40,8 @@ class Host():
 		containers = self.env.getContainersOfHost(self.id)
 		for containerID in containers:
 			ips += self.env.getContainerByID(containerID).getApparentIPS()
-		assert ips <= self.ipsCap
-		return ips
+		assert int(ips) <= self.ipsCap
+		return int(ips)
 
 	def getIPSAvailable(self):
 		# IPS available is ipsCap - baseIPS
