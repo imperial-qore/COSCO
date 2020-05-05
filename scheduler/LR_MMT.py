@@ -14,9 +14,9 @@ class LRMMTScheduler(Scheduler):
 		self.utilHistory.append(hostUtils)
 
 	def selection(self):
+		self.updateUtilHistory()
 		selectedHostIDs = self.LRSelection(self.utilHistory)
 		selectedVMIDs = self.MMTVMSelection(selectedHostIDs)
-		self.updateUtilHistory()
 		return selectedVMIDs
 
 	def placement(self, containerIDs):

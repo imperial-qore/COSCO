@@ -1,6 +1,6 @@
 import math
-from localreg import *
-
+from utils.MathUtils import *
+from utils.MathConstants import *
 
 class Scheduler():
     def __init__(self):
@@ -39,52 +39,35 @@ class Scheduler():
                 selectedHostIDs.append(i)
         return selectedHostIDs
 
-    def getMaxContMigrationTime(self,host):
-        containerIDs = self.env.getContainersOfHost(host)
-        print("Containers in host",len(containerIDs))
-        if len(containerIDs):
-            ramSize = [self.env.containerlist[cid].getContainerSize() for cid in containerIDs]
-            maxSize = containerIDs[ramSize.index(max(ramSize))]
-        else:
-            maxSize=0
-        return maxSize
-
-    def getLR(self,hostutil,host):
-        hostutil.reverse()
-        finalUtil=0
-        x=[]
-        for i in range(len(hostutil[:10])):
-            x.append(i+1)
-        estimates = localreg(np.array(x), np.array(hostutil[:10]), degree=0, kernel=tricube, width=0.3)
-        if len(estimates)>=2:
-             maxMigrationTime = math.ceil((self.getMaxContMigrationTime(host)/self.env.intervaltime))
-             predicted = estimates[0] + estimates[1] * (len(hostutil[:10]) + maxMigrationTime);
-             finalUtil= 1.2*predicted
-        return True if finalUtil >= 1 else False
-
-    def getOverloadededHosts(self,utils):
-        selectedId=[]
-        hostL = []
-        for i,host in enumerate(self.env.hostlist):
-            for j in range(len(utils)):
-                hostL.append(utils[j][i])
-            print(hostL)
-            if bool(self.getLR(hostL,i)):
-                selectedId.append(i)
-        return selectedId
-
     def LRSelection(self, utilHistory):
-        selectedhost=self.getOverloadededHosts(utilHistory)
-        print("Selected overloaded host",selectedhost)
-        for hostid in selectedhost:
-            containId=self.env.getContainersOfHost(hostid)
-            print("containers in Host",hostid, containId)
-        return selectedhost
+        if (len(utilHistory) < LOCAL_REGRESSION_BANDWIDTH):
+            return self.ThresholdHostSelection()
+        selectedHostIDs = []; x = list(range(LOCAL_REGRESSION_BANDWIDTH))
+        for i,host in enumerate(self.env.hostlist):
+            hostL = [utilHistory[j][i] for j in range(len(utilHistory))]
+            _, estimates = loess(x, hostL[-LOCAL_REGRESSION_BANDWIDTH:], poly_degree=1, alpha=0.6)
+            weights = estimates['b'].values[-1]
+            predictedCPU = weights[0] + weights[1] * (LOCAL_REGRESSION_BANDWIDTH + 1)
+            if 1.2 * predictedCPU >= 100:
+                selectedHostIDs.append(i)
+        return selectedHostIDs
+
+    def RLRSelection(self, utilHistory):
+        if (len(utilHistory) < 10):
+            return self.ThresholdHostSelection()
+        selectedHostIDs = []; x = list(range(LOCAL_REGRESSION_BANDWIDTH))
+        for i,host in enumerate(self.env.hostlist):
+            hostL = [utilHistory[j][i] for j in range(len(utilHistory))]
+            _, estimates = loess(x, hostL[-LOCAL_REGRESSION_BANDWIDTH:], poly_degree=1, alpha=0.6, robustify=True)
+            weights = estimates['b'].values[-1]
+            predictedCPU = weights[0] + weights[1] * (LOCAL_REGRESSION_BANDWIDTH + 1)
+            if 1.2 * predictedCPU >= 100:
+                selectedHostIDs.append(i)
+        return selectedHostIDs
 
     # Container Selection
 
     def MMTVMSelection(self, selectedHostIDs):
-        print(selectedHostIDs)
         selectedVMIDs = []
         for hostID in selectedHostIDs:
             containerIDs = self.env.getContainersOfHost(hostID)

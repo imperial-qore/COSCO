@@ -94,5 +94,5 @@ if __name__ == '__main__':
 	for step in range(NUM_SIM_STEPS):
 		stepSimulation(workload, scheduler, env, stats)
 
-	saveStats(stats, datacenter, workload)
+	# saveStats(stats, datacenter, workload)
 
