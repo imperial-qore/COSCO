@@ -159,7 +159,7 @@ def loess(xvals, yvals, alpha, poly_degree=1, robustify=False):
                 r_i = [(1-np.abs(j**2))**2 if np.abs(j)<1 else 0 for j in e2_i]
                 w_f = [j*k for (j,k) in zip(w_i, r_i)]    # new weights
                 W_r = np.diag(w_f)
-                b_r = np.linalg.inv(X.T @ W_r @ X) @ (X.T @ W_r @ y)
+                b_r = np.linalg.pinv(X.T @ W_r @ X) @ (X.T @ W_r @ y)
                 riter_est = loc_eval(v_i, b_r)
 
                 riterDF = pd.DataFrame({
