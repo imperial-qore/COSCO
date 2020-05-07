@@ -1,6 +1,9 @@
 from environment.Datacenter.SimpleFog import *
+from scheduler.IQR_MMT_Random import IQRMMTRScheduler
+from scheduler.MAD_MMT_Random import MADMMTRScheduler
 from scheduler.Random_Random_FirstFit import RFScheduler
 from scheduler.RLR_MMT_Random import RLRMMTRScheduler
+from scheduler.Threshold_MC_Random import TMCRScheduler
 from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
 from stats.Stats import *
@@ -27,7 +30,7 @@ def initalizeEnvironment():
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR '''
-	scheduler = RLRMMTRScheduler()
+	scheduler = TMCRScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

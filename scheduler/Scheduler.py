@@ -1,6 +1,8 @@
 import math
 from utils.MathUtils import *
 from utils.MathConstants import *
+import pandas as pd
+from statistics import median
 
 class Scheduler():
     def __init__(self):
@@ -65,6 +67,30 @@ class Scheduler():
                 selectedHostIDs.append(i)
         return selectedHostIDs
 
+    def MADSelection(self, utilHistory):
+        selectedHostIDs = []
+        for i, host in enumerate(self.env.hostlist):
+            hostL = [utilHistory[j][i] for j in range(len(utilHistory))]
+            median_hostL = np.median(np.array(hostL))
+            mad = np.median([abs(Utilhst-median_hostL) for Utilhst in hostL])
+            ThresholdCPU = 100-LOCAL_REGRESSION_CPU_MULTIPLIER * mad
+            UtilizedCPU = host.getCPU()
+            if UtilizedCPU > ThresholdCPU:
+                selectedHostIDs.append(i)
+        return selectedHostIDs
+
+    def IQRSelection(self, utilHistory):
+        selectedHostIDs = []
+        for i, host in enumerate(self.env.hostlist):
+            hostL = [utilHistory[j][i] for j in range(len(utilHistory))]
+            q1, q3 = np.percentile(np.array(hostL), [25, 75])
+            IQR = q3-q1
+            ThresholdCPU = 100-LOCAL_REGRESSION_CPU_MULTIPLIER * IQR
+            UtilizedCPU = host.getCPU()
+            if UtilizedCPU > ThresholdCPU:
+                selectedHostIDs.append(i)
+        return selectedHostIDs
+
     # Container Selection
 
     def RandomContainerSelection(self):
@@ -96,6 +122,25 @@ class Scheduler():
                 selectedContainerIDs.append(containerIDs[containerIPS.index(max(containerIPS))])
         return selectedContainerIDs
 
+    def MaxCorContainerSelection(self, selectedHostIDs,utilHistoryContainer):
+        selectedContainerIDs = []
+        for hostID in selectedHostIDs:
+            containerIDs = self.env.getContainersOfHost(hostID)
+            if len(containerIDs):
+                hostL = []
+                for cid in containerIDs:
+                    hostL.append([utilHistoryContainer[j][cid] for j in range(len(utilHistoryContainer))])
+                data = pd.DataFrame(hostL)
+                data = data.T; RSquared = []
+                for i in range(data.shape[1]):
+                    x = np.array(data.drop(data.columns[i],axis=1))
+                    y= np.array(data.iloc[:,i])
+                    X1 = np.c_[x, np.ones(x.shape[0])]
+                    y_pred = np.dot(X1, np.dot(np.linalg.pinv(np.dot(np.transpose(X1), X1)), np.dot(np.transpose(X1), y)))
+                    corr = np.corrcoef(np.column_stack((y,y_pred)), rowvar=False)
+                    RSquared.append(corr[0][1])
+                selectedContainerIDs.append(containerIDs[RSquared.index(max(RSquared))])
+        return selectedContainerIDs
     # Container placement
 
     def RandomPlacement(self, containerIDs):
