@@ -177,7 +177,7 @@ def loess(xvals, yvals, alpha, poly_degree=1, robustify=False):
             idiffs = \
                 np.abs((robust_est[-2]["g"]-robust_est[-1]["g"])/robust_est[-2]["g"])
 
-            if ((np.all(idiffs<.005)) or cycle_nbr>50): break
+            if ((np.all(idiffs<.05)) or cycle_nbr>20): break
 
             cycle_nbr+=1
 

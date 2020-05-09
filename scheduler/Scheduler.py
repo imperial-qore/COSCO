@@ -127,20 +127,19 @@ class Scheduler():
         for hostID in selectedHostIDs:
             containerIDs = self.env.getContainersOfHost(hostID)
             if len(containerIDs):
-                hostL = []
-                for cid in containerIDs:
-                    hostL.append([utilHistoryContainer[j][cid] for j in range(len(utilHistoryContainer))])
+                hostL = [[utilHistoryContainer[j][cid] for j in range(len(utilHistoryContainer))] for cid in containerIDs]
                 data = pd.DataFrame(hostL)
                 data = data.T; RSquared = []
                 for i in range(data.shape[1]):
                     x = np.array(data.drop(data.columns[i],axis=1))
-                    y= np.array(data.iloc[:,i])
+                    y = np.array(data.iloc[:,i])
                     X1 = np.c_[x, np.ones(x.shape[0])]
                     y_pred = np.dot(X1, np.dot(np.linalg.pinv(np.dot(np.transpose(X1), X1)), np.dot(np.transpose(X1), y)))
                     corr = np.corrcoef(np.column_stack((y,y_pred)), rowvar=False)
                     RSquared.append(corr[0][1])
                 selectedContainerIDs.append(containerIDs[RSquared.index(max(RSquared))])
         return selectedContainerIDs
+
     # Container placement
 
     def RandomPlacement(self, containerIDs):

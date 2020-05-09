@@ -30,7 +30,7 @@ def initalizeEnvironment():
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR '''
-	scheduler = TMCRScheduler()
+	scheduler = RLRMMTRScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
