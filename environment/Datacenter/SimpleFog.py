@@ -24,7 +24,7 @@ class SimpleFog():
 	def generateHosts(self):
 		hosts = []
 		for i in range(self.num_hosts):
-			typeID = np.random.randint(0,3)
+			typeID = np.random.randint(0,3) # i%3 #
 			IPS = self.types['IPS'][typeID]
 			Ram = RAM(self.types['RAMSize'][typeID], self.types['RAMRead'][typeID], self.types['RAMWrite'][typeID])
 			Disk_ = Disk(self.types['DiskSize'][typeID], self.types['DiskRead'][typeID], self.types['DiskWrite'][typeID])

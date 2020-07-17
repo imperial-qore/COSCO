@@ -4,6 +4,7 @@ from scheduler.MAD_MMT_Random import MADMMTRScheduler
 from scheduler.Random_Random_FirstFit import RFScheduler
 from scheduler.RLR_MMT_Random import RLRMMTRScheduler
 from scheduler.Threshold_MC_Random import TMCRScheduler
+from scheduler.Random_Random_Random import RandomScheduler
 from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
 from stats.Stats import *
@@ -12,13 +13,13 @@ import pickle
 import shutil
 
 # Global constants
-NUM_SIM_STEPS = 100
-HOSTS = 10
-CONTAINERS = 20
+NUM_SIM_STEPS = 400
+HOSTS = 50
+CONTAINERS = 50
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
-NEW_CONTAINERS = 3
+NEW_CONTAINERS = 10
 
 def initalizeEnvironment():
 	# Initialize simple fog datacenter
@@ -30,7 +31,7 @@ def initalizeEnvironment():
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR '''
-	scheduler = RLRMMTRScheduler()
+	scheduler = RandomScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -83,7 +84,8 @@ def saveStats(stats, datacenter, workload):
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	stats.generateGraphs(dirname)
+	# stats.generateGraphs(dirname)
+	stats.generateDatasets(dirname)
 	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
 	    pickle.dump(stats, handle)
 
@@ -92,7 +94,8 @@ if __name__ == '__main__':
 	datacenter, workload, scheduler, env, stats = initalizeEnvironment()
 
 	for step in range(NUM_SIM_STEPS):
+		print("Simulation Interval:", step)
 		stepSimulation(workload, scheduler, env, stats)
 
-	# saveStats(stats, datacenter, workload)
+	saveStats(stats, datacenter, workload)
 
