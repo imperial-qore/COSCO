@@ -5,6 +5,7 @@ from scheduler.Random_Random_FirstFit import RFScheduler
 from scheduler.RLR_MMT_Random import RLRMMTRScheduler
 from scheduler.Threshold_MC_Random import TMCRScheduler
 from scheduler.Random_Random_Random import RandomScheduler
+from scheduler.GOBI import GOBIScheduler
 from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
 from stats.Stats import *
@@ -31,7 +32,7 @@ def initalizeEnvironment():
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR '''
-	scheduler = RandomScheduler()
+	scheduler = GOBIScheduler('energy')
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

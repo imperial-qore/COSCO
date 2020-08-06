@@ -1,0 +1,4 @@
+EPOCHS = 100
+MODEL_SAVE_PATH = 'checkpoints'
+
+POPULATION_SIZE = 100
