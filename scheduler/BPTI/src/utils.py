@@ -12,7 +12,7 @@ plt.style.use(['science', 'ieee'])
 plt.rcParams["text.usetex"] = True
 plt.rcParams['figure.figsize'] = 2, 2
 
-if not os.path.exists(MODEL_SAVE_PATH):
+if 'train' in argv[0] and not os.path.exists(MODEL_SAVE_PATH):
 	os.mkdir(MODEL_SAVE_PATH)
 
 class color:
@@ -26,7 +26,8 @@ class color:
     UNDERLINE = '\033[4m'
 
 def load_energy_data():
-	data = pd.read_csv('datasets/'+argv[1]+'_scheduling.csv')
+	dataset_path = 'datasets/energy_scheduling.csv'
+	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BPTI/'+dataset_path)
 	data = data.values.astype(np.float)
 	dataset = []
 	print("Dataset size", data.shape[0])

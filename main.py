@@ -6,6 +6,7 @@ from scheduler.RLR_MMT_Random import RLRMMTRScheduler
 from scheduler.Threshold_MC_Random import TMCRScheduler
 from scheduler.Random_Random_Random import RandomScheduler
 from scheduler.GOBI import GOBIScheduler
+from scheduler.GA import GAScheduler
 from workload.StaticWorkload_StaticDistribution import *
 from environment.Environment import *
 from stats.Stats import *
@@ -31,7 +32,7 @@ def initalizeEnvironment():
 	workload = SWSD(NEW_CONTAINERS)
 	
 	# Initialize scheduler
-	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR '''
+	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI '''
 	scheduler = GOBIScheduler('energy')
 
 	# Initialize Environment
@@ -85,7 +86,7 @@ def saveStats(stats, datacenter, workload):
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	# stats.generateGraphs(dirname)
+	stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
 	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
 	    pickle.dump(stats, handle)

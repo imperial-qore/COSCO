@@ -4,14 +4,15 @@ sys.path.append('scheduler/BPTI/')
 from .Scheduler import *
 from .BPTI.train import *
 
-class GOBIScheduler(Scheduler):
+class GAScheduler(Scheduler):
 	def __init__(self, data_type):
 		super().__init__()
 		self.model = eval(data_type+"()")
 		self.model, _, _, _ = load_model(data_type, self.model, data_type)
 		self.data_type = data_type
+		self.dataset, self.dataset_size = eval("load_"+data_type+"_data()")
 
-	def run_GOBI(self):
+	def run_GA(self):
 		cpu = [host.getCPU() for host in self.env.hostlist]
 		alloc = []; prev_alloc = {}
 		for c in self.env.containerlist:
@@ -22,7 +23,7 @@ class GOBIScheduler(Scheduler):
 			alloc.append(oneHot)
 		init = np.concatenate((np.array([cpu]).transpose(), alloc), axis=1)
 		init = torch.tensor(init, dtype=torch.float, requires_grad=True)
-		result, iteration, fitness = opt(init, self.model, [], self.data_type)
+		result, iteration, fitness = ga(self.dataset, self.model, [], self.data_type)
 		decision = []
 		for cid in prev_alloc:
 			one_hot = result[cid, 1:].tolist()
@@ -35,5 +36,5 @@ class GOBIScheduler(Scheduler):
 
 	def placement(self, containerIDs):
 		first_alloc = np.all([not (c and c.getHostID() != -1) for c in self.env.containerlist])
-		decision = self.run_GOBI()
+		decision = self.run_GA()
 		return decision
