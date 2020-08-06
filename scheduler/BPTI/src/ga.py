@@ -64,7 +64,5 @@ def ga(dataset, f, bounds, data_type):
         if len(best_fitness) > (100 if "a" in data_type else 10) and best_fitness[-1] >= best_fitness[-2]: break
         generation += 1
   
-      
-    print("Generation: {}\nResult: {}\nFitness: {}".format(generation, 
-          "".join(str(population[0].chromosome)), 
-          population[0].fitness)) 
+    return population[0].chromosome, generation, population[0].fitness
+

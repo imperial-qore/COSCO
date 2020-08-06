@@ -85,11 +85,11 @@ if __name__ == '__main__':
 		print(model.find); start = time()
 		for param in model.parameters(): param.requires_grad = False
 		bounds = np.array([[0,9.5], [0,90], [1,40], [-16,16]])
+		init = torch.tensor(random.choice(dataset)[0], dtype=torch.float, requires_grad=True)
 
 		if exec_type == "ga":
-			ga(dataset, model, bounds, data_type)
+			result, iteration, fitness = ga(dataset, model, bounds, data_type)
 		elif exec_type == "opt":
-			opt(dataset, model, bounds, data_type)
-		elif exec_type == "data":
-			least_dataset(dataset, data_type)
+			result, iteration, fitness = opt(init, model, bounds, data_type)
 		print("Time", time()-start)
+		print("Iteration: {}\nResult: {}\nFitness: {}".format(iteration, result, fitness)) 
