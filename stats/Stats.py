@@ -159,20 +159,25 @@ class Stats():
 		plt.tight_layout(pad=0)
 		plt.savefig(dirname + '/' + 'Workload' + '.pdf')
 
-	def generateDatasetWithInterval(self, dirname, metric, metric2=None, objfunc=None):
-		title = metric + '_' + (metric2 + '_' if metric2 else "") + (objfunc + '_' if objfunc else "") + '_with_interval' 
+	def generateDatasetWithInterval(self, dirname, metric, objfunc, metric2=None, objfunc2=None):
+		title = metric + '_' + (metric2 + '_' if metric2 else "") + (objfunc + '_' if objfunc else "") + (objfunc2 + '_' if objfunc2 else "") + 'with_interval' 
 		totalIntervals = len(self.hostinfo)
-		metric_with_interval = []; metric2_with_interval = [] # metric1 is of host and metric2 is of caontainers
+		metric_with_interval = []; metric2_with_interval = [] # metric1 is of host and metric2 is of containers
+		host_alloc_with_interval = []; objfunc2_with_interval = []
 		objfunc_with_interval = []
 		for interval in range(totalIntervals):
 			metric_with_interval.append([self.hostinfo[interval][metric][hostID] for hostID in range(len(self.hostinfo[0][metric]))])
+			host_alloc_with_interval.append([self.activecontainerinfo[interval]['hostalloc'][cID] for cID in range(len(self.activecontainerinfo[0]['hostalloc']))])
+			objfunc_with_interval.append(self.metrics[interval][objfunc])
 			if metric2:
-				metric2_with_interval.append([self.activecontainerinfo[interval][metric2][cID] for cID in range(len(self.activecontainerinfo[0][metric2]))])
-			if objfunc:
-				objfunc_with_interval.append(self.metrics[interval][objfunc])
+				metric2_with_interval.append(self.activecontainerinfo[interval][metric2])
+			if objfunc2:
+				objfunc2_with_interval.append(self.metrics[interval][objfunc2])
 		df = pd.DataFrame(metric_with_interval)
 		if metric2: df = pd.concat([df, pd.DataFrame(metric2_with_interval)], axis=1)
-		if objfunc: df = pd.concat([df, pd.DataFrame(objfunc_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(host_alloc_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(objfunc_with_interval)], axis=1)
+		if objfunc2: df = pd.concat([df, pd.DataFrame(objfunc2_with_interval)], axis=1)
 		df.to_csv(dirname + '/' + title + '.csv' )
 
 	def generateGraphs(self, dirname):
@@ -187,4 +192,5 @@ class Stats():
 		self.generateWorkloadWithInterval(dirname)
 
 	def generateDatasets(self, dirname):
-		self.generateDatasetWithInterval(dirname, 'cpu', 'hostalloc', 'energytotalinterval')
+		self.generateDatasetWithInterval(dirname, 'cpu', objfunc='energytotalinterval')
+		self.generateDatasetWithInterval(dirname, 'cpu', objfunc='energytotalinterval', metric2='apparentips', objfunc2='avgresponsetime')

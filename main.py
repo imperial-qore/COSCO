@@ -15,13 +15,13 @@ import pickle
 import shutil
 
 # Global constants
-NUM_SIM_STEPS = 100
+NUM_SIM_STEPS = 400
 HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
-NEW_CONTAINERS = 10
+NEW_CONTAINERS = 7
 
 def initalizeEnvironment():
 	# Initialize simple fog datacenter
@@ -33,7 +33,7 @@ def initalizeEnvironment():
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI '''
-	scheduler = GOBIScheduler('energy')
+	scheduler = TMCRScheduler() # GOBIScheduler('energy')
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

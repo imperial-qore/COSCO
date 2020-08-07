@@ -41,6 +41,27 @@ def load_energy_data():
 		cpu = np.array([cpu]).transpose()
 		alloc = np.array(alloc)
 		dataset.append(((np.concatenate((cpu, alloc), axis=1)), torch.Tensor([(data[i][-1]- 11000)/3000])))
+		# Normalization by (x - min)/(max - min)
+	return dataset, len(dataset)
+
+def load_energy_latency_data():
+	dataset_path = 'datasets/energy_latency_scheduling.csv'
+	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BPTI/'+dataset_path)
+	data = data.values.astype(np.float)
+	dataset = []
+	print("Dataset size", data.shape[0])
+	for i in range(data.shape[0]):
+		cpuH, cpuC, alloc = [], [], []
+		for j in range(50):
+			cpuH.append(data[i][j]/100)
+			cpuC.append(data[i][j+50]/6000)
+			oneHot = [0] * 50
+			oneHot[int(data[i][j+100])] = 1
+			alloc.append(oneHot)
+		cpuH = np.array([cpuH]).transpose(); cpuC = np.array([cpuC]).transpose()
+		alloc = np.array(alloc)
+		dataset.append(((np.concatenate((cpuH, cpuC, alloc), axis=1)), torch.Tensor([(data[i][-2]- 11000)/3000, (data[i][-1]- 800)/2400])))
+		# Normalization by (x - min)/(max - min)
 	return dataset, len(dataset)
 
 def plot_accuracies(accuracy_list):
