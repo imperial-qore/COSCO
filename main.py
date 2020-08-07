@@ -15,7 +15,7 @@ import pickle
 import shutil
 
 # Global constants
-NUM_SIM_STEPS = 400
+NUM_SIM_STEPS = 100
 HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
@@ -33,7 +33,7 @@ def initalizeEnvironment():
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI '''
-	scheduler = TMCRScheduler() # GOBIScheduler('energy')
+	scheduler = GAScheduler('energy') # GOBIScheduler('energy')
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
