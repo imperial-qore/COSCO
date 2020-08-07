@@ -8,9 +8,9 @@ import matplotlib.pyplot as plt
 def convertToOneHot(dat, cpu_old):
     alloc = []
     for i in dat:
-        oneHot = [0] * 50; alist = i.tolist()[1:]
+        oneHot = [0] * 50; alist = i.tolist()[-50:]
         oneHot[alist.index(max(alist))] = 1; alloc.append(oneHot)
-    new_dat_oneHot = torch.cat((cpu_old.reshape(-1,1), torch.FloatTensor(alloc)), dim=1)
+    new_dat_oneHot = torch.cat((cpu_old, torch.FloatTensor(alloc)), dim=1)
     return new_dat_oneHot
 
 def opt(init, model, bounds, data_type):
@@ -18,11 +18,11 @@ def opt(init, model, bounds, data_type):
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
     iteration = 0; equal = 0; z_old = 100; zs = []
     while True:
-        cpu_old = deepcopy(init.data[:,0]); alloc_old = deepcopy(init.data[:,1:])
+        cpu_old = deepcopy(init.data[:,0:-50]); alloc_old = deepcopy(init.data[:,-50:])
         z = model(init)
         optimizer.zero_grad(); z.backward(); optimizer.step(); scheduler.step()
         init.data = convertToOneHot(init.data, cpu_old)
-        equal = equal + 1 if torch.all(alloc_old.eq(init.data[:,1:])) else 0
+        equal = equal + 1 if torch.all(alloc_old.eq(init.data[:,-50:])) else 0
         if equal > 30: break
         iteration += 1; z_old = z.item()
     #     zs.append(z.item())

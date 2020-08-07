@@ -22,20 +22,16 @@ class Individual(object):
                 child_chromosome.append(gp2) 
             else: 
                 child_chromosome.append(random.choice(self.dataset)[0][len(child_chromosome)]) 
-        if "a" in self.data_type :
-            for i in range(4):
-                child_chromosome[i] = max(self.bounds[i][0], min(child_chromosome[i], self.bounds[i][1]))
-        else:
-            alloc = []
-            for i in child_chromosome:
-                oneHot = [0] * 50; alist = i.tolist()[1:]
-                oneHot[alist.index(max(alist))] = 1; alloc.append(oneHot)
-            child_chromosome = np.concatenate((self.chromosome[:,0].reshape(-1,1), np.array(alloc)), axis=1)
+        alloc = []
+        for i in child_chromosome:
+            oneHot = [0] * 50; alist = i.tolist()[-50:]
+            oneHot[alist.index(max(alist))] = 1; alloc.append(oneHot)
+        child_chromosome = np.concatenate((self.chromosome[:,0:-50], np.array(alloc)), axis=1)
         return Individual(self.dataset, self.f, self.bounds, self.data_type, child_chromosome) 
   
     def cal_fitness(self): 
         res = self.f(self.chromosome)
-        return CoeffCd * res[1] - CoeffCl * res[0] if "a" in self.data_type else res
+        return res
   
 def ga(dataset, f, bounds, data_type): 
     generation = 1
@@ -61,7 +57,7 @@ def ga(dataset, f, bounds, data_type):
         population = new_generation 
   
         best_fitness.append(population[0].fitness)
-        if len(best_fitness) > (100 if "a" in data_type else 10) and best_fitness[-1] >= best_fitness[-2]: break
+        if len(best_fitness) > 10 and best_fitness[-1] >= best_fitness[-2]: break
         generation += 1
   
     return population[0].chromosome, generation, population[0].fitness
