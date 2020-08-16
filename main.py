@@ -68,7 +68,7 @@ def stepSimulation(workload, scheduler, env, stats):
 	migrations = env.simulationStep(decision) # Schedule containers
 	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
 	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
-	print("Deployed:", len(deployed), "of", len(newcontainerinfos), [i[0] for i in newcontainerinfos])
+	print("Deployed:", len(env.getCreationIDs(migrations, deployed)), "of", len(newcontainerinfos), [i[0] for i in newcontainerinfos])
 	print("Destroyed:", len(destroyed), "of", env.getNumActiveContainers())
 	print("Containers in host:", env.getContainersInHosts())
 	print("Num active containers:", env.getNumActiveContainers())

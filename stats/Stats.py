@@ -84,6 +84,7 @@ class Stats():
 		metrics['nummigrations'] = len(migrations)
 		metrics['energy'] = [host.getPower()*self.env.intervaltime for host in self.env.hostlist]
 		metrics['energytotalinterval'] = np.sum(metrics['energy'])
+		metrics['energypercontainerinterval'] = np.sum(metrics['energy'])/self.env.getNumActiveContainers()
 		metrics['responsetime'] = [c.totalExecTime + c.totalMigrationTime for c in destroyed]
 		metrics['avgresponsetime'] = np.average(metrics['responsetime']) if len(destroyed) > 0 else 0
 		metrics['migrationtime'] = [c.totalMigrationTime for c in destroyed]
@@ -135,16 +136,19 @@ class Stats():
 		plt.savefig(dirname + '/' + title + '.pdf')
 
 	def generateMetricsWithInterval(self, dirname):
-		fig, axes = plt.subplots(8, 1, sharex=True, figsize=(4, 5))
+		fig, axes = plt.subplots(9, 1, sharex=True, figsize=(4, 5))
 		x = list(range(len(self.metrics)))
+		res = {}
 		for i,metric in enumerate(['numdestroyed', 'nummigrations', 'energytotalinterval', 'avgresponsetime',\
-			 'avgmigrationtime', 'slaviolations', 'slaviolationspercentage', 'waittime']):
+			 'avgmigrationtime', 'slaviolations', 'slaviolationspercentage', 'waittime', 'energypercontainerinterval']):
 			metric_with_interval = [self.metrics[i][metric] for i in range(len(self.metrics))] if metric != 'waittime' else \
 				[sum(self.metrics[i][metric]) for i in range(len(self.metrics))]
 			axes[i].plot(x, metric_with_interval)
 			axes[i].set_ylabel(metric, fontsize=5)
 			axes[i].grid(b=True, which='both', color='#eeeeee', linestyle='-')
-			print("Summation ", metric, " = ", sum(metric_with_interval))
+			res[metric] = sum(metric_with_interval)
+			print("Summation ", metric, " = ", res[metric])
+		print('Average energy (sum energy interval / sum numdestroyed) = ', res['energytotalinterval']/res['numdestroyed'])
 		plt.tight_layout(pad=0)
 		plt.savefig(dirname + '/' + 'Metrics' + '.pdf')
 

@@ -31,7 +31,7 @@ class Host():
 		containers = self.env.getContainersOfHost(self.id)
 		for containerID in containers:
 			ips += self.env.getContainerByID(containerID).getBaseIPS()
-		assert ips <= self.ipsCap
+		# assert ips <= self.ipsCap
 		return ips
 
 	def getApparentIPS(self):
@@ -40,7 +40,7 @@ class Host():
 		containers = self.env.getContainersOfHost(self.id)
 		for containerID in containers:
 			ips += self.env.getContainerByID(containerID).getApparentIPS()
-		assert int(ips) <= self.ipsCap
+		# assert int(ips) <= self.ipsCap
 		return int(ips)
 
 	def getIPSAvailable(self):
@@ -55,9 +55,9 @@ class Host():
 		for containerID in containers:
 			s, r, w = self.env.getContainerByID(containerID).getRAM()
 			size += s; read += r; write += w
-		assert size <= self.ramCap.size
-		assert read <= self.ramCap.read
-		assert write <= self.ramCap.write
+		# assert size <= self.ramCap.size
+		# assert read <= self.ramCap.read
+		# assert write <= self.ramCap.write
 		return size, read, write
 
 	def getRAMAvailable(self):
