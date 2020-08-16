@@ -20,6 +20,7 @@ class Container():
 		self.totalMigrationTime = 0
 		self.active = True
 		self.destroyAt = -1
+		self.lastContainerSize = 0
 
 	def getBaseIPS(self):
 		return self.ipsmodel.getIPS()
@@ -28,16 +29,19 @@ class Container():
 		hostBaseIPS = self.getHost().getBaseIPS()
 		hostIPSCap = self.getHost().ipsCap
 		canUseIPS = (hostIPSCap - hostBaseIPS) / len(self.env.getContainersOfHost(self.hostid))
-		return min(self.ipsmodel.getMaxIPS(), self.ipsmodel.getIPS() + canUseIPS)
+		return min(self.ipsmodel.getMaxIPS(), self.getBaseIPS() + canUseIPS)
 
 	def getRAM(self):
-		return self.rammodel.ram()
+		rsize, rread, rwrite = self.rammodel.ram()
+		self.lastContainerSize = rsize
+		return rsize, rread, rwrite
 
 	def getDisk(self):
 		return self.diskmodel.disk()
 
 	def getContainerSize(self):
-		return self.rammodel.size
+		if self.lastContainerSize == 0: self.getRAM()
+		return self.lastContainerSize
 
 	def getHostID(self):
 		return self.hostid
@@ -58,7 +62,7 @@ class Container():
 		self.totalMigrationTime += lastMigrationTime
 		execTime = self.env.intervaltime - lastMigrationTime
 		apparentIPS = self.getApparentIPS()
-		requiredExecTime = (self.ipsmodel.totalInstructions - self.ipsmodel.completedInstructions) / apparentIPS
+		requiredExecTime = (self.ipsmodel.totalInstructions - self.ipsmodel.completedInstructions) / apparentIPS if apparentIPS else 0
 		self.totalExecTime += min(execTime, requiredExecTime)
 		self.ipsmodel.completedInstructions += apparentIPS * min(execTime, requiredExecTime)
 

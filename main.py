@@ -1,4 +1,5 @@
 from environment.Datacenter.SimpleFog import *
+from environment.Datacenter.BitbrainFog import *
 from scheduler.IQR_MMT_Random import IQRMMTRScheduler
 from scheduler.MAD_MMT_Random import MADMMTRScheduler
 from scheduler.Random_Random_FirstFit import RFScheduler
@@ -8,6 +9,7 @@ from scheduler.Random_Random_Random import RandomScheduler
 from scheduler.GOBI import GOBIScheduler
 from scheduler.GA import GAScheduler
 from workload.StaticWorkload_StaticDistribution import *
+from workload.BitbrainWorkload_GaussianDistribution import *
 from environment.Environment import *
 from stats.Stats import *
 import os
@@ -25,15 +27,16 @@ NEW_CONTAINERS = 7
 
 def initalizeEnvironment():
 	# Initialize simple fog datacenter
-	datacenter = SimpleFog(HOSTS)
+	''' Can be SimpleFog, BitbrainFog '''
+	datacenter = BitbrainFog(HOSTS)
 
 	# Initialize workload
-	''' Can be SWSD '''
-	workload = SWSD(NEW_CONTAINERS)
+	''' Can be SWSD, BWGD '''
+	workload = BWGD(NEW_CONTAINERS, 3)
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI '''
-	scheduler = GAScheduler('energy') # GOBIScheduler('energy')
+	scheduler = RandomScheduler() # GOBIScheduler('energy')
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

@@ -95,6 +95,7 @@ class Scheduler():
 
     def RandomContainerSelection(self):
         selectableIDs = self.env.getSelectableContainers()
+        if selectableIDs == []: return []
         selectedCount = np.random.randint(0, len(selectableIDs)) + 1
         selectedIDs = []; 
         while len(selectedIDs) < selectedCount:

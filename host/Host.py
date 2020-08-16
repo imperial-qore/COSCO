@@ -3,7 +3,7 @@ from host.RAM import *
 from host.Bandwidth import *
 
 class Host():
-	# IPS = Instructions per second capacity
+	# IPS = Million Instructions per second capacity 
 	# RAM = Ram in MB capacity
 	# Disk = Disk characteristics capacity
 	# Bw = Bandwidth characteristics capacity

@@ -1,18 +1,16 @@
-import numpy as np
+from .Workload import *
 from container.IPSModels.IPSMConstant import *
 from container.RAMModels.RMConstant import *
 from container.DiskModels.DMConstant import *
 
-class SWSD():
-	def __init__(self, num_worloads):
-		self.num_worloads = num_worloads
-		self.creation_id = 0
-		self.createdContainers = []
-		self.deployedContainers = []
+class SWSD(Workload):
+	def __init__(self, num_workloads):
+		super().__init__()
+		self.num_workloads = num_workloads
 
 	def generateNewContainers(self, interval):
 		workloadlist = []
-		for i in range(self.num_worloads):
+		for i in range(self.num_workloads):
 			CreationID = self.creation_id
 			ipsMultiplier = np.random.randint(1,5)
 			IPSModel = IPSMConstant(1000*ipsMultiplier, 1500*ipsMultiplier, 4*ipsMultiplier, interval + 3*ipsMultiplier)
@@ -25,15 +23,3 @@ class SWSD():
 		self.createdContainers += workloadlist
 		self.deployedContainers += [False] * len(workloadlist)
 		return self.getUndeployedContainers()
-
-	def getUndeployedContainers(self):
-		undeployed = []
-		for i,deployed in enumerate(self.deployedContainers):
-			if not deployed:
-				undeployed.append(self.createdContainers[i])
-		return undeployed
-
-	def updateDeployedContainers(self, creationIDs):
-		for cid in creationIDs:
-			assert not self.deployedContainers[cid]
-			self.deployedContainers[cid] = True
