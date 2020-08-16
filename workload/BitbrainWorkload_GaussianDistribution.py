@@ -13,7 +13,7 @@ warnings.simplefilter("ignore")
 
 # Intel Pentium III gives 2054 MIPS at 600 MHz
 # Source: https://archive.vn/20130205075133/http://www.tomshardware.com/charts/cpu-charts-2004/Sandra-CPU-Dhrystone,449.html
-ips_multiplier = 2054 / 600 
+ips_multiplier = 2054.0 / (2 * 600)
 
 class BWGD(Workload):
 	def __init__(self, meanNumContainers, sigmaNumContainers):
@@ -41,7 +41,7 @@ class BWGD(Workload):
 			df = pd.read_csv(self.dataset_path+'rnd/'+str(index)+'.csv', sep=';\t')
 			sla = gauss(self.meanSLA, self.sigmaSLA)
 			IPSModel = IPSMBitbrain((ips_multiplier*df['CPU usage [MHZ]']).to_list(), (ips_multiplier*df['CPU capacity provisioned [MHZ]']).to_list()[0], int(1.2*sla), interval + sla)
-			RAMModel = RMBitbrain((df['Memory capacity provisioned [KB]']/1000).to_list(), (df['Network received throughput [KB/s]']/1000).to_list(), (df['Network transmitted throughput [KB/s]']/1000).to_list())
+			RAMModel = RMBitbrain((df['Memory usage [KB]']/1000).to_list(), (df['Network received throughput [KB/s]']/1000).to_list(), (df['Network transmitted throughput [KB/s]']/1000).to_list())
 			disk_size  = self.disk_sizes[index % len(self.disk_sizes)]
 			DiskModel = DMBitbrain(disk_size, (df['Disk read throughput [KB/s]']/1000).to_list(), (df['Disk write throughput [KB/s]']/1000).to_list())
 			workloadlist.append((CreationID, interval, IPSModel, RAMModel, DiskModel))

@@ -76,8 +76,11 @@ class Environment():
 	def getHostByID(self, hostID):
 		return self.hostlist[hostID]
 
-	def getCreationIDs(self, containerIDs):
-		return [self.containerlist[cid].creationID for cid in containerIDs]
+	def getCreationIDs(self, migrations, containerIDs):
+		creationIDs = []
+		for decision in migrations:
+			if decision[0] in containerIDs: creationIDs.append(self.containerlist[decision[0]].creationID)
+		return creationIDs
 
 	def getPlacementPossible(self, containerID, hostID):
 		container = self.containerlist[containerID]
@@ -113,6 +116,9 @@ class Environment():
 				if container.getHostID() != hid:
 					migrations.append((cid, hid))
 				container.allocateAndExecute(hid, allocbw)
+			# destroy pointer to this unallocated container as book-keeping is done by workload model
+			else: 
+				self.containerlist[cid] = None
 		return migrations
 
 	def destroyCompletedContainers(self):
@@ -166,6 +172,9 @@ class Environment():
 				migrations.append((cid, hid))
 				container.allocateAndExecute(hid, allocbw)
 				containerIDsAllocated.append(cid)
+		# destroy pointer to unallocated containers as book-keeping is done by workload model
+		for (cid, hid) in decision:
+			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None
 		for i,container in enumerate(self.containerlist):
 			if container and i not in containerIDsAllocated:
 				container.execute(0)

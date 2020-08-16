@@ -9,7 +9,7 @@ class BitbrainFog():
 	def __init__(self, num_hosts):
 		self.num_hosts = num_hosts
 		self.types = {
-			'IPS' : [3000, 5000, 10000],
+			'IPS' : [5000, 10000, 50000], # Some containers have IPS requirement as high as 40k
 			'RAMSize' : [3000, 4000, 8000],
 			'RAMRead' : [3000, 2000, 3000],
 			'RAMWrite' : [3000, 2000, 3000],

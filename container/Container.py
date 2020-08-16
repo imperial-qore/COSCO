@@ -59,6 +59,7 @@ class Container():
 		# Migration time is the time to migrate to new host
 		# Thus, execution of task takes place for interval
 		# time - migration time with apparent ips
+		assert self.hostid != -1
 		self.totalMigrationTime += lastMigrationTime
 		execTime = self.env.intervaltime - lastMigrationTime
 		apparentIPS = self.getApparentIPS()
@@ -71,7 +72,7 @@ class Container():
 
 	def destroy(self):
 		self.destroyAt = self.env.interval
-		self.hostID = -1
+		self.hostid = -1
 		self.active = False
 
 
