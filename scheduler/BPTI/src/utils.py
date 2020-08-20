@@ -36,7 +36,7 @@ def load_energy_data():
 		for j in range(50):
 			cpu.append(data[i][j]/100)
 			oneHot = [0] * 50
-			oneHot[int(data[i][j+50])] = 1
+			if int(data[i][j+100]) >= 0: oneHot[int(data[i][j+100])] = 1
 			alloc.append(oneHot)
 		cpu = np.array([cpu]).transpose()
 		alloc = np.array(alloc)
@@ -56,7 +56,7 @@ def load_energy_latency_data():
 			cpuH.append(data[i][j]/100)
 			cpuC.append(data[i][j+50]/6000)
 			oneHot = [0] * 50
-			oneHot[int(data[i][j+100])] = 1
+			if int(data[i][j+100]) >= 0: oneHot[int(data[i][j+100])] = 1
 			alloc.append(oneHot)
 		cpuH = np.array([cpuH]).transpose(); cpuC = np.array([cpuC]).transpose()
 		alloc = np.array(alloc)
