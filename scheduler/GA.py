@@ -1,8 +1,8 @@
 import sys
-sys.path.append('scheduler/BPTI/')
+sys.path.append('scheduler/BaGTI/')
 
 from .Scheduler import *
-from .BPTI.train import *
+from .BaGTI.train import *
 
 class GAScheduler(Scheduler):
 	def __init__(self, data_type):
