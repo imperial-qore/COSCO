@@ -4,6 +4,7 @@ from scheduler.IQR_MMT_Random import IQRMMTRScheduler
 from scheduler.MAD_MMT_Random import MADMMTRScheduler
 from scheduler.Random_Random_FirstFit import RFScheduler
 from scheduler.Random_Random_LeastFull import RLScheduler
+from scheduler.LR_MMT_Random import LRMMTRScheduler
 from scheduler.RLR_MMT_Random import RLRMMTRScheduler
 from scheduler.Threshold_MC_Random import TMCRScheduler
 from scheduler.Random_Random_Random import RandomScheduler
@@ -38,8 +39,8 @@ def initalizeEnvironment():
 	workload = BWGD(NEW_CONTAINERS, 3)
 	
 	# Initialize scheduler
-	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI, DRL '''
-	scheduler = RandomScheduler()
+	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, MADMMTR, TMCR, TMMR, TMMTR, GA, GOBI, DRL '''
+	scheduler = GOBIScheduler('energy')
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

@@ -40,10 +40,10 @@ class DRLScheduler(Scheduler):
 
 	def get_last_value(self):
 		energy = self.env.stats.metrics[-1]['energytotalinterval']
-		energy = (energy - 11000)/3000
+		energy = (energy - 9800)/9000
 		if '_' in self.data_type:
 			latency = self.env.stats.metric[-1]['avgresponsetime']
-			latency = (latency - 800)/2400
+			latency = (latency)/7000
 			return Coeff_Energy*energy + Coeff_Latency*latency
 		return energy
 

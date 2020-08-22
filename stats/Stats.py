@@ -183,7 +183,7 @@ class Stats():
 		df = pd.concat([df, pd.DataFrame(host_alloc_with_interval)], axis=1)
 		df = pd.concat([df, pd.DataFrame(objfunc_with_interval)], axis=1)
 		if objfunc2: df = pd.concat([df, pd.DataFrame(objfunc2_with_interval)], axis=1)
-		df.to_csv(dirname + '/' + title + '.csv' )
+		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
 
 	def generateGraphs(self, dirname):
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'cpu')

@@ -58,7 +58,7 @@ def load_model(filename, model, data_type):
 
 if __name__ == '__main__':
 	data_type = argv[1] # can be 'energy', 'energy_latency'
-	exec_type = argv[2] # can be 'ga', 'opt'
+	exec_type = argv[2] # can be 'train', ga', 'opt'
 
 	model = eval(data_type+"()")
 	model, optimizer, start_epoch, accuracy_list = load_model(data_type, model, data_type)
@@ -80,7 +80,7 @@ if __name__ == '__main__':
 				save_model(model, optimizer, epoch, accuracy_list)
 		print ("The minimum loss on test set is ", str(min(accuracy_list)), " at epoch ", accuracy_list.index(min(accuracy_list)))
 
-		plot_accuracies(accuracy_list)
+		plot_accuracies(accuracy_list, data_type)
 	else:
 		print(model.find); start = time()
 		for param in model.parameters(): param.requires_grad = False
