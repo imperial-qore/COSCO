@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 workload/datasets
+scheduler/A2C/dataset
 
 # C extensions
 *.so

@@ -57,8 +57,8 @@ def load_model(filename, model, data_type):
 	return model, optimizer, epoch, accuracy_list
 
 if __name__ == '__main__':
-	data_type = argv[1]
-	exec_type = argv[2]
+	data_type = argv[1] # can be 'energy', 'energy_latency'
+	exec_type = argv[2] # can be 'ga', 'opt'
 
 	model = eval(data_type+"()")
 	model, optimizer, start_epoch, accuracy_list = load_model(data_type, model, data_type)

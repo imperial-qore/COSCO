@@ -17,6 +17,7 @@ class Environment():
 		self.intervaltime = IntervalTime
 		self.interval = 0
 		self.inactiveContainers = []
+		self.stats = None
 		self.addHostlistInit(hostinit)
 
 	def addHostInit(self, IPS, RAM, Disk, Bw, Powermodel):

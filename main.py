@@ -9,6 +9,7 @@ from scheduler.Threshold_MC_Random import TMCRScheduler
 from scheduler.Random_Random_Random import RandomScheduler
 from scheduler.GOBI import GOBIScheduler
 from scheduler.GA import GAScheduler
+from scheduler.DRL import DRLScheduler
 from workload.StaticWorkload_StaticDistribution import *
 from workload.BitbrainWorkload_GaussianDistribution import *
 from environment.Environment import *
@@ -37,12 +38,15 @@ def initalizeEnvironment():
 	workload = BWGD(NEW_CONTAINERS, 3)
 	
 	# Initialize scheduler
-	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI '''
-	scheduler = GOBIScheduler('energy')
+	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI, DRL '''
+	scheduler = DRLScheduler('energy')
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
 	env = Environment(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, HOSTS, INTERVAL_TIME, hostlist)
+	
+	# Initialize stats
+	stats = Stats(env, workload, datacenter, scheduler)
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -55,8 +59,6 @@ def initalizeEnvironment():
 	print("Schedule:", env.getActiveContainerList())
 	printDecisionAndMigrations(decision, migrations)
 
-	# Initialize stats
-	stats = Stats(env, workload, datacenter, scheduler)
 	stats.saveStats(deployed, migrations, [], deployed, decision)
 	return datacenter, workload, scheduler, env, stats
 

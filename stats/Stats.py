@@ -7,6 +7,7 @@ plt.rcParams["text.usetex"] = False
 class Stats():
 	def __init__(self, Environment, WorkloadModel, Datacenter, Scheduler):
 		self.env = Environment
+		self.env.stats = self
 		self.workload = WorkloadModel
 		self.datacenter = Datacenter
 		self.scheduler = Scheduler
