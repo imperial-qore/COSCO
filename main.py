@@ -20,7 +20,7 @@ import pickle
 import shutil
 
 # Global constants
-NUM_SIM_STEPS = 100
+NUM_SIM_STEPS = 200
 HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
@@ -39,12 +39,12 @@ def initalizeEnvironment():
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI, DRL '''
-	scheduler = DRLScheduler('energy')
+	scheduler = RandomScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
 	env = Environment(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, HOSTS, INTERVAL_TIME, hostlist)
-	
+
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
 
@@ -82,17 +82,15 @@ def stepSimulation(workload, scheduler, env, stats):
 def saveStats(stats, datacenter, workload):
 	dirname = "logs/" + datacenter.__class__.__name__
 	dirname += "_" + workload.__class__.__name__
-	dirname += "_" + str(NUM_SIM_STEPS) 
+	dirname += "_" + scheduler.__clas__.__name__
 	dirname += "_" + str(HOSTS)
 	dirname += "_" + str(CONTAINERS)
-	dirname += "_" + str(TOTAL_POWER)
-	dirname += "_" + str(ROUTER_BW)
-	dirname += "_" + str(INTERVAL_TIME)
 	dirname += "_" + str(NEW_CONTAINERS)
+	dirname += "_" + str(NUM_SIM_STEPS) 
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	stats.generateGraphs(dirname)
+	# stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
 	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
 	    pickle.dump(stats, handle)
