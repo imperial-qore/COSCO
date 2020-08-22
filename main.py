@@ -82,7 +82,7 @@ def stepSimulation(workload, scheduler, env, stats):
 def saveStats(stats, datacenter, workload):
 	dirname = "logs/" + datacenter.__class__.__name__
 	dirname += "_" + workload.__class__.__name__
-	dirname += "_" + scheduler.__clas__.__name__
+	dirname += "_" + scheduler.__class__.__name__.replace('Scheduler', '')
 	dirname += "_" + str(HOSTS)
 	dirname += "_" + str(CONTAINERS)
 	dirname += "_" + str(NEW_CONTAINERS)
