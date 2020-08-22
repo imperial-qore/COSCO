@@ -10,7 +10,7 @@ class DRLScheduler(Scheduler):
 		super().__init__()
 		self.model = eval(data_type+"_RL()")
 		self.last_schedule = None
-		self.model, self.optimizer, self.epoch, self.accuracy_list = load_model(data_type, self.model, data_type)
+		self.model, self.optimizer, self.epoch, self.accuracy_list = load_model(data_type+'_RL', self.model, data_type)
 		self.data_type = data_type
 		self.buffer = []
 		directory = 'scheduler/A2C/dataset/'
