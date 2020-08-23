@@ -34,7 +34,7 @@ class energy_RL(nn.Module):
 class energy_latency_RL(nn.Module):
     def __init__(self):
         super(energy_latency_RL, self).__init__()
-        self.name = "energy_latency_"+str(Coeff_Energy)+"_"+str(Coeff_Latency)+"RL"
+        self.name = "energy_latency_"+str(Coeff_Energy)+"_"+str(Coeff_Latency)+"_RL"
         self.feature = nn.Sequential(
             nn.Linear(50 * 52, 128),
             nn.Softplus(),

@@ -9,7 +9,7 @@ from torch.distributions import Categorical
 
 def backprop(model, schedule_t, value_t, schedule_next, optimizer):
 	value_pred, action_pred = model(schedule_t)
-	value_pred_next, _ = model(schedule_next)
+	value_pred_next, action_next = model(schedule_next)
 	optimizer.zero_grad()
 	value_loss = torch.sum((value_pred - value_t) ** 2)
 	policy_loss = -1 * (value_pred_next - value_pred) # -1 for minimizing value, () has advantage
@@ -20,7 +20,7 @@ def backprop(model, schedule_t, value_t, schedule_next, optimizer):
 	loss = value_loss + policy_loss
 	loss.backward()
 	optimizer.step()
-	return value_loss.item(), policy_loss.item(), action_pred
+	return value_loss.item(), policy_loss.item(), action_next
 
 def save_model(model, optimizer, epoch, accuracy_list):
 	file_path = MODEL_SAVE_PATH + "/" + model.name + "_" + str(epoch) + ".ckpt"
@@ -31,7 +31,7 @@ def save_model(model, optimizer, epoch, accuracy_list):
         'accuracy_list': accuracy_list}, file_path)
 
 def load_model(filename, model, data_type):
-	optimizer = torch.optim.Adam(model.parameters() , lr=0.0001, weight_decay=1e-5)
+	optimizer = torch.optim.AdamW(model.parameters() , lr=0.0001, weight_decay=1e-5)
 	file_path = MODEL_SAVE_PATH + "/" + filename + "_Trained.ckpt"
 	if os.path.exists(file_path):
 		print(color.GREEN+"Loading pre-trained model: "+filename+color.ENDC)
