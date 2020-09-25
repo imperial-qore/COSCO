@@ -40,7 +40,7 @@ def initalizeEnvironment():
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, MADMMTR, TMCR, TMMR, TMMTR, GA, GOBI, DRL '''
-	scheduler = DRLScheduler('energy_latency')
+	scheduler = GOBIScheduler('energy_latency')
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
