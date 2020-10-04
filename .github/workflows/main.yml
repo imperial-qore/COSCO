@@ -25,14 +25,14 @@ jobs:
           id: vars
           run: echo ::set-output name=tag::$(echo ${GITHUB_REF:10})
         - name: Build the Yolo image
-          run: docker build -t yolo framework/workload/DockerImages/yolo/
+          run: docker build -t shreshthtuli/yolo framework/workload/DockerImages/yolo/
         - name: Push the yolo image
           run: docker push shreshthtuli/yolo
         - name: Build the PocketSphinx image
-          run: docker build -t pocketsphinx framework/workload/DockerImages/PocketSphinx/
+          run: docker build -t shreshthtuli/pocketsphinx framework/workload/DockerImages/PocketSphinx/
         - name: Push the PocketSphinx image
           run: docker push shreshthtuli/pocketsphinx
         - name: Build the Aeneas image
-          run: docker build -t aeneas framework/workload/DockerImages/Aeneas/
+          run: docker build -t ashreshthtuli/eneas framework/workload/DockerImages/Aeneas/
         - name: Push the Aeneas image
           run: docker push shreshthtuli/aeneas

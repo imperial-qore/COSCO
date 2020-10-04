@@ -26,6 +26,6 @@ sudo service flask start
 
 # Load Docker images
 
-sudo docker load -i $HOME/agent/DockerImages/aeneas.tar.gz
-sudo docker load -i $HOME/agent/DockerImages/pocketsphinx.tar.gz
-sudo docker load -i $HOME/agent/DockerImages/yolo.tar.gz
+sudo docker pull shreshthtuli/yolo
+sudo docker pull shreshthtuli/pocketsphinx
+sudo docker pull shreshthtuli/aeneas

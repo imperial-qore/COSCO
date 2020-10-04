@@ -90,12 +90,12 @@ if not path.exists(ssh_dir):
 for filename in ['id_rsa', 'id_rsa.pub']:
 	copy('framework/install_scripts/ssh_keys/'+filename, ssh_dir)
 
-if not path.exists('framework/agent/DockerImages/'):
-	mkdir('framework/agent/DockerImages/')
-
 run_cmd_pwd("apt install ansible")
 
 # Install docker and build docker images
+if not path.exists('framework/agent/DockerImages/'):
+	mkdir('framework/agent/DockerImages/')
+	
 print(color.HEADER+'Building Docker Images'+color.ENDC)
 if 'Windows' in platform.system():
 	trial = subprocess.run("where git.exe", shell=True, stderr=subprocess.PIPE)
