@@ -92,24 +92,24 @@ for filename in ['id_rsa', 'id_rsa.pub']:
 
 run_cmd_pwd("apt install ansible")
 
-# Install docker and build docker images
-if not path.exists('framework/agent/DockerImages/'):
-	mkdir('framework/agent/DockerImages/')
+# # Install docker and build docker images
+# if not path.exists('framework/agent/DockerImages/'):
+# 	mkdir('framework/agent/DockerImages/')
 	
-print(color.HEADER+'Building Docker Images'+color.ENDC)
-if 'Windows' in platform.system():
-	trial = subprocess.run("where git.exe", shell=True, stderr=subprocess.PIPE)
-	stdout = trial.stderr.decode()
-	if 'Could not find' in stdout:
-		if sys.maxsize > 2**32: # 64-bit system
-			link = 'https://github.com/git-for-windows/git/releases/download/v2.28.0.windows.1/Git-2.28.0-64-bit.exe'
-		else: # 32-bit system
-			link = 'https://github.com/git-for-windows/git/releases/download/v2.28.0.windows.1/Git-2.28.0-32-bit.exe'
-		filename = wget.download(link)
-		print('\n'+color.HEADER+'Please follow the prompts for installing Git'+color.ENDC)
-		startfile(filename)
-		remove(filename)
-elif 'Linux' in platform.system():
-	run_cmd("framework/install_scripts/install_docker.sh")
+# print(color.HEADER+'Building Docker Images'+color.ENDC)
+# if 'Windows' in platform.system():
+# 	trial = subprocess.run("where git.exe", shell=True, stderr=subprocess.PIPE)
+# 	stdout = trial.stderr.decode()
+# 	if 'Could not find' in stdout:
+# 		if sys.maxsize > 2**32: # 64-bit system
+# 			link = 'https://github.com/git-for-windows/git/releases/download/v2.28.0.windows.1/Git-2.28.0-64-bit.exe'
+# 		else: # 32-bit system
+# 			link = 'https://github.com/git-for-windows/git/releases/download/v2.28.0.windows.1/Git-2.28.0-32-bit.exe'
+# 		filename = wget.download(link)
+# 		print('\n'+color.HEADER+'Please follow the prompts for installing Git'+color.ENDC)
+# 		startfile(filename)
+# 		remove(filename)
+# elif 'Linux' in platform.system():
+# 	run_cmd("framework/install_scripts/install_docker.sh")
 
 print(color.GREEN+"All packages installed."+color.ENDC)
