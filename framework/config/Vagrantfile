@@ -1,0 +1,49 @@
+servers=[
+	{
+		:hostname => 'vm1',
+		:ip => '192.168.0.2',
+		:box => 'ubuntu/bionic64',
+		:ram => 1024,
+		:cpu => 1
+	},
+	{
+		:hostname => 'vm2',
+		:ip => '192.168.0.3',
+		:box => 'ubuntu/bionic64',
+		:ram => 2048,
+		:cpu => 2
+	}
+]
+
+
+agent_path='C:/Users/SHRESHTH/Downloads/DockerConOpenstack/framework/agent'
+
+Vagrant.configure(2) do |config|
+    servers.each do |machine|
+        config.vm.define machine[:hostname] do |node|
+            node.vm.box = machine[:box]
+            config.ssh.insert_key = false
+            config.vm.boot_timeout = 800
+            # Configure SSH keys
+            config.ssh.private_key_path = ["~/.ssh/id_rsa", "~/.vagrant.d/insecure_private_key"]
+            config.vm.provision "pub key", type: "file", source: "~/.ssh/id_rsa.pub", destination: "~/.ssh/authorized_keys"
+            config.vm.provision "pri key", type:  "file", source: "~/.ssh/id_rsa", destination: "$HOME/agent/"
+            config.vm.provision "pri key chmod", type:  "shell", inline: "sudo chmod 600 $HOME/agent/id_rsa", privileged: false
+            # Transfer agent data
+            config.vm.provision "data transfer", type:  "file", source: agent_path, destination: "$HOME/"
+            # Agent setup
+            config.vm.provision "calIPS script chmod", type:  "shell", inline: "sudo chmod +x $HOME/agent/scripts/calIPS_clock_vagrant.sh", privileged: false
+            config.vm.provision "set script chmod", type:  "shell", inline: "sudo chmod +x $HOME/agent/scripts/setup.sh", privileged: false
+            config.vm.provision "conf setup script", type:  "shell", inline: "sed -i -e 's/\r$//' $HOME/agent/scripts/setup.sh", privileged: false
+            config.vm.provision "run setup script", type:  "shell", inline: "$HOME/agent/scripts/setup.sh", privileged: false
+            # Configure agent
+            node.vm.hostname = machine[:hostname]
+            node.vm.network :private_network, ip: machine[:ip]
+            node.vm.provider "virtualbox" do |vb|
+            	vb.name = machine[:hostname]
+            	vb.cpus = machine[:cpu]
+                vb.customize ["modifyvm", :id, "--memory", machine[:ram]]
+            end
+        end
+    end
+end
