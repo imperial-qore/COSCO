@@ -16,7 +16,7 @@ servers=[
 ]
 
 
-agent_path='C:/Users/SHRESHTH/Downloads/DockerConOpenstack/framework/agent'
+agent_path='C:/Users/SHRESHTH/Desktop/SimpleFogSim/framework/agent'
 
 Vagrant.configure(2) do |config|
     servers.each do |machine|

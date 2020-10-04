@@ -27,6 +27,7 @@ def setupVagrantEnvironment(cfg, mode):
     with open(cfg, "r") as f:
         config = json.load(f)
     if mode in [0, 1]:
+        MAIN_DIR = os.getcwd().replace('\\', '/')
         os.chdir(r"framework/config/") 
         with open('Vagrantfile', 'r') as file:
             data = file.read()
@@ -42,7 +43,7 @@ def setupVagrantEnvironment(cfg, mode):
             custom_list += "\n"
         custom_list += "]\n\n"
         data = re.sub(r"servers=\[((.|\n)*)agent_path=", custom_list+"\nagent_path=", data)
-        data = re.sub(r"agent_path=\[((.|\n)*)Vagrant", "agent_path='"+os.getcwd().replace('\\', '/')+"/framework/agent'\n\nVagrant", data)
+        data = re.sub(r"agent_path=((.|\n)*)Vagrant", "agent_path='"+MAIN_DIR+"/framework/agent'\n\nVagrant", data)
         with open('Vagrantfile', 'w') as file:
             file.write(data)
         call(["vagrant", "up", "--parallel"])
