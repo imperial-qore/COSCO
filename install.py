@@ -91,5 +91,6 @@ for filename in ['id_rsa', 'id_rsa.pub']:
 	copy('framework/install_scripts/ssh_keys/'+filename, ssh_dir)
 
 run_cmd_pwd("apt install ansible")
+run_cmd_pwd("apt install dos2unix")
 
 print(color.GREEN+"All packages installed."+color.ENDC)

@@ -32,7 +32,8 @@ class Datacenter():
             resp = requests.get("http://"+IP+":8081/host", data=json.dumps(payload))
             data = json.loads(resp.text)
             logging.error("Host details collected from: {}".format(IP))
-            IPS = instructions
+            print(data)
+            IPS = instructions/(float(data['clock']) * 1000)
             Power = PMXeon_X5570()
             hosts.append((IP,IPS, Ram, Disk_, Bw,Power))
         return hosts

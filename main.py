@@ -66,7 +66,7 @@ def initalizeEnvironment(environment):
 	# Initialize workload
 	''' Can be SWSD, BWGD // DFW '''
 	if environment != '':
-		workload = DFW(NEW_CONTAINERS,db)
+		workload = DFW(NEW_CONTAINERS, db)
 	else: 
 		workload = BWGD(NEW_CONTAINERS, 3)
 	
@@ -146,6 +146,9 @@ if __name__ == '__main__':
 	env, mode = opts.env, int(opts.mode)
 
 	if env != '':
+		# Convert all agent files to unix format
+		unixify(['framework/agent/', 'framework/agent/scripts/'])
+		
 		# Start InfluxDB service
 		print(color.HEADER+'InfluxDB service runs as a separate front-end window. Please minimize this window.'+color.ENDC)
 		if 'Windows' in platform.system():

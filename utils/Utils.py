@@ -13,3 +13,10 @@ def printDecisionAndMigrations(decision, migrations):
 		if d not in migrations: print(color.ENDC, end='')
 		print(',', end='') if i != len(decision)-1 else print(']')
 	print()
+
+
+def unixify(paths):
+	for path in paths:
+		for file in os.listdir(path):
+			if '.py' in file or '.sh' in file:
+				os.system("bash -c 'dos2unix "+path+file+"'")
