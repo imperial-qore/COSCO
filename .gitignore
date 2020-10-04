@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 workload/datasets
 scheduler/A2C/dataset
+.vagrant
 
 # C extensions
 *.so
