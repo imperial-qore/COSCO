@@ -49,9 +49,9 @@ elif 'Linux' in platform.system():
 
 # Installing Vagrant
 if 'Windows' in platform.system():
-	trial = subprocess.run("where vagrant.exe", shell=True,stdout=subprocess.PIPE)
-	stdout = trial.stdout.decode()
-	if 'Cloud not find' in stdout:
+	trial = subprocess.run("where vagrant.exe", shell=True, stderr=subprocess.PIPE)
+	stdout = trial.stderr.decode()
+	if 'Could not find' in stdout:
 		if sys.maxsize > 2**32: # 64-bit system
 			link = 'https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_x86_64.msi'
 		else: # 32-bit system
@@ -65,9 +65,9 @@ elif 'Linux' in platform.system():
 
 # Install VirtualBox
 if 'Windows' in platform.system():
-	trial = subprocess.run("where virtualbox.exe", shell=True,stdout=subprocess.PIPE)
-	stdout = trial.stdout.decode()
-	if 'Cloud not find' in stdout:
+	trial = subprocess.run("where virtualbox.exe", shell=True, stderr=subprocess.PIPE)
+	stdout = trial.stderr.decode()
+	if 'Could not find' in stdout:
 		link = 'https://download.virtualbox.org/virtualbox/6.0.24/VirtualBox-6.0.24-139119-Win.exe'
 		filename = wget.download(link)
 		print('\n'+color.HEADER+'Please follow the prompts for installing VirtualBox'+color.ENDC)
@@ -78,9 +78,9 @@ elif 'Linux' in platform.system():
 
 # Install WSL if Windows
 if 'Windows' in platform.system():
-	trial = subprocess.run("where bash.exe", shell=True,stdout=subprocess.PIPE)
-	stdout = trial.stdout.decode()
-	if 'Cloud not find' in stdout:
+	trial = subprocess.run("where bash.exe", shell=True, stderr=subprocess.PIPE)
+	stdout = trial.stderr.decode()
+	if 'Could not find' in stdout:
 		system("powershell.exe -ExecutionPolicy Bypass 'wsl-ubuntu-powershell-master/0_enable_wsl.ps1'")
 
 # Copy SSH keys
@@ -95,8 +95,18 @@ if not path.exists('framework/agent/DockerImages/'):
 
 run_cmd_pwd("apt install ansible")
 
-# Build docker images
+# Install docker and build docker images
 print(color.HEADER+'Building Docker Images'+color.ENDC)
-run_cmd("framework/install_scripts/install_docker.sh")
+if 'Windows' in platform.system():
+	trial = subprocess.run("where docker.exe", shell=True, stderr=subprocess.PIPE)
+	stdout = trial.stderr.decode()
+	if 'Could not find' in stdout:
+		link = 'https://github.com/docker/toolbox/releases/download/v19.03.1/DockerToolbox-19.03.1.exe'
+		filename = wget.download(link)
+		print('\n'+color.HEADER+'Please follow the prompts for installing VirtualBox'+color.ENDC)
+		startfile(filename)
+		remove(filename)
+elif 'Linux' in platform.system():
+	run_cmd("framework/install_scripts/install_docker.sh")
 
 print(color.GREEN+"All packages installed."+color.ENDC)

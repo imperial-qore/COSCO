@@ -152,7 +152,7 @@ if __name__ == '__main__':
 			startfile('C:/Program Files/InfluxDB/influxdb-1.8.3-1/influxd.exe')
 
 		logFile = 'SimpleFogSim.log'
-		configFile = 'framework/configs/' + opts.env + '_config.json'
+		configFile = 'framework/config/' + opts.env + '_config.json'
 	    
 		logging.basicConfig(filename=logFile, level=logging.DEBUG,
 	                        format='%(asctime)s - %(levelname)s - %(message)s')

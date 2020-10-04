@@ -2,7 +2,7 @@ import os
 import logging
 import json
 import re
-from subprocess import call
+from subprocess import call, Popen
 
 def setup(cfg):
     # For ansible setup
@@ -27,7 +27,7 @@ def setupVagrantEnvironment(cfg, mode):
     with open(cfg, "r") as f:
         config = json.load(f)
     if mode in [0, 1]:
-        call(["cd", "framework/config/"])
+        os.chdir(r"framework/config/") 
         with open('Vagrantfile', 'r') as file:
             data = file.read()
         custom_list = "servers=[\n"
@@ -46,7 +46,7 @@ def setupVagrantEnvironment(cfg, mode):
         with open('Vagrantfile', 'w') as file:
             file.write(data)
         call(["vagrant", "up", "--parallel"])
-        call(["cd", "../.."])
+        os.chdir("../../") 
         return host_ip
     return ['192.168.0.'+str(i+2) for i in range(len(config['vagrant']['servers']))]    
 
