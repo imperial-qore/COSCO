@@ -33,6 +33,6 @@ jobs:
         - name: Push the PocketSphinx image
           run: docker push shreshthtuli/pocketsphinx
         - name: Build the Aeneas image
-          run: docker build -t ashreshthtuli/eneas framework/workload/DockerImages/Aeneas/
+          run: docker build -t shreshthtuli/aeneas framework/workload/DockerImages/Aeneas/
         - name: Push the Aeneas image
           run: docker push shreshthtuli/aeneas
