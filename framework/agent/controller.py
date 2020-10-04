@@ -29,14 +29,25 @@ class RequestRouter():
     def getContainer(self, containerId):
         return self.containerClient.inspectContainer(containerId)
     
-    def hostDetails(self):
+    def hostDetailsVagrant(self):
         rc = codes.SUCCESS
         memory = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
         data = subprocess.run("./scripts/calIPS_clock_vagrant.sh", shell=True,stdout=subprocess.PIPE)
         data  = (data.stdout.decode()).splitlines()
         bw = ((subprocess.run("sudo ethtool "+self.interface+" | grep Speed",shell=True,stdout=subprocess.PIPE)).stdout.decode()).split()[1][0:4]
-        payload ={"Total_Memory":int(float(memory.total/0.000000125)),"Total_Disk":int(float(disk.total/0.000000125)),"Bandwidth":int(bw),"clock":data[0],"Ram_read":int(float(data[3])),"Ram_write":int(float(data[4])),"Disk_read":int(float(data[1])),"Disk_write":int(float(data[2]))}
+        payload ={"Total_Memory":int(float(memory.total/(1024*1024))),"Total_Disk":int(float(disk.total/(1024*1024))),"Bandwidth":int(bw),"clock":data[0],"Ram_read":int(float(data[3])),"Ram_write":int(float(data[4])),"Disk_read":int(float(data[1])),"Disk_write":int(float(data[2]))}
+        data = json.dumps(payload)
+        return rc,data
+
+    def hostDetailsAnsible(self):
+        rc = codes.SUCCESS
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('/')
+        data = subprocess.run("./scripts/calIPS_ansible.sh", shell=True,stdout=subprocess.PIPE)
+        data  = (data.stdout.decode()).splitlines()
+        bw = ((subprocess.run("sudo ethtool "+self.interface+" | grep Speed",shell=True,stdout=subprocess.PIPE)).stdout.decode()).split()[1][0:4]
+        payload ={"Total_Memory":int(float(memory.total/(1024*1024))),"Total_Disk":int(float(disk.total/(1024*1024))),"Bandwidth":int(bw),"IPS":data[0],"Ram_read":int(float(data[3])),"Ram_write":int(float(data[4])),"Disk_read":int(float(data[1])),"Disk_write":int(float(data[2]))}
         data = json.dumps(payload)
         return rc,data
 
@@ -99,8 +110,10 @@ class RequestRouter():
    
     def handleHostOp(self,payload):
         opcode = payload["opcode"]
-        if opcode == "hostDetails":
-            return self.hostDetails()
+        if opcode == "hostDetailsVagrant":
+            return self.hostDetailsVagrant()
+        if opcode == "hostDetailsAnsible":
+            return self.hostDetailsAnsible()
         if opcode == "hostStat":
             return self.gethostStat()
 

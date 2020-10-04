@@ -6,10 +6,10 @@ class Framework():
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds
-	def __init__(self, TotalPower, RouterBw, Scheduler, ContainerLimit, HostLimit, IntervalTime, hostinit, database):
+	def __init__(self, TotalPower, RouterBw, Scheduler, ContainerLimit, IntervalTime, hostinit, database):
 		self.totalpower = TotalPower
 		self.totalbw = RouterBw
-		self.hostlimit = HostLimit
+		self.hostlimit = len(hostinit)
 		self.scheduler = Scheduler
 		self.scheduler.setEnvironment(self)
 		self.containerlimit = ContainerLimit
@@ -19,13 +19,12 @@ class Framework():
 		self.interval = 0
 		self.db = database
 		self.inactiveContainers = []
-		self.controller= RequestHandler(self.db)
+		self.controller = RequestHandler(self.db)
 		self.addHostlistInit(hostinit)
 	
-	def addHostInit(self, IP,IPS, RAM, Disk, Bw, Powermodel):
+	def addHostInit(self, IP, IPS, RAM, Disk, Bw, Powermodel):
 		assert len(self.hostlist) < self.hostlimit
-
-		host = Host(len(self.hostlist),IP,IPS, RAM, Disk, Bw, Powermodel, self)
+		host = Node(len(self.hostlist),IP,IPS, RAM, Disk, Bw, Powermodel, self)
 		self.hostlist.append(host)
 
 	def addHostlistInit(self, hostList):
@@ -33,10 +32,9 @@ class Framework():
 		for IP,IPS, RAM, Disk, Bw, Powermodel in hostList:
 			self.addHostInit(IP,IPS, RAM, Disk, Bw, Powermodel)
 
-	def addContainerInit(self, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel,application):
-		container = Container(len(self.containerlist), CreationID, CreationInterval, IPSModel, RAMModel, DiskModel, application,self, HostID = -1)
+	def addContainerInit(self, CreationID, CreationInterval, SLA, Application):
+		container = Task(len(self.containerlist), CreationID, CreationInterval, SLA, Application, self, HostID = -1)
 		self.containerlist.append(container)
-
 		return container
 
 	def addContainerListInit(self, containerInfoList):
@@ -49,6 +47,7 @@ class Framework():
 		print(self.containerlist)
 		return [container.id for container in deployedContainers]
 
+	# TODO: Update this
 	def addContainer(self, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel,application):
 		for i,c in enumerate(self.containerlist):
 			if c == None or not c.active:

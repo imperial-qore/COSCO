@@ -11,13 +11,13 @@ class DFW(Workload):
     def generateNewContainers(self, interval):
         workloadlist = []
         containers = []
-        applications = ['yolo', 'pocketsphinx', 'aeneas']
+        applications = ['shreshthtuli/yolo', 'shreshthtuli/pocketsphinx', 'shreshthtuli/aeneas']
         for i in range(self.num_workloads):
             CreationID = self.creation_id
             appSelection = np.random.randint(0,2)
+            SLA = np.random.randint(5,8)
             application = applications[appSelection]
-            workloadlist.append((CreationID, application))
-            print(application)
+            workloadlist.append((CreationID, interval, SLA, application))
             self.creation_id += 1
         self.createdContainers += workloadlist
         self.deployedContainers += [False] * len(workloadlist)

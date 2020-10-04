@@ -1,6 +1,6 @@
-from framework.node.Disk import *
-from framework.node.RAM import *
-from framework.node.Bandwidth import *
+from framework.metrics.Disk import *
+from framework.metrics.RAM import *
+from framework.metrics.Bandwidth import *
 import json
 from subprocess import call
 from datetime import datetime
@@ -10,115 +10,89 @@ class Node():
 	# RAM = Ram in MB capacity
 	# Disk = Disk characteristics capacity
 	# Bw = Bandwidth characteristics capacity
-	def __init__(self, ID, IP,IPS, RAM, Disk, Bw, Powermodel, Environment):
+	def __init__(self, ID, IP, IPS, RAM, Disk, Bw, Powermodel, Framework):
 		self.id = ID
 		self.ip = IP
 		self.ipsCap = IPS
 		self.ramCap = RAM
 		self.diskCap = Disk
 		self.bwCap = Bw
+		# Initialize utilization metrics
+		self.ips = 0
+		self.ram = RAM(0, 0, 0)
+		self.bw = Bandwidth(0, 0)
+		self.disk = Disk(0, 0, 0)
+		self.json_body = {}
 		self.powermodel = Powermodel
 		self.powermodel.allocHost(self)
 		self.powermodel.host = self
-		self.env = Environment
+		self.env = Framework
 		self.createHost()
 		
 	def createHost(self):
-		host_data= []
-		json_body = {
+		self.json_body = {
 						"measurement":"host",
 						"tags": {
 									"host_id":self.id,
 									"host_ip":self.ip
 								},
 						"time": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
+						"interval": self.env.interval
 						"fields":
 								{
-									"CPU" :self.ipsCap,
-									"RAM_size" :self.ramCap.size,
-									"RAM_read" :self.ramCap.read,
-									"RAM_write" :str(self.ramCap.write),
-									"DISK_size" :self.diskCap.size,
-									"DISK_read" :str(self.diskCap.read),
-									"DISK_write":str(self.diskCap.write),
-									"Bw_up" :self.bwCap.uplink,
-									"Bw_down": self.bwCap.downlink,
-									"Power" :str(self.powermodel)
+									"IPS_Cap": self.ipsCap,
+									"RAM_Cap_size": self.ramCap.size,
+									"RAM_Cap_read": self.ramCap.read,
+									"RAM_Cap_write": str(self.ramCap.write),
+									"DISK_Cap_size": self.diskCap.size,
+									"DISK_Cap_read": str(self.diskCap.read),
+									"DISK_Cap_write": str(self.diskCap.write),
+									"Bw_Cap_up": self.bwCap.uplink,
+									"Bw_Cap_down": self.bwCap.downlink,
+									"IPS": self.ips,
+									"RAM_size": self.ram.size,
+									"RAM_read": self.ram.read,
+									"RAM_write": str(self.ram.write),
+									"DISK_size": self.disk.size,
+									"DISK_read": str(self.disk.read),
+									"DISK_write": str(self.disk.write),
+									"Bw_up": self.bw.uplink,
+									"Bw_down": self.bw.downlink,
+									"Power": str(self.powermodel)
 								}
 					}
-			
-			
-		host_data.append(json_body)
-			
-		
-		#print(host_data)
-		#
-		#if list(self.db.select("select * from host")):
-		#self.db.delete("host")
-		self.env.db.insert(host_data)
-		#self.env.db.insert(host_data)
-		#print(list(self.db.select("select * from host")))
-
-
+		self.env.db.insert([self.json_body])
 
 	def getPower(self):
 		return self.powermodel.power()
 
 	def getCPU(self):
 		# 0 - 100 last interval
-		ips = self.getApparentIPS()
-		return 100 * (ips / self.ipsCap)
+		return min(100, 100 * (self.ips / self.ipsCap))
 
 	def getBaseIPS(self):
-		# Get base ips count as sum of min ips of all containers
-		ips = 0
-		containers = self.env.getContainersOfHost(self.id)
-		for containerID in containers:
-			ips += self.env.getContainerByID(containerID).getBaseIPS()
-		# assert ips <= self.ipsCap
-		return ips
+		return self.ips
 
 	def getApparentIPS(self):
-		# Give containers remaining IPS for faster execution
-		ips = 0
-		containers = self.env.getContainersOfHost(self.id)
-		for containerID in containers:
-			ips += self.env.getContainerByID(containerID).getApparentIPS()
-		# assert int(ips) <= self.ipsCap
-		return int(ips)
+		return self.ips
 
 	def getIPSAvailable(self):
-		# IPS available is ipsCap - baseIPS
-		# When containers allocated, existing ips can be allocated to
-		# the containers
-		return self.ipsCap - self.getBaseIPS()
+		return self.ipsCap - self.ips
 
 	def getCurrentRAM(self):
-		size, read, write = 0, 0, 0
-		containers = self.env.getContainersOfHost(self.id)
-		for containerID in containers:
-			s, r, w = self.env.getContainerByID(containerID).getRAM()
-			size += s; read += r; write += w
-		# assert size <= self.ramCap.size
-		# assert read <= self.ramCap.read
-		# assert write <= self.ramCap.write
-		return size, read, write
+		return self.ram.size, self.ram.read, self.ram.write
 
 	def getRAMAvailable(self):
 		size, read, write = self.getCurrentRAM()
 		return self.ramCap.size - size, self.ramCap.read - read, self.ramCap.write - write
 
 	def getCurrentDisk(self):
-		size, read, write = 0, 0, 0
-		containers = self.env.getContainersOfHost(self.id)
-		for containerID in containers:
-			s, r, w = self.env.getContainerByID(containerID).getDisk()
-			size += s; read += r; write += w
-		assert size <= self.diskCap.size
-		assert read <= self.diskCap.read
-		assert write <= self.diskCap.write
-		return size, read, write
+		return self.disk.size, self.disk.read, self.disk.write
 
 	def getDiskAvailable(self):
 		size, read, write = self.getCurrentDisk()
 		return self.diskCap.size - size, self.diskCap.read - read, self.diskCap.write - write
+
+	# TODO: Implement this
+	def updateUtilizationMetrics(self, json):
+		pass

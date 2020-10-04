@@ -19,4 +19,4 @@ def unixify(paths):
 	for path in paths:
 		for file in os.listdir(path):
 			if '.py' in file or '.sh' in file:
-				os.system("bash -c 'dos2unix "+path+file+"'")
+				_ = os.system("bash -c \"dos2unix "+path+file+" 2&> /dev/null\"")

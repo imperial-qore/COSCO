@@ -59,7 +59,7 @@ def initalizeEnvironment(environment):
 	# Initialize simple fog datacenter
 	''' Can be SimpleFog, BitbrainFog // Datacenter '''
 	if environment != '':
-		datacenter = Datacenter(HOSTS_IP)
+		datacenter = Datacenter(HOSTS_IP, environment)
 	else:
 		datacenter = BitbrainFog(HOSTS)
 
@@ -77,9 +77,9 @@ def initalizeEnvironment(environment):
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
 	if environment != '':
-		env = Framework(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, HOSTS, INTERVAL_TIME, hostlist, db)
+		env = Framework(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db)
 	else:
-		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, HOSTS, INTERVAL_TIME, hostlist)
+		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -148,7 +148,7 @@ if __name__ == '__main__':
 	if env != '':
 		# Convert all agent files to unix format
 		unixify(['framework/agent/', 'framework/agent/scripts/'])
-		
+
 		# Start InfluxDB service
 		print(color.HEADER+'InfluxDB service runs as a separate front-end window. Please minimize this window.'+color.ENDC)
 		if 'Windows' in platform.system():
