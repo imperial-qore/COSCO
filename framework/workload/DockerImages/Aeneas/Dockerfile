@@ -35,6 +35,7 @@ RUN \
     python setup.py build_ext --inplace
     
 COPY execute.sh .
+RUN chmod +x execute.sh
 
 COPY assets assets
 

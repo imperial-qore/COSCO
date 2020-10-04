@@ -29,6 +29,7 @@ RUN wget https://pjreddie.com/media/files/yolov3.weights
 RUN mkdir output 
     
 COPY execute.sh .
+RUN chmod +x execute.sh
 COPY assets assets
 
 CMD ["./execute.sh"]
