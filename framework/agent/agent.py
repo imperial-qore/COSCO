@@ -1,3 +1,5 @@
+#!/usr/bin/env pythhon3
+
 import sys
 import logging
 import os
