@@ -2,9 +2,10 @@
 __pycache__/
 *.py[cod]
 *$py.class
-workload/datasets
+simulator/workload/datasets
 scheduler/A2C/dataset
 .vagrant
+framework/agent/DockerImages
 
 # C extensions
 *.so

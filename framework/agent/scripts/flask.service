@@ -1,0 +1,14 @@
+[Unit]
+Description=Flask web server
+
+[Install]
+WantedBy=multi-user.target
+
+[Service]
+User=vagrant
+PermissionsStartOnly=true
+WorkingDirectory=/home/vagrant/agent
+ExecStart=/home/vagrant/agent/agent.py
+TimeoutSec=600
+Restart=on-failure
+RuntimeDirectoryMode=755

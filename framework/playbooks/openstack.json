@@ -1,0 +1,9 @@
+{
+	
+    "image": "21cd7486-a2a6-458c-9b05-9207c0b63819",
+    "key_name": "shivupoojar",
+    "network": "provider_64_net",
+    "src": "~/DockerConOpenstack/Server",
+    "dest":"/home/ubuntu",
+    "num_hosts":2
+}

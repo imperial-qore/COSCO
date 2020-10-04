@@ -1,0 +1,18 @@
+{
+	"database" : {
+		"ip": "127.0.0.1",
+		"port":8086},
+	"vagrant" : {
+		"box" : "ubuntu/bionic64",
+		"servers" : [
+			{
+				"ram" : 1024,
+				"cpu" : 1
+			},
+			{
+				"ram" : 2048,
+				"cpu" : 2
+			}
+		]
+	}
+}
