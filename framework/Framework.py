@@ -2,7 +2,7 @@ from framework.node.Node import *
 from framework.task.Task import *
 from framework.server.controller import *
 
-class Environment():
+class Framework():
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds

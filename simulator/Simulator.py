@@ -1,7 +1,7 @@
-from host.Host import *
-from container.Container import *
+from simulator.host.Host import *
+from simulator.container.Container import *
 
-class Environment():
+class Simulator():
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds

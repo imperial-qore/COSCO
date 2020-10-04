@@ -1,6 +1,6 @@
-from host.Disk import *
-from host.RAM import *
-from host.Bandwidth import *
+from simulator.host.Disk import *
+from simulator.host.RAM import *
+from simulator.host.Bandwidth import *
 
 class Host():
 	# IPS = Million Instructions per second capacity 

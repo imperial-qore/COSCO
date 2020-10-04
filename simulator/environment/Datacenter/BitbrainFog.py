@@ -1,9 +1,9 @@
 import numpy as np
-from host.Disk import *
-from host.RAM import *
-from host.Bandwidth import *
-from host.Powermodels.PMRaspberryPi import *
-from host.Powermodels.PMConstant import *
+from simulator.host.Disk import *
+from simulator.host.RAM import *
+from simulator.host.Bandwidth import *
+from simulator.host.Powermodels.PMRaspberryPi import *
+from simulator.host.Powermodels.PMConstant import *
 
 class BitbrainFog():
 	def __init__(self, num_hosts):

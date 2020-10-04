@@ -1,7 +1,7 @@
 from .Workload import *
-from container.IPSModels.IPSMBitbrain import *
-from container.RAMModels.RMBitbrain import *
-from container.DiskModels.DMBitbrain import *
+from simulator.container.IPSModels.IPSMBitbrain import *
+from simulator.container.RAMModels.RMBitbrain import *
+from simulator.container.DiskModels.DMBitbrain import *
 from random import gauss, randint
 from os import path, makedirs, listdir, remove
 import wget
@@ -20,7 +20,7 @@ class BWGD(Workload):
 		super().__init__()
 		self.mean = meanNumContainers
 		self.sigma = sigmaNumContainers
-		dataset_path = 'workload/datasets/bitbrain/'
+		dataset_path = 'simulator/workload/datasets/bitbrain/'
 		if not path.exists(dataset_path):
 			makedirs(dataset_path)
 			print('Downloading Bitbrain Dataset')

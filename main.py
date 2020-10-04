@@ -1,14 +1,3 @@
-from scheduler.IQR_MMT_Random import IQRMMTRScheduler
-from scheduler.MAD_MMT_Random import MADMMTRScheduler
-from scheduler.Random_Random_FirstFit import RFScheduler
-from scheduler.Random_Random_LeastFull import RLScheduler
-from scheduler.RLR_MMT_Random import RLRMMTRScheduler
-from scheduler.Threshold_MC_Random import TMCRScheduler
-from scheduler.Random_Random_Random import RandomScheduler
-from scheduler.GOBI import GOBIScheduler
-from stats.Stats import *
-from utils.Utils import *
-from subprocess import call
 import os, sys, stat
 import sys
 import optparse
@@ -18,18 +7,39 @@ import pickle
 import shutil
 import sqlite3
 import platform
+from subprocess import call
+from os import startfile, system
+
+# Framework imports
+from framework.Framework import *
 from framework.database.Database import *
 from framework.datacenter.Datacenter_Setup import *
 from framework.datacenter.Datacenter import *
-from framework.Environment import *
 from framework.workload.DeFogWorkload import *
 
-from os import startfile, system
+# Simulator imports
+from simulator.Simulator import *
+from simulator.environment.datacenter.BitbrainFog import *
+from simulator.workload.BitbrainWorkload_GaussianDistribution import *
+
+# Scheduler imports
+from scheduler.IQR_MMT_Random import IQRMMTRScheduler
+from scheduler.MAD_MMT_Random import MADMMTRScheduler
+from scheduler.Random_Random_FirstFit import RFScheduler
+from scheduler.Random_Random_LeastFull import RLScheduler
+from scheduler.RLR_MMT_Random import RLRMMTRScheduler
+from scheduler.Threshold_MC_Random import TMCRScheduler
+from scheduler.Random_Random_Random import RandomScheduler
+from scheduler.GOBI import GOBIScheduler
+
+# Auxilliary imports
+from stats.Stats import *
+from utils.Utils import *
 
 # Global constants
-NUM_SIM_STEPS = 2
-HOSTS = 2
-CONTAINERS = 5
+NUM_SIM_STEPS = 10
+HOSTS = 50
+CONTAINERS = 50
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
@@ -41,28 +51,35 @@ INTERFACE ='ens3'
 MASTER_PORT = 5000
 HOSTS_IP = []
 
-def initalizeEnvironment(env):
-	if env != '':
+def initalizeEnvironment(environment):
+	if environment != '':
 		# Initialize the db
 		db = Database(DB_NAME, DB_HOST, DB_PORT)
 
 	# Initialize simple fog datacenter
 	''' Can be SimpleFog, BitbrainFog // Datacenter '''
-	if env != '':
+	if environment != '':
 		datacenter = Datacenter(HOSTS_IP)
+	else:
+		datacenter = BitbrainFog(HOSTS)
 
 	# Initialize workload
 	''' Can be SWSD, BWGD // DFW '''
-	if env != '':
+	if environment != '':
 		workload = DFW(NEW_CONTAINERS,db)
+	else: 
+		workload = BWGD(NEW_CONTAINERS, 3)
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI '''
-	scheduler = RandomScheduler()
+	scheduler = GOBIScheduler('energy')
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
-	env = Environment(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, HOSTS, INTERVAL_TIME, hostlist, db)
+	if environment != '':
+		env = Framework(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, HOSTS, INTERVAL_TIME, hostlist, db)
+	else:
+		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, HOSTS, INTERVAL_TIME, hostlist)
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -111,7 +128,7 @@ def saveStats(stats, datacenter, workload):
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	stats.generateGraphs(dirname)
+	# stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
 	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
 	    pickle.dump(stats, handle)

@@ -1,7 +1,7 @@
 from .Workload import *
-from container.IPSModels.IPSMConstant import *
-from container.RAMModels.RMConstant import *
-from container.DiskModels.DMConstant import *
+from simulator.container.IPSModels.IPSMBitbrain import *
+from simulator.container.RAMModels.RMBitbrain import *
+from simulator.container.DiskModels.DMBitbrain import *
 
 class SWSD(Workload):
 	def __init__(self, num_workloads):
