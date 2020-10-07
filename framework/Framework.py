@@ -165,9 +165,7 @@ class Framework():
 		return [len(self.getContainersOfHost(host)) for host in range(self.hostlimit)]
 
 	def simulationStep(self, decision):
-		sleep(self.intervaltime - self.intervalAllocTimings[-1])
-		for host in self.hostlist:
-			host.updateUtilizationMetrics()
+		start = time()
 		migrations = []
 		containerIDsAllocated = []
 		for (cid, hid) in decision:
@@ -183,4 +181,8 @@ class Framework():
 		# destroy pointer to unallocated containers as book-keeping is done by workload model
 		for (cid, hid) in decision:
 			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None
+		self.intervalAllocTimings.append(time() - start)
+		sleep(self.intervaltime - self.intervalAllocTimings[-1])
+		for host in self.hostlist:
+			host.updateUtilizationMetrics()
 		return migrations
