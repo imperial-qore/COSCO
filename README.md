@@ -3,6 +3,10 @@
 [![Actions Status](https://github.com/FogBus-2/SimpleFogSim/workflows/DeFog-Benchmarks/badge.svg)](https://github.com/FogBus-2/SimpleFogSim/actions)
 [![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2FFogBus-2%2FSimpleFogSim&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=hits&edge_flat=false)](https://hits.seeyoufarm.com)
 
+<br>
+
+[![Docker pulls yolo](https://img.shields.io/docker/pulls/shreshthtuli/yolo?label=docker%20pulls%3A%20yolo)]
+
 # SimpleFogSim
 Simple Fog Simulator
 
