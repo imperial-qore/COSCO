@@ -6,12 +6,12 @@
 		"box" : "ubuntu/bionic64",
 		"servers" : [
 			{
-				"ram" : 1024,
-				"cpu" : 1
+				"ram" : 4096,
+				"cpu" : 2
 			},
 			{
-				"ram" : 1024,
-				"cpu" : 1
+				"ram" : 8192,
+				"cpu" : 4
 			}
 		]
 	}

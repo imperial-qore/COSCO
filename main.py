@@ -8,7 +8,7 @@ import shutil
 import sqlite3
 import platform
 from subprocess import call
-from os import startfile, system
+from os import startfile, system, rename
 
 # Framework imports
 from framework.Framework import *
@@ -37,7 +37,7 @@ from stats.Stats import *
 from utils.Utils import *
 
 # Global constants
-NUM_SIM_STEPS = 10
+NUM_SIM_STEPS = 100
 HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
@@ -50,6 +50,7 @@ DB_PORT = 0
 INTERFACE ='ens3'
 MASTER_PORT = 5000
 HOSTS_IP = []
+logFile = 'SimpleFogSim.log'
 
 def initalizeEnvironment(environment, logger):
 	if environment != '':
@@ -75,7 +76,7 @@ def initalizeEnvironment(environment, logger):
 	scheduler = GOBIScheduler('energy')
 
 	# Initialize Environment
-	hostlist = [] # datacenter.generateHosts()
+	hostlist = [] #datacenter.generateHosts()
 	if environment != '':
 		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
 	else:
@@ -83,7 +84,7 @@ def initalizeEnvironment(environment, logger):
 
 	#######
 	a = env.controller.getContainerStat("192.168.0.2")
-	# a = env.controller.stop({"fields": {'name': '12_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.2")
+	# a = env.controller.create({"fields": {'name': '1_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.2")
 	# a = env.controller.checkpoint(1, 2, "192.168.0.3")
 	# a = env.controller.migrate(1, 2, "192.168.0.3", "192.168.0.2")
 	# a = env.controller.restore(8, 2, "shreshthtuli/yolo", "192.168.0.2")
@@ -138,11 +139,12 @@ def saveStats(stats, datacenter, workload):
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	# stats.generateGraphs(dirname)
+	stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
 	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
 	    pickle.dump(stats, handle)
-	## TODO: Transfer SimpleFogSim.log file to this directory
+	if 'Datacenter' in datacenter.__class__.__name__:
+		rename(logFile, dirname+'/'+logFile)
 
 if __name__ == '__main__':
 	usage = "usage: python main.py -e <environment> -m <mode> # empty environment run simulator"
@@ -164,7 +166,6 @@ if __name__ == '__main__':
 		if 'Windows' in platform.system():
 			startfile('C:/Program Files/InfluxDB/influxdb-1.8.3-1/influxd.exe')
 
-		logFile = 'SimpleFogSim.log'
 		configFile = 'framework/config/' + opts.env + '_config.json'
 	    
 		logger.basicConfig(filename=logFile, level=logging.DEBUG,
