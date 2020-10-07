@@ -152,16 +152,17 @@ class RequestRouter():
         uname = payload["uname"]
         rc, data =  codes.SUCCESS, "Migration successful"
         try:
-            cid = subprocess.Popen("docker inspect -f '{{.Id}}' "+container_name, shell=True, stdout=subprocess.PIPE).communicate()[0].decode('utf-8').strip()
+            cid = subprocess.run("docker inspect -f '{{.Id}}' "+container_name, shell=True, stdout=subprocess.PIPE)
+            cid = cid.stdout.decode('utf-8').strip()
             cmd = "sudo tar -zcf /tmp/"+container_name+"."+checkpoint_name+".tgz -C /var/lib/docker/containers/"+cid+"/"+"checkpoints/ "+checkpoint_name+"/"
-            subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+            subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
             self.containerClient.delete(container_name)
-            subprocess.call(["scp", "-i", "~/agent/id_rsa","/tmp/"+container_name+"."+checkpoint_name+".tgz", uname+"@"+targetIP+":/tmp/"])
+            subprocess.call(["scp", "-o", "StrictHostKeyChecking=no", "-i", "~/agent/id_rsa","/tmp/"+container_name+"."+checkpoint_name+".tgz", uname+"@"+targetIP+":/tmp/"])
             subprocess.call(["sudo","rm","-rf","/tmp/"+container_name+"."+checkpoint_name+".tgz"])
         except ValueError:
             data = "Migrate checkpoint to "+targetIP+" not successful"
             rc = codes.ERROR
-        return rc, json.dumps({'message': data})
+        return rc, json.dumps({'message': data if rc == codes.SUCCESS else 'error'})
 
     def restore(self, payload):
         container_name = payload["name"]
@@ -172,13 +173,13 @@ class RequestRouter():
             cmd = "docker create --name "+container_name+" "+container_image
             cid = subprocess.Popen(cmd, shell=True,stdout=subprocess.PIPE).communicate()[0].decode('utf-8').strip()
             cmd = "sudo tar -zxf /tmp/"+container_name+"."+checkpoint_name+".tgz -C /var/lib/docker/containers/"+str(cid)+"/"+"checkpoints/"
-            subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,universal_newlines=True)
+            subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,universal_newlines=True)
             subprocess.call(["sudo","rm","-rf","/tmp/"+container_name+"."+checkpoint_name+".tgz"])
         except ValueError:
-            rc, data = codes.ERROR, "restore not successful"
+            rc, data = codes.ERROR, json.dumps({'message': "restore not successful"})
         output = subprocess.run("docker start --checkpoint "+checkpoint_name+" "+container_name, shell=True,stderr=subprocess.PIPE)
         output = output.stderr.decode()
         if 'Error' in output:
             rc, data = codes.ERROR, output.split(":")[1]
-        return rc, json.dumps({'message': data})
+        return rc, json.dumps({'message': data if rc == codes.SUCCESS else 'error'})
 

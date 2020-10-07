@@ -83,7 +83,7 @@ class Task():
 	def getHost(self):
 		return self.env.getHostByID(self.hostid)
 
-	def allocateAndExecute(self, hostID, allocBw):
+	def allocateAndExecute(self, hostID):
 		self.logger.debug("Allocating container "+self.json_body['fields']['name']+" to host "+self.env.getHostByID(hostID).ip)
 		self.hostid = hostID
 		self.json_body["fields"]["Host_id"] = hostID

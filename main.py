@@ -83,13 +83,14 @@ def initalizeEnvironment(environment, logger):
 		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
 
 	#######
-	a = env.controller.getContainerStat("192.168.0.2")
-	# a = env.controller.create({"fields": {'name': '1_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.2")
-	# a = env.controller.checkpoint(1, 2, "192.168.0.3")
-	# a = env.controller.migrate(1, 2, "192.168.0.3", "192.168.0.2")
-	# a = env.controller.restore(8, 2, "shreshthtuli/yolo", "192.168.0.2")
-	print(a)
-	exit()
+	# a = env.controller.getContainerStat("192.168.0.2")
+	# for	ccid in range(4, 9, 1):
+	# 	a = env.controller.create({"fields": {'name': str(ccid)+'_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.3")
+	# 	a = env.controller.checkpoint(ccid, 2, "192.168.0.3")
+	# 	a = env.controller.migrate(ccid, 2, "192.168.0.3", "192.168.0.2")
+	# 	a = env.controller.restore(ccid, 2, "shreshthtuli/yolo", "192.168.0.2")
+	# 	print(a)
+	# exit()
 	#######
 
 	# Execute first step
