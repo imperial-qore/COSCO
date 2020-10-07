@@ -31,7 +31,7 @@ class Datacenter():
                 instructions  = int((instructions.stdout.decode()).splitlines()[0])
         for IP in self.hosts:
             payload = {"opcode": "hostDetails"+self.env}
-            resp = requests.get("http://"+IP+":8081/host", data=json.dumps(payload))
+            resp = requests.get("http://"+IP+":8081/request", data=json.dumps(payload))
             data = json.loads(resp.text)
             logging.error("Host details collected from: {}".format(IP))
             print(data)

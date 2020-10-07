@@ -1,14 +1,13 @@
 from framework.node.Node import *
 from framework.task.Task import *
 from framework.server.controller import *
+from time import time, sleep
 
 class Framework():
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds
-	def __init__(self, TotalPower, RouterBw, Scheduler, ContainerLimit, IntervalTime, hostinit, database):
-		self.totalpower = TotalPower
-		self.totalbw = RouterBw
+	def __init__(self, Scheduler, ContainerLimit, IntervalTime, hostinit, database, env, logger):
 		self.hostlimit = len(hostinit)
 		self.scheduler = Scheduler
 		self.scheduler.setEnvironment(self)
@@ -19,8 +18,12 @@ class Framework():
 		self.interval = 0
 		self.db = database
 		self.inactiveContainers = []
-		self.controller = RequestHandler(self.db)
+		self.logger = logger
+		self.environment = env
+		self.controller = RequestHandler(self.db, self)
 		self.addHostlistInit(hostinit)
+		self.globalStartTime = time()
+		self.intervalAllocTimings = []
 	
 	def addHostInit(self, IP, IPS, RAM, Disk, Bw, Powermodel):
 		assert len(self.hostlist) < self.hostlimit
@@ -29,8 +32,8 @@ class Framework():
 
 	def addHostlistInit(self, hostList):
 		assert len(hostList) == self.hostlimit
-		for IP,IPS, RAM, Disk, Bw, Powermodel in hostList:
-			self.addHostInit(IP,IPS, RAM, Disk, Bw, Powermodel)
+		for IP, IPS, RAM, Disk, Bw, Powermodel in hostList:
+			self.addHostInit(IP, IPS, RAM, Disk, Bw, Powermodel)
 
 	def addContainerInit(self, CreationID, CreationInterval, SLA, Application):
 		container = Task(len(self.containerlist), CreationID, CreationInterval, SLA, Application, self, HostID = -1)
@@ -47,19 +50,18 @@ class Framework():
 		print(self.containerlist)
 		return [container.id for container in deployedContainers]
 
-	# TODO: Update this
-	def addContainer(self, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel,application):
+	def addContainer(self, CreationID, CreationInterval, SLA, Application):
 		for i,c in enumerate(self.containerlist):
 			if c == None or not c.active:
-				container = Container(i, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel, application,self, HostID = -1)
+				container = Task(len(self.containerlist), CreationID, CreationInterval, SLA, Application, self, HostID = -1)
 				self.containerlist[i] = container
 				return container
 
 	def addContainerList(self, containerInfoList):
 		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit-self.getNumActiveContainers())]
 		deployedContainers = []
-		for CreationID, CreationInterval, IPSModel, RAMModel, DiskModel,application in deployed:
-			dep = self.addContainer(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel,application)
+		for CreationID, CreationInterval, SLA, Application in deployed:
+			dep = self.addContainer(CreationID, CreationInterval, SLA, Application)
 			deployedContainers.append(dep)
 		return [container.id for container in deployedContainers]
 
@@ -110,26 +112,24 @@ class Framework():
 		return deployed
 
 	def allocateInit(self, decision):
+		start = time()
 		migrations = []
-		routerBwToEach = self.totalbw / len(decision)
 		for (cid, hid) in decision:
 			container = self.getContainerByID(cid)
-			assert container.getHostID() == -1
-			numberAllocToHost = len(self.scheduler.getMigrationToHost(hid, decision))
-			allocbw = min(self.getHostByID(hid).bwCap.downlink / numberAllocToHost, routerBwToEach)
+			assert container.getHostID() == -1 and hid != -1
 			if self.getPlacementPossible(cid, hid):
-				if container.getHostID() != hid:
-					migrations.append((cid, hid))
-				container.allocateAndExecute(hid, allocbw)
+				migrations.append((cid, hid))
+				container.allocateAndExecute(hid)
 			# destroy pointer to this unallocated container as book-keeping is done by workload model
 			else: 
 				self.containerlist[cid] = None
+		self.intervalAllocTimings.append(time() - start)
 		return migrations
 
 	def destroyCompletedContainers(self):
 		destroyed = []
-		for i,container in enumerate(self.containerlist):
-			if container and container.getBaseIPS() == 0:
+		for i, container in enumerate(self.containerlist):
+			if container and not container.active:
 				container.destroy()
 				self.containerlist[i] = None
 				self.inactiveContainers.append(container)
@@ -165,7 +165,9 @@ class Framework():
 		return [len(self.getContainersOfHost(host)) for host in range(self.hostlimit)]
 
 	def simulationStep(self, decision):
-		routerBwToEach = self.totalbw / len(decision) if len(decision) > 0 else self.totalbw
+		sleep(self.intervaltime - self.intervalAllocTimings[-1])
+		for host in self.hostlist:
+			host.updateUtilizationMetrics()
 		migrations = []
 		containerIDsAllocated = []
 		for (cid, hid) in decision:
@@ -173,30 +175,12 @@ class Framework():
 			currentHostID = self.getContainerByID(cid).getHostID()
 			currentHost = self.getHostByID(currentHostID)
 			targetHost = self.getHostByID(hid)
-			if self.containerlist[cid].hostid != -1:
-				self.controller.checkpoint(container.creationID,currentHostID)
-			#	print(container.id,currentHostID)
-			# Check point and restore --> migrate
-			migrateFromNum = len(self.scheduler.getMigrationFromHost(currentHostID, decision))
-			migrateToNum = len(self.scheduler.getMigrationToHost(hid, decision))
-			allocbw = min(targetHost.bwCap.downlink / migrateToNum, currentHost.bwCap.uplink / migrateFromNum, routerBwToEach)
-			# Check point and restore --> migrate 
 			if hid != self.containerlist[cid].hostid and self.getPlacementPossible(cid, hid):
 				if self.containerlist[cid].hostid != -1:
-					print("Migration in process")
-	   				#self.controller.checkpoint(container.creationID,currentHostID)
-					self.controller.migrate(currentHostID,hid,container.id)
-					container.allocateAndrestore(hid, allocbw)
-					#container.allocateAndExecute(hid,allocbw)
+					container.allocateAndrestore(hid)
 					containerIDsAllocated.append(cid)
 					migrations.append((cid, hid))
-				#container.allocateAndrestore(hid, allocbw)
-				
 		# destroy pointer to unallocated containers as book-keeping is done by workload model
 		for (cid, hid) in decision:
 			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None
-			
-		for i,container in enumerate(self.containerlist):
-			if container and i not in containerIDsAllocated:
-				container.execute(0)
 		return migrations

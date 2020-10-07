@@ -1,7 +1,7 @@
 import os, sys, stat
 import sys
 import optparse
-import logging
+import logging as logger
 import configparser
 import pickle
 import shutil
@@ -51,7 +51,7 @@ INTERFACE ='ens3'
 MASTER_PORT = 5000
 HOSTS_IP = []
 
-def initalizeEnvironment(environment):
+def initalizeEnvironment(environment, logger):
 	if environment != '':
 		# Initialize the db
 		db = Database(DB_NAME, DB_HOST, DB_PORT)
@@ -75,11 +75,21 @@ def initalizeEnvironment(environment):
 	scheduler = GOBIScheduler('energy')
 
 	# Initialize Environment
-	hostlist = datacenter.generateHosts()
+	hostlist = [] # datacenter.generateHosts()
 	if environment != '':
-		env = Framework(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db)
+		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
 	else:
 		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
+
+	#######
+	a = env.controller.getContainerStat("192.168.0.2")
+	# a = env.controller.stop({"fields": {'name': '12_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.2")
+	# a = env.controller.checkpoint(1, 2, "192.168.0.3")
+	# a = env.controller.migrate(1, 2, "192.168.0.3", "192.168.0.2")
+	# a = env.controller.restore(8, 2, "shreshthtuli/yolo", "192.168.0.2")
+	print(a)
+	exit()
+	#######
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -157,9 +167,9 @@ if __name__ == '__main__':
 		logFile = 'SimpleFogSim.log'
 		configFile = 'framework/config/' + opts.env + '_config.json'
 	    
-		logging.basicConfig(filename=logFile, level=logging.DEBUG,
+		logger.basicConfig(filename=logFile, level=logging.DEBUG,
 	                        format='%(asctime)s - %(levelname)s - %(message)s')
-		logging.debug("Creating enviornment in :{}".format(env))
+		logger.debug("Creating enviornment in :{}".format(env))
 		cfg = {}
 		with open(configFile, "r") as f:
 			cfg = json.load(f)
@@ -187,7 +197,7 @@ if __name__ == '__main__':
 		elif env == 'VLAN':
 			pass
 
-	datacenter, workload, scheduler, env, stats = initalizeEnvironment(env)
+	datacenter, workload, scheduler, env, stats = initalizeEnvironment(env, logger)
 
 	for step in range(NUM_SIM_STEPS):
 		print(color.BOLD+"Simulation Interval:", step, color.ENDC)

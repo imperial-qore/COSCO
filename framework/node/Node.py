@@ -10,12 +10,12 @@ class Node():
 	# RAM = Ram in MB capacity
 	# Disk = Disk characteristics capacity
 	# Bw = Bandwidth characteristics capacity
-	def __init__(self, ID, IP, IPS, RAM, Disk, Bw, Powermodel, Framework):
+	def __init__(self, ID, IP, IPS, RAM_, Disk_, Bw, Powermodel, Framework):
 		self.id = ID
 		self.ip = IP
 		self.ipsCap = IPS
-		self.ramCap = RAM
-		self.diskCap = Disk
+		self.ramCap = RAM_
+		self.diskCap = Disk_
 		self.bwCap = Bw
 		# Initialize utilization metrics
 		self.ips = 0
@@ -37,9 +37,8 @@ class Node():
 									"host_ip":self.ip
 								},
 						"time": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%SZ'),
-						"interval": self.env.interval
-						"fields":
-								{
+						"interval": self.env.interval,
+						"fields": {
 									"IPS_Cap": self.ipsCap,
 									"RAM_Cap_size": self.ramCap.size,
 									"RAM_Cap_read": self.ramCap.read,
@@ -93,6 +92,13 @@ class Node():
 		size, read, write = self.getCurrentDisk()
 		return self.diskCap.size - size, self.diskCap.read - read, self.diskCap.write - write
 
-	# TODO: Implement this
 	def updateUtilizationMetrics(self, json):
-		pass
+		container_data = self.env.controller.getContainerStat(self.IP)
+		for container_d in container_data:
+			ccid = int(container_d['fields']['name'].split("_")[0])
+			container = self.env.getContainerByCID(ccid)
+			container.updateUtilizationMetrics(container_d['fields'])
+		host_data = self.env.controller.getHostDetails(self.IP)
+		self.ips = host_data['fields']['cpu'] * self.ipsCap / 100
+		self.ram.size = host_data['fields']['memory']
+		self.disk.size = host_data['fields']['disk']

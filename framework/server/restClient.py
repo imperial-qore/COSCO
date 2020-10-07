@@ -1,36 +1,18 @@
 import requests
 import json
-import sys
 from string import Template
 
 import framework.server.common.codes as codes
 
-OPERATE_CONTAINER = Template("http://$HOST:$PORT/container")
-OPERATE_HOST = Template("http://$HOST:$PORT/host")
+REQUEST_TEMPLATE = Template("http://$HOST:$PORT/request")
+CONTAINER_PORT = 8081
 
-
-def HandleContainer(payload,host):
+def HandleRequest(payload, host):
     resp = ""
-    port = 8081
-    clientUrl = OPERATE_CONTAINER.substitute(HOST = host, PORT = port)
-    
+    clientUrl = REQUEST_TEMPLATE.substitute(HOST = host, PORT = CONTAINER_PORT)
     try:
-        resp = requests.post(clientUrl, data=json.dumps(payload))
+        resp = requests.get(clientUrl, data=json.dumps(payload))
     except requests.exceptions.ConnectionError as e:
         resp = codes.FAILED
-    return resp
-
-def HostDetails(payload,host):
-    resp = ""
-    port = 8081
-    clientUrl = OPERATE_HOST.substitute(HOST = host, PORT = port)
-    print(clientUrl)
-        #payload = {"opcode": "create", "params": containerCfg}
-    rc = codes.SUCCESS  # TODO: This is not used
-    try:
-        resp = requests.post(clientUrl, data=json.dumps(payload))
-    except requests.exceptions.ConnectionError as e:
-        rc = codes.FAILED
-    return resp
-
-
+    # print(resp.text)
+    return json.loads(resp.text)

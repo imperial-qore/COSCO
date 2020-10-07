@@ -5,3 +5,9 @@
 
 # SimpleFogSim
 Simple Fog Simulator
+
+## To be done by the user:
+* Power model required to be implemented in 'framework/node/Powermodels'
+* Config.json needs to be updated  --> based on environment
+* Update based on arch --> 'framework/server/scripts/instructions_arch.json'
+* Update SLA requirement based on application requirements --> 'framework/workload/\*.py'

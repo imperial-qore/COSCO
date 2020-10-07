@@ -1,6 +1,8 @@
 from framework.metrics.Disk import *
 from framework.metrics.RAM import *
 from framework.metrics.Bandwidth import *
+from dateutil import parser
+from datetime import datetime
 
 class Task():
 	# IPS = ips requirement
@@ -25,6 +27,7 @@ class Task():
 		self.active = True
 		self.destroyAt = -1
 		self.application = application
+		self.execError = ""
 		self.containerDBInsert()
 		
 	def containerDBInsert(self):
@@ -80,52 +83,54 @@ class Task():
 	def getHost(self):
 		return self.env.getHostByID(self.hostid)
 
-	# TODO: Update this
-	def allocate(self, hostID, allocBw):
-		# Migrate if different host
-		lastMigrationTime = self.getContainerSize() / allocBw if self.hostid != hostID else 0
+	def allocateAndExecute(self, hostID, allocBw):
+		self.logger.debug("Allocating container "+self.json_body['fields']['name']+" to host "+self.env.getHostByID(hostID).ip)
 		self.hostid = hostID
-		self.json_body["fields"]["Host_id"]=hostID
-		return lastMigrationTime
-
-	def execute(self, lastMigrationTime):
-		# Migration time is the time to migrate to new host
-		# Thus, execution of task takes place for interval
-		# time - migration time with apparent ips
-		assert self.hostid != -1
-		self.env.controller.Create(self.json_body)
-		self.env.db.insert([self.json_body])
+		self.json_body["fields"]["Host_id"] = hostID
+		_, lastMigrationTime = self.env.controller.create(self.json_body, self.env.getHostByID(self.hostid).ip)
 		self.totalMigrationTime += lastMigrationTime
 		execTime = self.env.intervaltime - lastMigrationTime
-		apparentIPS = self.getApparentIPS()
-		requiredExecTime = (self.ipsmodel.totalInstructions - self.ipsmodel.completedInstructions) / apparentIPS if apparentIPS else 0
-		self.totalExecTime += min(execTime, requiredExecTime)
-		self.ipsmodel.completedInstructions += apparentIPS * min(execTime, requiredExecTime)
+		self.totalExecTime += execTime
+		self.env.db.insert([self.json_body])
 
-	def allocateAndExecute(self, hostID, allocBw):
-		self.execute(self.allocate(hostID, allocBw))
-
-	def allocateAndrestore(self,hostID,allobw):
+	def allocateAndrestore(self, hostID):
+		self.logger.debug("Migrating container "+self.json_body['fields']['name']+" from host "+self.getHost().ip+
+			" to host "+self.env.getHostByID(hostID).ip)
+		cur_host_ip = self.getHost().ip
+		self.hostid = hostID
+		tar_host_ip = self.getHost().ip
 		self.json_body["fields"]["Host_id"] = hostID
-		self.env.controller.restore(self.json_body)
+		_, checkpointTime = self.env.controller.checkpoint(self.creationID, self.id, cur_host_ip)
+		_, migrationTime = self.env.controller.migrate(self.creationID, self.id, cur_host_ip, tar_host_ip)
+		_, restoreTime = self.env.controller.restore(self.creationID, self.id, self.application, tar_host_ip)
+		lastMigrationTime = checkpointTime + migrationTime + restoreTime
+		self.totalMigrationTime += lastMigrationTime
+		execTime = self.env.intervaltime - lastMigrationTime
+		self.totalExecTime += execTime
 		self.env.db.insert([self.json_body])
 		
 	def destroy(self):
-		#print("Container destroying process started",self.env.interval)
-		rc = self.env.controller.destroy(self.json_body)
-	#	print("Response after container destroy",self.json_body["fields"]["name"],self.json_body["fields"]["Host_id"],rc)
+		assert not self.active
+		rc = self.env.controller.destroy(self.json_body, self.getHost().ip)
 		query = "DELETE FROM CreatedContainers WHERE creation_id="+"'"+str(self.creationID)+"'"+";"
-	#	print("Deleting from AllocatedContainers")
 		self.env.db.delete_measurement(query)
 		self.json_body["tags"]["active"] = False
 		self.json_body["fields"]["Host_id"] = -1
 		self.destroyAt = self.env.interval
 		self.hostid = -1
-		self.active = False
 
-	# TODO: Implement this
-	def updateUtilizationMetrics(self, json):
-		pass
+	def updateUtilizationMetrics(self, data):
+		self.ips = data['cpu'] * self.getHost().ipsCap / 100
+		self.ram.size = data['memory'] * self.getHost().ramCap.size / 100
+		self.disk.size = data['disk']
+		self.bw.downlink = data['bw_down']
+		self.bw.uplink = data['bw_up']
+		self.active = data['running']
+		if not self.active:
+			finished_at = parser.parse(data['finished_at']).replace(tzinfo=None)
+			now = datetime.utcnow()
+			self.totalExecTime -= abs((now - finished_at).total_seconds())
+			self.execError = data['error']
 		
 		
 
