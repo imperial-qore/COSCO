@@ -10,6 +10,7 @@ from framework.node.Powermodels.PMXeon_X5570 import *
 from framework.metrics.Disk import *
 from framework.metrics.RAM import *
 from framework.metrics.Bandwidth import *
+from utils.Utils import *
 
 class Datacenter():
     
@@ -20,6 +21,7 @@ class Datacenter():
         self.types = {'Power' : [1]}
         
     def generateHosts(self):
+        print(color.HEADER+"Obtaining host information and generating hosts"+color.ENDC)
         hosts = []
         if self.env == 'Vagrant':
             if 'Windows' in platform.system():

@@ -84,7 +84,7 @@ class Task():
 		return self.env.getHostByID(self.hostid)
 
 	def allocateAndExecute(self, hostID):
-		self.logger.debug("Allocating container "+self.json_body['fields']['name']+" to host "+self.env.getHostByID(hostID).ip)
+		self.env.logger.debug("Allocating container "+self.json_body['fields']['name']+" to host "+self.env.getHostByID(hostID).ip)
 		self.hostid = hostID
 		self.json_body["fields"]["Host_id"] = hostID
 		_, lastMigrationTime = self.env.controller.create(self.json_body, self.env.getHostByID(self.hostid).ip)

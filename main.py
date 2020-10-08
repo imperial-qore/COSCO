@@ -73,10 +73,10 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI '''
-	scheduler = GOBIScheduler('energy')
+	scheduler = RandomScheduler()
 
 	# Initialize Environment
-	hostlist = [] #datacenter.generateHosts()
+	hostlist = datacenter.generateHosts()
 	if environment != '':
 		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
 	else:
@@ -110,6 +110,7 @@ def initalizeEnvironment(environment, logger):
 	return datacenter, workload, scheduler, env, stats
 
 def stepSimulation(workload, scheduler, env, stats):
+	exit()
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
 	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
 	

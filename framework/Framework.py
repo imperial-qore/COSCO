@@ -43,8 +43,8 @@ class Framework():
 	def addContainerListInit(self, containerInfoList):
 		deployed = containerInfoList[:min(len(containerInfoList), self.containerlimit-self.getNumActiveContainers())]
 		deployedContainers = []
-		for CreationID, CreationInterval, IPSModel, RAMModel, DiskModel,application in deployed:
-			dep = self.addContainerInit(CreationID, CreationInterval, IPSModel, RAMModel, DiskModel,application)
+		for CreationID, CreationInterval, SLA, Application in deployed:
+			dep = self.addContainerInit(CreationID, CreationInterval, SLA, Application)
 			deployedContainers.append(dep)
 		self.containerlist += [None] * (self.containerlimit - len(self.containerlist))
 		print(self.containerlist)
