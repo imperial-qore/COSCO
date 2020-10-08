@@ -124,6 +124,8 @@ class Framework():
 			else: 
 				self.containerlist[cid] = None
 		self.intervalAllocTimings.append(time() - start)
+		self.logger.debug('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
+		print('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
 		sleep(self.intervaltime - self.intervalAllocTimings[-1])
 		for host in self.hostlist:
 			host.updateUtilizationMetrics()

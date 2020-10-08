@@ -93,7 +93,7 @@ class Node():
 		return self.diskCap.size - size, self.diskCap.read - read, self.diskCap.write - write
 
 	def updateUtilizationMetrics(self):
-		container_data = self.env.controller.getContainerStat(self.IP)
+		container_data = self.env.controller.getContainerStat(self.ip)
 		for container_d in container_data:
 			ccid = int(container_d['fields']['name'].split("_")[0])
 			container = self.env.getContainerByCID(ccid)

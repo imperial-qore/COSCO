@@ -19,7 +19,7 @@ from framework.workload.DeFogWorkload import *
 
 # Simulator imports
 from simulator.Simulator import *
-from simulator.environment.datacenter.BitbrainFog import *
+from simulator.environment.BitbrainFog import *
 from simulator.workload.BitbrainWorkload_GaussianDistribution import *
 
 # Scheduler imports
@@ -42,7 +42,7 @@ HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
-INTERVAL_TIME = 300 # seconds
+INTERVAL_TIME = 30 # seconds
 NEW_CONTAINERS = 2
 DB_NAME = ''
 DB_HOST = ''
