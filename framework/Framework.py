@@ -124,6 +124,9 @@ class Framework():
 			else: 
 				self.containerlist[cid] = None
 		self.intervalAllocTimings.append(time() - start)
+		sleep(self.intervaltime - self.intervalAllocTimings[-1])
+		for host in self.hostlist:
+			host.updateUtilizationMetrics()
 		return migrations
 
 	def destroyCompletedContainers(self):

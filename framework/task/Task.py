@@ -131,7 +131,3 @@ class Task():
 			now = datetime.utcnow()
 			self.totalExecTime -= abs((now - finished_at).total_seconds())
 			self.execError = data['error']
-		
-		
-
-
