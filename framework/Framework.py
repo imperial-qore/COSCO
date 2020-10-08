@@ -47,13 +47,12 @@ class Framework():
 			dep = self.addContainerInit(CreationID, CreationInterval, SLA, Application)
 			deployedContainers.append(dep)
 		self.containerlist += [None] * (self.containerlimit - len(self.containerlist))
-		print(self.containerlist)
 		return [container.id for container in deployedContainers]
 
 	def addContainer(self, CreationID, CreationInterval, SLA, Application):
 		for i,c in enumerate(self.containerlist):
 			if c == None or not c.active:
-				container = Task(len(self.containerlist), CreationID, CreationInterval, SLA, Application, self, HostID = -1)
+				container = Task(i, CreationID, CreationInterval, SLA, Application, self, HostID = -1)
 				self.containerlist[i] = container
 				return container
 
@@ -93,18 +92,14 @@ class Framework():
 		container = self.containerlist[containerID]
 		host = self.hostlist[hostID]
 		ipsreq = container.getBaseIPS()
-		ramsizereq, ramreadreq, ramwritereq = container.getRAM()
-		disksizereq, diskreadreq, diskwritereq = container.getDisk()
+		ramsizereq, _, _ = container.getRAM()
+		disksizereq, _, _ = container.getDisk()
 		ipsavailable = host.getIPSAvailable()
 		ramsizeav, ramreadav, ramwriteav = host.getRAMAvailable()
 		disksizeav, diskreadav, diskwriteav = host.getDiskAvailable()
 		return (ipsreq <= ipsavailable and \
 				ramsizereq <= ramsizeav and \
-				ramreadreq <= ramreadav and \
-				ramwritereq <= ramwriteav and \
-				disksizereq <= disksizeav and \
-				diskreadreq <= diskreadav and \
-				diskwritereq <= diskwriteav)
+				disksizereq <= disksizeav)
 
 	def addContainersInit(self, containerInfoListInit):
 		self.interval += 1
@@ -181,13 +176,15 @@ class Framework():
 			if hid != self.containerlist[cid].hostid and self.getPlacementPossible(cid, hid):
 				if self.containerlist[cid].hostid != -1:
 					container.allocateAndrestore(hid)
-					containerIDsAllocated.append(cid)
-					migrations.append((cid, hid))
+				else:
+					container.allocateAndExecute(hid)
+				containerIDsAllocated.append(cid)
+				migrations.append((cid, hid))
 		# destroy pointer to unallocated containers as book-keeping is done by workload model
 		for (cid, hid) in decision:
 			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None
 		self.intervalAllocTimings.append(time() - start)
-		sleep(self.intervaltime - self.intervalAllocTimings[-1])
+		sleep(max(0, self.intervaltime - self.intervalAllocTimings[-1]))
 		for host in self.hostlist:
 			host.updateUtilizationMetrics()
 		return migrations

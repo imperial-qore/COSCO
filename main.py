@@ -35,20 +35,19 @@ from scheduler.GOBI import GOBIScheduler
 # Auxilliary imports
 from stats.Stats import *
 from utils.Utils import *
+from pdb import set_trace as bp
 
 # Global constants
-NUM_SIM_STEPS = 100
+NUM_SIM_STEPS = 5
 HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
-INTERVAL_TIME = 30 # seconds
+INTERVAL_TIME = 10 # seconds
 NEW_CONTAINERS = 2
 DB_NAME = ''
 DB_HOST = ''
 DB_PORT = 0
-INTERFACE ='ens3'
-MASTER_PORT = 5000
 HOSTS_IP = []
 logFile = 'SimpleFogSim.log'
 
@@ -83,6 +82,7 @@ def initalizeEnvironment(environment, logger):
 		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
 
 	#######
+	# a = env.controller.create({"fields": {'name': str(4)+'_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.2")
 	# a = env.controller.getContainerStat("192.168.0.2")
 	# for	ccid in range(4, 9, 1):
 	# 	a = env.controller.create({"fields": {'name': str(ccid)+'_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.3")
@@ -90,6 +90,7 @@ def initalizeEnvironment(environment, logger):
 	# 	a = env.controller.migrate(ccid, 2, "192.168.0.3", "192.168.0.2")
 	# 	a = env.controller.restore(ccid, 2, "shreshthtuli/yolo", "192.168.0.2")
 	# 	print(a)
+	# print(a)
 	# exit()
 	#######
 
@@ -110,10 +111,9 @@ def initalizeEnvironment(environment, logger):
 	return datacenter, workload, scheduler, env, stats
 
 def stepSimulation(workload, scheduler, env, stats):
-	exit()
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
+	bp()
 	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
-	
 	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.placement(selected+deployed) # Decide placement for selected container ids
 	migrations = env.simulationStep(decision) # Schedule containers
@@ -141,7 +141,7 @@ def saveStats(stats, datacenter, workload):
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	stats.generateGraphs(dirname)
+	# stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
 	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
 	    pickle.dump(stats, handle)

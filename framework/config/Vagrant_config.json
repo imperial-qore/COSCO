@@ -7,11 +7,13 @@
 		"servers" : [
 			{
 				"ram" : 4096,
-				"cpu" : 2
+				"cpu" : 2,
+				"disk": 20
 			},
 			{
 				"ram" : 8192,
-				"cpu" : 4
+				"cpu" : 4,
+				"disk": 30
 			}
 		]
 	}

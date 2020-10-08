@@ -49,7 +49,7 @@ class RequestRouter():
         cpu = psutil.cpu_percent()
         memory = psutil.virtual_memory()[2]
         disk = psutil.disk_usage('/')
-        disk_total = disk.total / (1024 * 1024)
+        disk_total = disk.used / (1024 * 1024)
         ts = time.time()
         payload = {"ip": self.hostIP, "time-stamp":ts, "cpu":cpu, "memory":memory, "disk":disk_total}
         data = json.dumps(payload)
@@ -67,6 +67,8 @@ class RequestRouter():
             c_name = container['Names'][0].replace('/', '')
             _, stats = self.containerClient.stats(c_id)
             inspect_data = self.containerClient.dclient1.inspect_container(c_id)['State']
+            read_bytes = stats['blkio_stats']['io_service_bytes_recursive'][0]['value'] if stats['blkio_stats']['io_service_bytes_recursive'] else 0
+            write_bytes = stats['blkio_stats']['io_service_bytes_recursive'][1]['value'] if stats['blkio_stats']['io_service_bytes_recursive'] else 0
             running = inspect_data['Running']
             finished_at = inspect_data['FinishedAt']
             error = inspect_data['Error']
@@ -85,18 +87,20 @@ class RequestRouter():
                     cpu_percent = cpu_delta / system_delta * 100.0
                 if stats["memory_stats"]["limit"] != 0:
                     memory_percent = float(stats["memory_stats"]["usage"]) / float(stats["memory_stats"]["limit"]) * 100.0
-                disk_stat = subprocess.Popen("docker ps --size -a", shell=True,stdout=subprocess.PIPE).communicate()[0].decode('utf-8').strip()
-                for line in disk_stat.splitlines():
+                disk_stat = subprocess.run(["docker", "ps", "--size", "-a"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                for line in disk_stat.stdout.splitlines():
                     if c_name in line:
-                        disk_stat = re.search('(virtual (.+?)MB)', line).group(1)
+                        disk_stat = re.search('(virtual (.+?)B)', line).group(1)
                         break
-                disk_size = float(disk_stat.split(' ')[1][:-2])
+                disk_size = disk_stat.split(' ')[1][:-1]
             payload = {
                         "name": c_name,
                         "time": time_stamp,
                         "cpu": cpu_percent,
                         "memory": memory_percent,
                         "disk": disk_size, 
+                        "read_bytes": read_bytes,
+                        "write_bytes": write_bytes,
                         "bw_up": bw_up, 
                         "bw_down": bw_down,
                         "running": running,

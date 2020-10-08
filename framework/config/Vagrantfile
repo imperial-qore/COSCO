@@ -4,14 +4,16 @@ servers=[
 		:ip => '192.168.0.2',
 		:box => 'ubuntu/bionic64',
 		:ram => 4096,
-		:cpu => 2
+		:cpu => 2,
+		:disk => '20GB'
 	},
 	{
 		:hostname => 'vm2',
 		:ip => '192.168.0.3',
 		:box => 'ubuntu/bionic64',
 		:ram => 8192,
-		:cpu => 4
+		:cpu => 4,
+		:disk => '30GB'
 	}
 ]
 
@@ -22,6 +24,7 @@ Vagrant.configure(2) do |config|
     servers.each do |machine|
         config.vm.define machine[:hostname] do |node|
             node.vm.box = machine[:box]
+            node.vm.disk :disk, size: machine[:disk], primary: true
             config.ssh.insert_key = false
             config.vm.boot_timeout = 800
             # Configure SSH keys

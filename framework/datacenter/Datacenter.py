@@ -36,7 +36,7 @@ class Datacenter():
             resp = requests.get("http://"+IP+":8081/request", data=json.dumps(payload))
             data = json.loads(resp.text)
             logging.error("Host details collected from: {}".format(IP))
-            print(data)
+            print(color.BOLD+IP+color.ENDC, data)
             IPS = instructions/(float(data['clock']) * 1000) if self.env == 'Vagrant' else data['IPS']
             Power = PMXeon_X5570()
             Ram = RAM(data['Total_Memory'], data['Ram_read'], data['Ram_write'])

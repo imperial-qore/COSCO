@@ -22,6 +22,8 @@ class Task():
 		self.env = Framework
 		self.createAt = creationInterval
 		self.startAt = self.env.interval
+		self.lastReadBytes = 0
+		self.lastWriteBytes = 0
 		self.totalExecTime = 0
 		self.totalMigrationTime = 0
 		self.active = True
@@ -94,7 +96,7 @@ class Task():
 		self.env.db.insert([self.json_body])
 
 	def allocateAndrestore(self, hostID):
-		self.logger.debug("Migrating container "+self.json_body['fields']['name']+" from host "+self.getHost().ip+
+		self.env.logger.debug("Migrating container "+self.json_body['fields']['name']+" from host "+self.getHost().ip+
 			" to host "+self.env.getHostByID(hostID).ip)
 		cur_host_ip = self.getHost().ip
 		self.hostid = hostID
@@ -122,7 +124,14 @@ class Task():
 	def updateUtilizationMetrics(self, data):
 		self.ips = data['cpu'] * self.getHost().ipsCap / 100
 		self.ram.size = data['memory'] * self.getHost().ramCap.size / 100
-		self.disk.size = data['disk']
+		if self.lastReadBytes != 0:
+			self.ram.read = (data['read_bytes'] - self.lastReadBytes) / (1024 * 1024 * self.env.intervaltime)
+			self.ram.write = (data['write_bytes'] - self.lastWriteBytes) / (1024 * 1024 * self.env.intervaltime)
+			self.disk.read = (data['read_bytes'] - self.lastReadBytes) / (1024 * 1024 * self.env.intervaltime)
+			self.disk.write = (data['write_bytes'] - self.lastWriteBytes) / (1024 * 1024 * self.env.intervaltime)
+		self.lastReadBytes = data['read_bytes']	
+		self.lastWriteBytes = data['write_bytes']
+		self.disk.size = float(data['disk'][:-1]) if data['disk'][-1] == 'M' else 1024 * float(data['disk'][:-1])
 		self.bw.downlink = data['bw_down']
 		self.bw.uplink = data['bw_up']
 		self.active = data['running']

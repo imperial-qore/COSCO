@@ -67,8 +67,10 @@ if 'Windows' in platform.system():
 		print('\n'+color.HEADER+'Please follow the prompts for installing Vagrant'+color.ENDC)
 		startfile(filename)
 		remove(filename)
+	set_disk = subprocess.run("setx VAGRANT_EXPERIMENTAL \"disks\"", shell=True, stderr=subprocess.PIPE)
 elif 'Linux' in platform.system():
 	run_cmd_pwd('apt install vagrant')
+	set_disk = subprocess.run("export VAGRANT_EXPERIMENTAL=disks", shell=True, stderr=subprocess.PIPE)
 
 # Install VirtualBox
 if 'Windows' in platform.system():

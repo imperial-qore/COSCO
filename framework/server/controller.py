@@ -26,7 +26,7 @@ class RequestHandler():
             "host_ip": hostIP,
             "name": json_body["fields"]["name"]
         }
-        rc = rclient.HandleRequest(payload, hostIP)
+        rc = rclient.HandleRequest(payload, hostIP, self.env)
         self.env.logger.debug(payload)
         self.env.logger.debug("Response from "+opcode+"d container", rc)
         return rc, time() - start
@@ -39,7 +39,7 @@ class RequestHandler():
 
     def gethostStat(self, hostIP):
         message = "Host stats collected successfully"
-        data = rclient.HandleRequest({"opcode": "hostStat"}, hostIP)
+        data = rclient.HandleRequest({"opcode": "hostStat"}, hostIP, self.env)
         datapoint =  {
                     "measurement": "hostStat",
                     "tags": {
@@ -59,7 +59,7 @@ class RequestHandler():
                
     def getContainerStat(self, hostIP):
         message = "Container stats collected successfully"
-        data = rclient.HandleRequest({"opcode": "ContainerStat"}, hostIP)
+        data = rclient.HandleRequest({"opcode": "ContainerStat"}, hostIP, self.env)
         datapoints = []
         for container_dict in data['stats']:
             datapoints.append({
@@ -75,25 +75,21 @@ class RequestHandler():
         self.db.insert(datapoints)
         return datapoints, message
             
-    def getHostDetails(host_ip):
-        HostDetails = rclient.HandleRequest(host_ip)
-        return HostDetails
-
     def checkpoint(self, ccid, cid, cur_host_ip):
-        print("Checkpoint started")
+        # print("Checkpoint started")
         start = time()
         payload = {
                 "opcode": "checkpoint",
                 "c_name": str(ccid)+"_"+str(cid),
                 "name": str(ccid)+"_"+str(cid)
         } 
-        rc = rclient.HandleRequest(payload, cur_host_ip)
+        rc = rclient.HandleRequest(payload, cur_host_ip, self.env)
         self.env.logger.debug("checkpoint completed, response is container:"+str(ccid)+"_"+str(cid)+", host:"+cur_host_ip)
         self.env.logger.debug(payload)
         return rc, time() - start
     
     def migrate(self, ccid, cid, cur_host_ip, tar_host_ip):
-        print("Migration started")
+        # print("Migration started")
         start = time()
         payload = {
                 "opcode": "migrate",
@@ -102,7 +98,7 @@ class RequestHandler():
                 "name": str(ccid)+"_"+str(cid),
                 "targetIP": tar_host_ip
         }
-        rc = rclient.HandleRequest(payload, cur_host_ip)
+        rc = rclient.HandleRequest(payload, cur_host_ip, self.env)
         self.env.logger.debug("Migrated from "+cur_host_ip+" to "+tar_host_ip+" for container: "+str(ccid)+"_"+str(cid))
         self.env.logger.debug(payload)
         return rc, time() - start
@@ -116,7 +112,7 @@ class RequestHandler():
             "name": name,
             "image": image
         }
-        rc = rclient.HandleRequest(payload, tar_host_ip)
+        rc = rclient.HandleRequest(payload, tar_host_ip, self.env)
         self.env.logger.debug("Restore container "+str(ccid)+"_"+str(cid)+" at "+tar_host_ip)
         self.env.logger.debug(payload)
         return rc, time() - start
