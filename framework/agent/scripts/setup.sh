@@ -23,6 +23,7 @@ newgrp docker
 sudo cp ~/agent/scripts/flask.conf /etc/init.d/
 sudo cp ~/agent/scripts/flask.service /lib/systemd/system/flask.service
 sudo service flask start
+sudo chmod +x ~/agent/scripts/delete.sh
 
 # Load Docker images
 

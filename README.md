@@ -10,6 +10,10 @@
 # SimpleFogSim
 Simple Fog Simulator
 
+## Installation
+- sudo python3 install.py
+- python3 install.py (run in windows powershell (as admin))
+
 ## To be done by the user:
 * Power model required to be implemented in 'framework/node/Powermodels'
 * Config.json needs to be updated  --> based on environment
