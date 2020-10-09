@@ -197,7 +197,7 @@ if __name__ == '__main__':
 		print(color.BOLD+"Simulation Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, env, stats)
 
-	if env == '':
+	if env != '':
 		# Destroy environment if required
 		eval('destroy'+env+'Environment(configFile, mode)')
 
