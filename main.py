@@ -38,7 +38,7 @@ from utils.Utils import *
 from pdb import set_trace as bp
 
 # Global constants
-NUM_SIM_STEPS = 10
+NUM_SIM_STEPS = 0
 HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
@@ -50,6 +50,8 @@ DB_HOST = ''
 DB_PORT = 0
 HOSTS_IP = []
 logFile = 'COSCO.log'
+
+with open(logFile, 'w'): os.utime(logFile, None)
 
 def initalizeEnvironment(environment, logger):
 	if environment != '':
@@ -80,19 +82,6 @@ def initalizeEnvironment(environment, logger):
 		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
 	else:
 		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
-
-	#######
-	# a = env.controller.create({"fields": {'name': str(4)+'_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.2")
-	# a = env.controller.getContainerStat("192.168.0.2")
-	# for	ccid in range(4, 9, 1):
-	# 	a = env.controller.create({"fields": {'name': str(ccid)+'_2', 'image': 'shreshthtuli/yolo'}}, "192.168.0.3")
-	# 	a = env.controller.checkpoint(ccid, 2, "192.168.0.3")
-	# 	a = env.controller.migrate(ccid, 2, "192.168.0.3", "192.168.0.2")
-	# 	a = env.controller.restore(ccid, 2, "shreshthtuli/yolo", "192.168.0.2")
-	# 	print(a)
-	# print(a)
-	# exit()
-	#######
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -127,7 +116,7 @@ def stepSimulation(workload, scheduler, env, stats):
 
 	stats.saveStats(deployed, migrations, destroyed, selected, decision)
 
-def saveStats(stats, datacenter, workload):
+def saveStats(stats, datacenter, workload, env):
 	dirname = "logs/" + datacenter.__class__.__name__
 	dirname += "_" + workload.__class__.__name__
 	dirname += "_" + str(NUM_SIM_STEPS) 
@@ -142,9 +131,12 @@ def saveStats(stats, datacenter, workload):
 	os.mkdir(dirname)
 	# stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
+	stats.env, stats.workload, stats.datacenter, stats.scheduler = None, None, None, None
 	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
 	    pickle.dump(stats, handle)
 	if 'Datacenter' in datacenter.__class__.__name__:
+		logger.getLogger().handlers.clear(); env.logger.getLogger().handlers.clear()
+		if os.path.exists(dirname+'/'+logFile): os.remove(dirname+'/'+logFile)
 		rename(logFile, dirname+'/'+logFile)
 
 if __name__ == '__main__':
@@ -169,7 +161,7 @@ if __name__ == '__main__':
 
 		configFile = 'framework/config/' + opts.env + '_config.json'
 	    
-		logger.basicConfig(filename=logFile, level=logging.DEBUG,
+		logger.basicConfig(filename=logFile, level=logger.DEBUG,
 	                        format='%(asctime)s - %(levelname)s - %(message)s')
 		logger.debug("Creating enviornment in :{}".format(env))
 		cfg = {}
@@ -204,14 +196,14 @@ if __name__ == '__main__':
 	for step in range(NUM_SIM_STEPS):
 		print(color.BOLD+"Simulation Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, env, stats)
-	saveStats(stats, datacenter, workload)
 
 	if env == '':
 		# Destroy environment if required
-		eval('destroy'+env+'Enviornment(configFile, mode)')
+		eval('destroy'+env+'Environment(configFile, mode)')
 
 		# Quit InfluxDB
-		os.system('taskkill /f /im influxd.exe')
+		if 'Windows' in platform.system():
+			os.system('taskkill /f /im influxd.exe')
 
-	saveStats(stats, datacenter, workload)
+	saveStats(stats, datacenter, workload, env)
 

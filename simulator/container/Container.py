@@ -8,6 +8,7 @@ class Container():
 		self.creationID = creationID
 		self.ipsmodel = IPSModel
 		self.ipsmodel.allocContainer(self)
+		self.sla = self.ipsmodel.SLA
 		self.rammodel = RAMModel
 		self.rammodel.allocContainer(self)
 		self.diskmodel = DiskModel

@@ -90,7 +90,7 @@ class Stats():
 		metrics['avgresponsetime'] = np.average(metrics['responsetime']) if len(destroyed) > 0 else 0
 		metrics['migrationtime'] = [c.totalMigrationTime for c in destroyed]
 		metrics['avgmigrationtime'] = np.average(metrics['migrationtime']) if len(destroyed) > 0 else 0
-		metrics['slaviolations'] = len(np.where([c.destroyAt > c.ipsmodel.SLA for c in destroyed]))
+		metrics['slaviolations'] = len(np.where([c.destroyAt > c.sla for c in destroyed]))
 		metrics['slaviolationspercentage'] = metrics['slaviolations'] * 100.0 / len(destroyed) if len(destroyed) > 0 else 0
 		metrics['waittime'] = [c.startAt - c.createAt for c in destroyed]
 		self.metrics.append(metrics)
