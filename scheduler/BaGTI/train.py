@@ -57,12 +57,13 @@ def load_model(filename, model, data_type):
 	return model, optimizer, epoch, accuracy_list
 
 if __name__ == '__main__':
-	data_type = argv[1] # can be 'energy', 'energy_latency'
+	data_type = argv[1] # can be 'energy', 'energy_latency', 'energy_latency2' + '_' + str(HOSTS)
 	exec_type = argv[2] # can be 'train', ga', 'opt'
 
 	model = eval(data_type+"()")
 	model, optimizer, start_epoch, accuracy_list = load_model(data_type, model, data_type)
-	dataset, dataset_size = eval("load_"+data_type+"_data()")
+	dtl = data_type.split('_')
+	dataset, dataset_size, _ = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
 
 	if exec_type == "train":
 		split = int(0.8 * dataset_size)

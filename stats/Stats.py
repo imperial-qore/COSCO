@@ -1,6 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
+from scheduler.GOBI import GOBIScheduler
+
 plt.style.use(['science'])
 plt.rcParams["text.usetex"] = False
 
@@ -11,6 +13,8 @@ class Stats():
 		self.workload = WorkloadModel
 		self.datacenter = Datacenter
 		self.scheduler = Scheduler
+		self.simulated_scheduler = GOBIScheduler('energy_latency_'+str(self.datacenter.num_hosts))
+		self.simulated_scheduler.env = self.env
 		self.initStats()
 
 	def initStats(self):	
@@ -93,6 +97,7 @@ class Stats():
 		metrics['slaviolations'] = len(np.where([c.destroyAt > c.sla for c in destroyed]))
 		metrics['slaviolationspercentage'] = metrics['slaviolations'] * 100.0 / len(destroyed) if len(destroyed) > 0 else 0
 		metrics['waittime'] = [c.startAt - c.createAt for c in destroyed]
+		metrics['energytotalinterval_pred'], metrics['avgresponsetime_pred'] = self.runSimulationGOBI()
 		self.metrics.append(metrics)
 
 	def saveSchedulerInfo(self, selectedcontainers, decision):
@@ -110,6 +115,27 @@ class Stats():
 		self.saveAllContainerInfo()
 		self.saveMetrics(destroyed, migrations)
 		self.saveSchedulerInfo(selectedcontainers, decision)
+
+	def runSimulationGOBI(self):
+		host_alloc = []; container_alloc = [-1] * len(self.env.hostlist)
+		for i in range(len(self.env.hostlist)):
+			host_alloc.append([])
+		for c in self.env.containerlist:
+			if c and c.getHostID() != -1: 
+				host_alloc[c.getHostID()].append(c.id) 
+				container_alloc[c.id] = c.getHostID()
+		selected = self.simulated_scheduler.selection()
+		decision = self.simulated_scheduler.filter_placement(self.simulated_scheduler.placement(selected))
+		for cid, hid in decision:
+			if self.env.getPlacementPossible(cid, hid) and container_alloc[cid] != -1:
+				host_alloc[container_alloc[cid]].remove(cid)
+				host_alloc[hid].append(cid)
+		energytotalinterval_pred = 0
+		for hid, cids in enumerate(host_alloc):
+			ips = 0
+			for cid in cids: ips += self.env.containerlist[cid].getApparentIPS()
+			energytotalinterval_pred += self.env.hostlist[hid].getPowerFromIPS(ips)
+		return energytotalinterval_pred, np.mean([metric_d['avgresponsetime'] for metric_d in self.metrics[-5:]])
 
 	########################################################################################################
 
@@ -170,19 +196,43 @@ class Stats():
 		metric_with_interval = []; metric2_with_interval = [] # metric1 is of host and metric2 is of containers
 		host_alloc_with_interval = []; objfunc2_with_interval = []
 		objfunc_with_interval = []
-		for interval in range(totalIntervals):
+		for interval in range(totalIntervals-1):
 			metric_with_interval.append([self.hostinfo[interval][metric][hostID] for hostID in range(len(self.hostinfo[0][metric]))])
 			host_alloc_with_interval.append([self.activecontainerinfo[interval]['hostalloc'][cID] for cID in range(len(self.activecontainerinfo[0]['hostalloc']))])
-			objfunc_with_interval.append(self.metrics[interval][objfunc])
+			objfunc_with_interval.append(self.metrics[interval+1][objfunc])
 			if metric2:
 				metric2_with_interval.append(self.activecontainerinfo[interval][metric2])
 			if objfunc2:
-				objfunc2_with_interval.append(self.metrics[interval][objfunc2])
+				objfunc2_with_interval.append(self.metrics[interval+1][objfunc2])
 		df = pd.DataFrame(metric_with_interval)
 		if metric2: df = pd.concat([df, pd.DataFrame(metric2_with_interval)], axis=1)
 		df = pd.concat([df, pd.DataFrame(host_alloc_with_interval)], axis=1)
 		df = pd.concat([df, pd.DataFrame(objfunc_with_interval)], axis=1)
 		if objfunc2: df = pd.concat([df, pd.DataFrame(objfunc2_with_interval)], axis=1)
+		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
+
+	def generateDatasetWithInterval2(self, dirname, metric, metric2, metric3, metric4, objfunc, objfunc2):
+		title = metric + '_' + metric2 + '_'  + metric3 + '_'  + metric4 + '_'  +objfunc + '_' + objfunc2 + '_' + 'with_interval' 
+		totalIntervals = len(self.hostinfo)
+		metric_with_interval = []; metric2_with_interval = [] 
+		metric3_with_interval = []; metric4_with_interval = []
+		host_alloc_with_interval = []; objfunc2_with_interval = []
+		objfunc_with_interval = []
+		for interval in range(totalIntervals-1):
+			metric_with_interval.append([self.hostinfo[interval][metric][hostID] for hostID in range(len(self.hostinfo[0][metric]))])
+			host_alloc_with_interval.append([self.activecontainerinfo[interval]['hostalloc'][cID] for cID in range(len(self.activecontainerinfo[0]['hostalloc']))])
+			objfunc_with_interval.append(self.metrics[interval+1][objfunc])
+			metric2_with_interval.append(self.activecontainerinfo[interval][metric2])
+			metric3_with_interval.append(self.metrics[interval][metric3])
+			metric4_with_interval.append(self.metrics[interval][metric4])
+			objfunc2_with_interval.append(self.metrics[interval+1][objfunc2])
+		df = pd.DataFrame(metric_with_interval)
+		df = pd.concat([df, pd.DataFrame(metric2_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(host_alloc_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(metric3_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(metric4_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(objfunc_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(objfunc2_with_interval)], axis=1)
 		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
 
 	def generateGraphs(self, dirname):
@@ -197,5 +247,6 @@ class Stats():
 		self.generateWorkloadWithInterval(dirname)
 
 	def generateDatasets(self, dirname):
-		self.generateDatasetWithInterval(dirname, 'cpu', objfunc='energytotalinterval')
-		self.generateDatasetWithInterval(dirname, 'cpu', objfunc='energytotalinterval', metric2='apparentips', objfunc2='avgresponsetime')
+		# self.generateDatasetWithInterval(dirname, 'cpu', objfunc='energytotalinterval')
+		self.generateDatasetWithInterval(dirname, 'cpu', metric2='apparentips', objfunc='energytotalinterval', objfunc2='avgresponsetime')
+		self.generateDatasetWithInterval2(dirname, 'cpu', 'apparentips', 'energytotalinterval_pred', 'avgresponsetime_pred', objfunc='energytotalinterval', objfunc2='avgresponsetime')

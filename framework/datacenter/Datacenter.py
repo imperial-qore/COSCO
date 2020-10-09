@@ -23,6 +23,9 @@ class Datacenter():
     def generateHosts(self):
         print(color.HEADER+"Obtaining host information and generating hosts"+color.ENDC)
         hosts = []
+        with open('framework/config/'+self.env+'_config.json', "r") as f:
+            config = json.load(f)
+        powermodels = [server["powermodel"] for server in config[self.env.lower()]['servers']]
         if self.env == 'Vagrant':
             if 'Windows' in platform.system():
                 with open('framework/server/scripts/instructions_arch.json') as f:
@@ -31,14 +34,14 @@ class Datacenter():
             else:
                 instructions = subprocess.run("bash -c framework/server/scripts/callIPS_instr.sh", shell=True,stdout=subprocess.PIPE)
                 instructions  = int((instructions.stdout.decode()).splitlines()[0])
-        for IP in self.hosts:
+        for i, IP in enumerate(self.hosts):
             payload = {"opcode": "hostDetails"+self.env}
             resp = requests.get("http://"+IP+":8081/request", data=json.dumps(payload))
             data = json.loads(resp.text)
             logging.error("Host details collected from: {}".format(IP))
             print(color.BOLD+IP+color.ENDC, data)
             IPS = instructions/(float(data['clock']) * 1000) if self.env == 'Vagrant' else data['IPS']
-            Power = PMXeon_X5570()
+            Power = eval(powermodels[i]+"()")
             Ram = RAM(data['Total_Memory'], data['Ram_read'], data['Ram_write'])
             Disk_ = Disk(data['Total_Disk'], data['Disk_read'], data['Disk_write'])
             Bw = Bandwidth(data['Bandwidth'], data['Bandwidth'])

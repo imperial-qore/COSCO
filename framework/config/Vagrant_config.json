@@ -8,12 +8,14 @@
 			{
 				"ram" : 4096,
 				"cpu" : 2,
-				"disk": 20
+				"disk": 20,
+				"powermodel": "PMXeon_X5570"
 			},
 			{
 				"ram" : 8192,
 				"cpu" : 4,
-				"disk": 30
+				"disk": 30,
+				"powermodel": "PMXeon_X5570"
 			}
 		]
 	}

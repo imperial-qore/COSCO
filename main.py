@@ -25,6 +25,7 @@ from simulator.workload.BitbrainWorkload_GaussianDistribution import *
 # Scheduler imports
 from scheduler.IQR_MMT_Random import IQRMMTRScheduler
 from scheduler.MAD_MMT_Random import MADMMTRScheduler
+from scheduler.LR_MMT_Random import LRMMTRScheduler
 from scheduler.Random_Random_FirstFit import RFScheduler
 from scheduler.Random_Random_LeastFull import RLScheduler
 from scheduler.RLR_MMT_Random import RLRMMTRScheduler
@@ -38,12 +39,12 @@ from utils.Utils import *
 from pdb import set_trace as bp
 
 # Global constants
-NUM_SIM_STEPS = 0
+NUM_SIM_STEPS = 400
 HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
-INTERVAL_TIME = 10 # seconds
+INTERVAL_TIME = 300 # seconds
 NEW_CONTAINERS = 2
 DB_NAME = ''
 DB_HOST = ''
@@ -73,8 +74,8 @@ def initalizeEnvironment(environment, logger):
 		workload = BWGD(NEW_CONTAINERS, 3)
 	
 	# Initialize scheduler
-	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMMR, TMMTR, GA, GOBI '''
-	scheduler = RandomScheduler()
+	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
+	scheduler = RandomScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -132,12 +133,13 @@ def saveStats(stats, datacenter, workload, env):
 	# stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
 	stats.env, stats.workload, stats.datacenter, stats.scheduler = None, None, None, None
-	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
-	    pickle.dump(stats, handle)
 	if 'Datacenter' in datacenter.__class__.__name__:
+		stats.simulated_scheduler = None
 		logger.getLogger().handlers.clear(); env.logger.getLogger().handlers.clear()
 		if os.path.exists(dirname+'/'+logFile): os.remove(dirname+'/'+logFile)
 		rename(logFile, dirname+'/'+logFile)
+	with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
+	    pickle.dump(stats, handle)
 
 if __name__ == '__main__':
 	usage = "usage: python main.py -e <environment> -m <mode> # empty environment run simulator"
@@ -171,20 +173,7 @@ if __name__ == '__main__':
 		DB_PORT = cfg['database']['port']
 		DB_NAME = 'COSCO'
 
-		if env == 'AWS':
-			cfg["AccessKey"] = config.get(env, 'AccessKey')
-			cfg["SecretAcessKey"] = config.get(env, 'SecretAcessKey')
-		elif env == 'Openstack':
-			cfg["image"] = config.get(env, 'image')
-	        # cfg["key_name"] = config.get(env, 'key_name')
-	        # cfg["network"] = config.get(env, 'network')
-	        # cfg["flavours"] = list(json.loads(config.get(env, 'flavours')))
-	        # logging.debug("Creating enviornment with configuration file as  :{}".format(cfg))
-	        # setup(cfg)
-		elif env == 'Azure':
-			cfg["AccessKey"] = config.get(env, 'AccessKey')
-			# cfg["SecretAcessKey"] = config.get(env, 'SecretAcessKey')
-		elif env == 'Vagrant':
+		if env == 'Vagrant':
 			print("Setting up VirtualBox environment using Vagrant")
 			HOSTS_IP = setupVagrantEnvironment(configFile, mode)
 			print(HOSTS_IP)
@@ -197,9 +186,9 @@ if __name__ == '__main__':
 		print(color.BOLD+"Simulation Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, env, stats)
 
-	if env != '':
+	if opts.env != '':
 		# Destroy environment if required
-		eval('destroy'+env+'Environment(configFile, mode)')
+		eval('destroy'+opts.env+'Environment(configFile, mode)')
 
 		# Quit InfluxDB
 		if 'Windows' in platform.system():

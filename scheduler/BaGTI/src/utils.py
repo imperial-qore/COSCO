@@ -9,7 +9,7 @@ import random
 from sys import argv
 
 plt.style.use(['science', 'ieee'])
-plt.rcParams["text.usetex"] = True
+# plt.rcParams["text.usetex"] = True
 plt.rcParams['figure.figsize'] = 2, 2
 
 if 'train' in argv[0] and not os.path.exists(MODEL_SAVE_PATH):
@@ -27,7 +27,7 @@ class color:
 
 def load_energy_data():
 	dataset_path = 'datasets/energy_scheduling.csv'
-	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BPTI/'+dataset_path)
+	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BaGTI/'+dataset_path)
 	data = data.values.astype(np.float)
 	dataset = []
 	print("Dataset size", data.shape[0])
@@ -44,25 +44,50 @@ def load_energy_data():
 		# Normalization by (x - min)/(max - min)
 	return dataset, len(dataset)
 
-def load_energy_latency_data():
-	dataset_path = 'datasets/energy_latency_scheduling.csv'
-	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BPTI/'+dataset_path)
+def load_energy_latency_data(HOSTS):
+	dataset_path = 'datasets/energy_latency_'+str(HOSTS)+'_scheduling.csv'
+	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BaGTI/'+dataset_path)
 	data = data.values.astype(np.float)
+	max_ips_container = max(data.max(0)[HOSTS:2*HOSTS])
 	dataset = []
 	print("Dataset size", data.shape[0])
 	for i in range(data.shape[0]):
 		cpuH, cpuC, alloc = [], [], []
-		for j in range(50):
+		for j in range(HOSTS):
 			cpuH.append(data[i][j]/100)
-			cpuC.append(data[i][j+50]/6000)
-			oneHot = [0] * 50
-			if int(data[i][j+100]) >= 0: oneHot[int(data[i][j+100])] = 1
+			cpuC.append(data[i][j+HOSTS]/max_ips_container)
+			oneHot = [0] * HOSTS
+			if int(data[i][j+(2*HOSTS)]) >= 0: oneHot[int(data[i][j+(2*HOSTS)])] = 1
 			alloc.append(oneHot)
 		cpuH = np.array([cpuH]).transpose(); cpuC = np.array([cpuC]).transpose()
 		alloc = np.array(alloc)
-		dataset.append(((np.concatenate((cpuH, cpuC, alloc), axis=1)), torch.Tensor([(data[i][-2]- 9800)/9000, (data[i][-1])/7000])))
+		dataset.append(((np.concatenate((cpuH, cpuC, alloc), axis=1)), torch.Tensor([(data[i][-2]- data.min(0)[-2])/(data.max(0)[-2] - data.min(0)[-2]), abs(data[i][-1])/data.max(0)[-1]])))
 		# Normalization by (x - min)/(max - min)
-	return dataset, len(dataset)
+	return dataset, len(dataset), max_ips_container
+
+def load_energy_latency2_data(HOSTS):
+	dataset_path = 'datasets/energy_latency2_'+str(HOSTS)+'_scheduling.csv'
+	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BaGTI/'+dataset_path)
+	data = data.values.astype(np.float)
+	max_ips_container = max(data.max(0)[HOSTS:2*HOSTS])
+	max_energy = max(data.max(0)[3*HOSTS+1])
+	max_response = max(data.max(0)[3*HOSTS+1])
+	dataset = []
+	print("Dataset size", data.shape[0])
+	for i in range(data.shape[0]):
+		cpuH, cpuC, alloc = [], [], []
+		for j in range(HOSTS):
+			cpuH.append(data[i][j]/100)
+			cpuC.append(data[i][j+HOSTS]/max_ips_container)
+			oneHot = [0] * HOSTS
+			if int(data[i][j+(2*HOSTS)]) >= 0: oneHot[int(data[i][j+(2*HOSTS)])] = 1
+			alloc.append(oneHot)
+		cpuH = np.array([cpuH]).transpose(); cpuC = np.array([cpuC]).transpose()
+		alloc = np.array(alloc)
+		pred_vals = np.broadcast_to(np.array([data[i][3*HOSTS+1]/max_energy, data[i][3*HOSTS+2]/max_response]), (HOSTS, 2))
+		dataset.append(((np.concatenate((cpuH, cpuC, alloc, pred_vals), axis=1)), torch.Tensor([(data[i][-2]- data.min(0)[-2])/(data.max(0)[-2] - data.min(0)[-2]), abs(data[i][-1])/data.max(0)[-1]])))
+		# Normalization by (x - min)/(max - min)
+	return dataset, len(dataset), (max_ips_container, max_energy, max_response)
 
 def plot_accuracies(accuracy_list, data_type):
 	trainAcc = [i[0] for i in accuracy_list]

@@ -10,7 +10,8 @@ class GAScheduler(Scheduler):
 		self.model = eval(data_type+"()")
 		self.model, _, _, _ = load_model(data_type, self.model, data_type)
 		self.data_type = data_type
-		self.dataset, self.dataset_size = eval("load_"+data_type+"_data()")
+		dtl = data_type.split('_')
+		self.dataset, self.dataset_size, _ = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
 
 	def run_GA(self):
 		cpu = [host.getCPU() for host in self.env.hostlist]

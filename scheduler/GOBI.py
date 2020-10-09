@@ -10,12 +10,15 @@ class GOBIScheduler(Scheduler):
 		self.model = eval(data_type+"()")
 		self.model, _, _, _ = load_model(data_type, self.model, data_type)
 		self.data_type = data_type
+		self.hosts = int(data_type.split('_')[-1])
+		dtl = data_type.split('_')
+		_, _, self.max_container_ips = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
 
 	def run_GOBI(self):
 		cpu = [host.getCPU()/100 for host in self.env.hostlist]
 		cpu = np.array([cpu]).transpose()
-		if '_' in self.model.name:
-			cpuC = [(c.getApparentIPS()/6000 if c else 0) for c in self.env.containerlist]
+		if 'latency' in self.model.name:
+			cpuC = [(c.getApparentIPS()/self.max_container_ips if c else 0) for c in self.env.containerlist]
 			cpuC = np.array([cpuC]).transpose()
 			cpu = np.concatenate((cpu, cpuC), axis=1)
 		alloc = []; prev_alloc = {}
@@ -30,7 +33,7 @@ class GOBIScheduler(Scheduler):
 		result, iteration, fitness = opt(init, self.model, [], self.data_type)
 		decision = []
 		for cid in prev_alloc:
-			one_hot = result[cid, -50:].tolist()
+			one_hot = result[cid, -self.hosts:].tolist()
 			new_host = one_hot.index(max(one_hot))
 			if prev_alloc[cid] != new_host: decision.append((cid, new_host))
 		return decision

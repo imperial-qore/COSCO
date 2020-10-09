@@ -21,6 +21,9 @@ class Host():
 	def getPower(self):
 		return self.powermodel.power()
 
+	def getPowerFromIPS(self, ips):
+		return self.powermodel.powerFromCPU(min(100, 100 * (ips / self.ipsCap)))
+		
 	def getCPU(self):
 		ips = self.getApparentIPS()
 		return 100 * (ips / self.ipsCap)

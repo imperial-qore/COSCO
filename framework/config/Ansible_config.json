@@ -1,0 +1,20 @@
+{
+	"database" : {
+		"ip": "127.0.0.1",
+		"port":8086},
+	"ansible" : {
+		"box" : "ubuntu/bionic64",
+		"servers" : [
+			{
+				"ip" : 4096,
+				"password" : 2,
+				"powermodel": "PMXeon_X5570"
+			},
+			{
+				"ip" : 4096,
+				"password" : 2,
+				"powermodel": "PMXeon_X5570"
+			}
+		]
+	}
+}
