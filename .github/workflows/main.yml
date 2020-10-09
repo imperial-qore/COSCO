@@ -7,8 +7,8 @@ name: DeFog-Benchmarks
 on:
   push:
     branches: [ master ]
-  paths:
-    - 'framework/workload/DockerImages/*'
+    paths:
+      - 'framework/workload/DockerImages/*'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
