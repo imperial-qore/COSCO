@@ -30,7 +30,7 @@ jobs:
         - name: Build the Yolo image
           run: docker build -t shreshthtuli/yolo framework/workload/DockerImages/yolo/
         - name: Push the yolo image
-          run: docker.pkg.github.com/fogbus-2/simplefogsim/yolo
+          run: docker push docker.pkg.github.com/fogbus-2/simplefogsim/yolo
         - name: Build the PocketSphinx image
           run: docker build -t shreshthtuli/pocketsphinx framework/workload/DockerImages/PocketSphinx/
         - name: Push the PocketSphinx image
