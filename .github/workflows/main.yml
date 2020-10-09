@@ -9,8 +9,11 @@ on:
     branches: [ master ]
     paths:
       - 'framework/workload/DockerImages/yolo/Dockerfile'
+      - 'framework/workload/DockerImages/yolo/*.sh'
       - 'framework/workload/DockerImages/Pocketsphinx/Dockerfile'
+      - 'framework/workload/DockerImages/Pocketsphinx/*.sh'
       - 'framework/workload/DockerImages/Aeneas/Dockerfile'
+      - 'framework/workload/DockerImages/Aeneas/*.sh'
       - '.github/workflows/*.yml'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel

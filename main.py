@@ -49,7 +49,7 @@ DB_NAME = ''
 DB_HOST = ''
 DB_PORT = 0
 HOSTS_IP = []
-logFile = 'SimpleFogSim.log'
+logFile = 'COSCO.log'
 
 def initalizeEnvironment(environment, logger):
 	if environment != '':
@@ -178,7 +178,7 @@ if __name__ == '__main__':
 			cfg = json.load(f)
 		DB_HOST = cfg['database']['ip']
 		DB_PORT = cfg['database']['port']
-		DB_NAME = 'SimpleFogSim'
+		DB_NAME = 'COSCO'
 
 		if env == 'AWS':
 			cfg["AccessKey"] = config.get(env, 'AccessKey')

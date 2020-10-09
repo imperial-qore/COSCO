@@ -18,7 +18,7 @@ servers=[
 ]
 
 
-agent_path='C:/Users/SHRESHTH/Desktop/SimpleFogSim/framework/agent'
+agent_path='C:/Users/SHRESHTH/Desktop/COSCO/framework/agent'
 
 Vagrant.configure(2) do |config|
     servers.each do |machine|
