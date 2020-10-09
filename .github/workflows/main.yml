@@ -11,6 +11,7 @@ on:
       - 'framework/workload/DockerImages/yolo/Dockerfile'
       - 'framework/workload/DockerImages/Pocketsphinx/Dockerfile'
       - 'framework/workload/DockerImages/Aeneas/Dockerfile'
+      - '.github/workflows/*.yml'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -29,7 +30,7 @@ jobs:
         - name: Build the Yolo image
           run: docker build -t shreshthtuli/yolo framework/workload/DockerImages/yolo/
         - name: Push the yolo image
-          run: docker push shreshthtuli/yolo
+          run: docker.pkg.github.com/fogbus-2/simplefogsim/yolo
         - name: Build the PocketSphinx image
           run: docker build -t shreshthtuli/pocketsphinx framework/workload/DockerImages/PocketSphinx/
         - name: Push the PocketSphinx image
