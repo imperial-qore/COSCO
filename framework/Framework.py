@@ -2,6 +2,7 @@ from framework.node.Node import *
 from framework.task.Task import *
 from framework.server.controller import *
 from time import time, sleep
+from pdb import set_trace as bp
 
 class Framework():
 	# Total power in watt
@@ -168,6 +169,7 @@ class Framework():
 		start = time()
 		migrations = []
 		containerIDsAllocated = []
+		# bp()
 		for (cid, hid) in decision:
 			container = self.getContainerByID(cid)
 			currentHostID = self.getContainerByID(cid).getHostID()

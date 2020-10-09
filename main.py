@@ -38,7 +38,7 @@ from utils.Utils import *
 from pdb import set_trace as bp
 
 # Global constants
-NUM_SIM_STEPS = 5
+NUM_SIM_STEPS = 10
 HOSTS = 50
 CONTAINERS = 50
 TOTAL_POWER = 1000
@@ -112,10 +112,9 @@ def initalizeEnvironment(environment, logger):
 
 def stepSimulation(workload, scheduler, env, stats):
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
-	bp()
 	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
 	selected = scheduler.selection() # Select container IDs for migration
-	decision = scheduler.placement(selected+deployed) # Decide placement for selected container ids
+	decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
 	migrations = env.simulationStep(decision) # Schedule containers
 	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
 	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))

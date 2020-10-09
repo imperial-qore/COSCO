@@ -17,6 +17,13 @@ class Scheduler():
     def placement(self, containerlist):
         pass
 
+    def filter_placement(self, decision):
+        filtered_decision = []
+        for cid, hid in decision:
+            if self.env.getContainerByID(cid).getHostID() != hid:
+                filtered_decision.append((cid, hid))
+        return filtered_decision
+
     def getMigrationFromHost(self, hostID, decision):
         containerIDs = []
         for (cid, _) in decision:

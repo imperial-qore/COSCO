@@ -75,7 +75,7 @@ class RequestRouter():
             cpu_percent = 0.0
             memory_percent = 0.0
             disk_percent = 0.0
-            disk_size = 0.0
+            disk_size = '0M'
             time_stamp = time.time()
             bw_up = stats['networks']['eth0']['tx_bytes'] / (1024 * 1024) if running else 0.0
             bw_down = stats['networks']['eth0']['rx_bytes'] / (1024 * 1024) if running else 0.0
