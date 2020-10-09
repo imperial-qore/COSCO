@@ -33,3 +33,4 @@ RUN chmod +x execute.sh
 COPY assets assets
 
 CMD ["./execute.sh"]
+
