@@ -8,7 +8,9 @@ on:
   push:
     branches: [ master ]
     paths:
-      - 'framework/workload/DockerImages/*'
+      - 'framework/workload/DockerImages/yolo/Dockerfile'
+      - 'framework/workload/DockerImages/Pocketsphinx/Dockerfile'
+      - 'framework/workload/DockerImages/Aeneas/Dockerfile'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
