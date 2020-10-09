@@ -7,8 +7,8 @@
 ![Docker pulls pocketsphinx](https://img.shields.io/docker/pulls/shreshthtuli/pocketsphinx?label=docker%20pulls%3A%20pocketsphinx)
 ![Docker pulls aeneas](https://img.shields.io/docker/pulls/shreshthtuli/aeneas?label=docker%20pulls%3A%20aeneas)
 
-# SimpleFogSim
-Simple Fog Simulator
+# COSCO Framework
+Coupled Simulation and Container Orchestration Framework for integrated Edge and Cloud Computing Environments
 
 ## Installation
 - sudo python3 install.py
