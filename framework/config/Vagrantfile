@@ -35,7 +35,8 @@ Vagrant.configure(2) do |config|
             # Transfer agent data
             config.vm.provision "data transfer", type:  "file", source: agent_path, destination: "$HOME/"
             # Agent setup
-            config.vm.provision "calIPS script chmod", type:  "shell", inline: "sudo chmod +x $HOME/agent/scripts/calIPS_clock_vagrant.sh", privileged: false
+            config.vm.provision "calIPS script chmod", type:  "shell", inline: "sudo chmod +x $HOME/agent/scripts/calIPS.sh", privileged: false
+            config.vm.provision "calIPS2 script chmod", type:  "shell", inline: "sudo chmod +x $HOME/agent/scripts/calIPS_clock.sh", privileged: false
             config.vm.provision "set script chmod", type:  "shell", inline: "sudo chmod +x $HOME/agent/scripts/setup.sh", privileged: false
             config.vm.provision "conf setup script", type:  "shell", inline: "sed -i -e 's/\r$//' $HOME/agent/scripts/setup.sh", privileged: false
             config.vm.provision "run setup script", type:  "shell", inline: "$HOME/agent/scripts/setup.sh", privileged: false

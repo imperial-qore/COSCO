@@ -40,8 +40,8 @@ from pdb import set_trace as bp
 
 # Global constants
 NUM_SIM_STEPS = 400
-HOSTS = 50
-CONTAINERS = 50
+HOSTS = 10
+CONTAINERS = 10
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
@@ -62,7 +62,7 @@ def initalizeEnvironment(environment, logger):
 	# Initialize simple fog datacenter
 	''' Can be SimpleFog, BitbrainFog // Datacenter '''
 	if environment != '':
-		datacenter = Datacenter(HOSTS_IP, environment)
+		datacenter = Datacenter(HOSTS_IP, environment, 'Virtual')
 	else:
 		datacenter = BitbrainFog(HOSTS)
 

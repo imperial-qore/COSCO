@@ -15,6 +15,7 @@ Coupled Simulation and Container Orchestration Framework for integrated Edge and
 - python3 install.py (run in windows powershell (as admin))
 
 ## To be done by the user:
+* Set environment type based on VMs/PMs of Datacenter object
 * Power model required to be implemented in 'framework/node/Powermodels' or set from existing
 * Config.json needs to be updated  --> based on environment
 * Update based on arch --> 'framework/server/scripts/instructions_arch.json'

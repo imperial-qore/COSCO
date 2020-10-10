@@ -135,7 +135,7 @@ class Stats():
 			ips = 0
 			for cid in cids: ips += self.env.containerlist[cid].getApparentIPS()
 			energytotalinterval_pred += self.env.hostlist[hid].getPowerFromIPS(ips)
-		return energytotalinterval_pred, np.mean([metric_d['avgresponsetime'] for metric_d in self.metrics[-5:]])
+		return energytotalinterval_pred*self.env.intervaltime, np.mean([metric_d['avgresponsetime'] for metric_d in self.metrics[-5:]])
 
 	########################################################################################################
 

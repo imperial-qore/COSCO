@@ -21,26 +21,49 @@ class RequestRouter():
         self.containerClient = dockerclient.DockerClient(config["dockerurl"])
         self.hostIP = config["hostIP"]
         self.interface = config["interface"]
-    
-    def hostDetailsVagrant(self):
+
+    def parse_io(self, line):
+        val = float(line.split(" ")[-2])
+        unit = line.split(" ")[-1]
+        if 'G' in unit: val *= 1000
+        elif 'K' in unit: val /= 1000
+        return val * 1.048576
+
+    def hostDetailsVirtual(self):
         rc = codes.SUCCESS
         memory = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
-        data = subprocess.run("./scripts/calIPS_clock_vagrant.sh", shell=True,stdout=subprocess.PIPE)
+        data = subprocess.run("./scripts/calIPS_clock.sh", shell=True,stdout=subprocess.PIPE)
         data  = (data.stdout.decode()).splitlines()
         bw = ((subprocess.run("sudo ethtool "+self.interface+" | grep Speed",shell=True,stdout=subprocess.PIPE)).stdout.decode()).split()[1][0:4]
-        payload ={"Total_Memory":int(float(memory.total/(1024*1024))),"Total_Disk":int(float(disk.total/(1024*1024))),"Bandwidth":int(bw),"clock":data[0],"Ram_read":int(float(data[3])),"Ram_write":int(float(data[4])),"Disk_read":int(float(data[1])),"Disk_write":int(float(data[2]))}
+        payload ={
+                "Total_Memory": int(float(memory.total/(1024*1024))),
+                "Total_Disk": int(float(disk.total/(1024*1024))),
+                "Bandwidth": int(bw),
+                "clock": data[0],
+                "Ram_read": self.parse_io(data[3]),
+                "Ram_write": self.parse_io(data[4]),
+                "Disk_read": self.parse_io(data[1]),
+                "Disk_write": self.parse_io(data[2])}
         data = json.dumps(payload)
         return rc, data
 
-    def hostDetailsAnsible(self):
+    def hostDetailsPhysical(self):
         rc = codes.SUCCESS
         memory = psutil.virtual_memory()
         disk = psutil.disk_usage('/')
-        data = subprocess.run("./scripts/calIPS_ansible.sh", shell=True,stdout=subprocess.PIPE)
+        data = subprocess.run("./scripts/calIPS.sh", shell=True,stdout=subprocess.PIPE)
         data  = (data.stdout.decode()).splitlines()
         bw = ((subprocess.run("sudo ethtool "+self.interface+" | grep Speed",shell=True,stdout=subprocess.PIPE)).stdout.decode()).split()[1][0:4]
-        payload ={"Total_Memory":int(float(memory.total/(1024*1024))),"Total_Disk":int(float(disk.total/(1024*1024))),"Bandwidth":int(bw),"IPS":data[0],"Ram_read":int(float(data[3])),"Ram_write":int(float(data[4])),"Disk_read":int(float(data[1])),"Disk_write":int(float(data[2]))}
+        payload ={
+                "Total_Memory": int(float(memory.total/(1024*1024))),
+                "Total_Disk": int(float(disk.total/(1024*1024))),
+                "Bandwidth": int(bw),
+                "MIPS": data[0],
+                "Ram_read": parse_io(data[3]),
+                "Ram_write": parse_io(data[4]),
+                "Disk_read": parse_io(data[1]),
+                "Disk_write": parse_io(data[2])}
         data = json.dumps(payload)
         return rc, data
 
@@ -130,10 +153,10 @@ class RequestRouter():
             return self.restore(payload)
         elif opcode == "ContainerStat":
             return self.getContainersStat()
-        elif opcode == "hostDetailsVagrant":
-            return self.hostDetailsVagrant()
-        elif opcode == "hostDetailsAnsible":
-            return self.hostDetailsAnsible()
+        elif opcode == "hostDetailsVirtual":
+            return self.hostDetailsVirtual()
+        elif opcode == "hostDetailsPhysical":
+            return self.hostDetailsPhysical()
         elif opcode == "hostStat":
             return self.gethostStat()
         else:
