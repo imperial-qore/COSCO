@@ -72,7 +72,7 @@ def initalizeEnvironment(environment, logger):
 	# Initialize workload
 	''' Can be SWSD, BWGD, BWGD2 // DFW '''
 	if environment != '':
-		workload = DFW(NEW_CONTAINERS, db)
+		workload = DFW(NEW_CONTAINERS, 1.5, db)
 	else: 
 		workload = BWGD2(NEW_CONTAINERS, 1.5)
 	

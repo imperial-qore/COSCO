@@ -42,22 +42,22 @@ class Node():
 									"IPS_Cap": self.ipsCap,
 									"RAM_Cap_size": self.ramCap.size,
 									"RAM_Cap_read": self.ramCap.read,
-									"RAM_Cap_write": str(self.ramCap.write),
+									"RAM_Cap_write": self.ramCap.write,
 									"DISK_Cap_size": self.diskCap.size,
-									"DISK_Cap_read": str(self.diskCap.read),
-									"DISK_Cap_write": str(self.diskCap.write),
+									"DISK_Cap_read": self.diskCap.read,
+									"DISK_Cap_write": self.diskCap.write,
 									"Bw_Cap_up": self.bwCap.uplink,
 									"Bw_Cap_down": self.bwCap.downlink,
 									"IPS": self.ips,
 									"RAM_size": self.ram.size,
 									"RAM_read": self.ram.read,
-									"RAM_write": str(self.ram.write),
+									"RAM_write": self.ram.write,
 									"DISK_size": self.disk.size,
-									"DISK_read": str(self.disk.read),
-									"DISK_write": str(self.disk.write),
+									"DISK_read": self.disk.read,
+									"DISK_write": self.disk.write,
 									"Bw_up": self.bw.uplink,
 									"Bw_down": self.bw.downlink,
-									"Power": str(self.powermodel)
+									"Power": str(self.powermodel.__class__.__name__)
 								}
 					}
 		self.env.db.insert([self.json_body])
