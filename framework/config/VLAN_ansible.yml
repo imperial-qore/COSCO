@@ -20,21 +20,21 @@
       path='/home/{{ username }}/.ssh/authorized_keys'
       manage_dir=no
     #sudo: true
-  
-  - name: Copy the key - id_rsa
-    become_user: "{{username}}"
-    copy:
-      src: "~/id_rsa" 
-      dest: "~/"
-
-  - name: Change the permission of key
-    shell: 'sudo chmod 600 /home/"{{username}}"/id_rsa'
-        
+    
   - name: Copy the agent repository
     become_user: "{{username}}"
     copy:
       src: "../../framework/agent"
       dest: "~/"
+
+  - name: Copy the key - id_rsa
+    become_user: "{{username}}"
+    copy:
+      src: "~/id_rsa" 
+      dest: "~/agent/"
+
+  - name: Change the permission of key
+    shell: 'sudo chmod 600 /home/"{{username}}"/agent/id_rsa'
 
   - name: Change the permission of calIPS_clock.sh file
     shell: 'sudo chmod +x /home/"{{username}}"/agent/scripts/calIPS_clock.sh'

@@ -48,7 +48,6 @@ def setupVLANEnvironment(cfg, mode):
         run_cmd_pwd("cp framework/config/hosts /etc/ansible/hosts", password)
         run_cmd_pwd("cp framework/config/ansible.cfg /etc/ansible/ansible.cfg", password)
         run_cmd("ansible-playbook framework/config/VLAN_ansible.yml")
-        return HOST_IPS
     uname = "ansible"
     for ip in HOST_IPS:
         res = call(["ssh", "-o", "StrictHostKeyChecking=no", "-i", "framework/install_scripts/ssh_keys/id_rsa", uname+"@"+ip, "~/agent/scripts/delete.sh"], shell=True, stdout=PIPE, stderr=PIPE)  
