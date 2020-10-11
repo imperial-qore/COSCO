@@ -120,6 +120,7 @@ class Framework():
 			else: 
 				self.containerlist[cid] = None
 		self.intervalAllocTimings.append(time() - start)
+		self.logger.debug("First allocation: "+str(decision))
 		self.logger.debug('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
 		print('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
 		sleep(self.intervaltime - self.intervalAllocTimings[-1])
@@ -170,6 +171,7 @@ class Framework():
 		migrations = []
 		containerIDsAllocated = []
 		# bp()
+		print(decision)
 		for (cid, hid) in decision:
 			container = self.getContainerByID(cid)
 			currentHostID = self.getContainerByID(cid).getHostID()
@@ -186,6 +188,9 @@ class Framework():
 		for (cid, hid) in decision:
 			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None
 		self.intervalAllocTimings.append(time() - start)
+		self.logger.debug("Decision: "+str(decision))
+		self.logger.debug('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
+		print('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
 		sleep(max(0, self.intervaltime - self.intervalAllocTimings[-1]))
 		for host in self.hostlist:
 			host.updateUtilizationMetrics()

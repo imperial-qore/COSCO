@@ -34,11 +34,11 @@ def run_cmd(cmd):
 def setupVLANEnvironment(cfg, mode):
     with open(cfg, "r") as f:
         config = json.load(f)
+    HOST_IPS = [server['ip'] for server in config['vlan']['servers']]
     if mode in [0, 1]:
         MAIN_DIR = os.getcwd().replace('\\', '/').replace('C:', '/mnt/c')
         password = getpass(color.BOLD+'Please enter linux password:'+color.ENDC)
         run_cmd_pwd("rm /etc/ansible/hosts", password)
-        HOST_IPS = [server['ip'] for server in config['ansible']['servers']]
         run_cmd_pwd("cp framework/install_scripts/ssh_keys/id_rsa ~/id_rsa", password)
         run_cmd_pwd("cp framework/install_scripts/ssh_keys/id_rsa.pub ~/id_rsa.pub", password)
         with open("framework/config/hosts", "w") as f:
@@ -49,7 +49,6 @@ def setupVLANEnvironment(cfg, mode):
         run_cmd_pwd("cp framework/config/ansible.cfg /etc/ansible/ansible.cfg", password)
         run_cmd("ansible-playbook framework/config/VLAN_ansible.yml")
         return HOST_IPS
-    HOST_IPS = ['192.168.0.'+str(i+2) for i in range(len(config['vagrant']['servers']))]
     uname = "ansible"
     for ip in HOST_IPS:
         res = call(["ssh", "-o", "StrictHostKeyChecking=no", "-i", "framework/install_scripts/ssh_keys/id_rsa", uname+"@"+ip, "~/agent/scripts/delete.sh"], shell=True, stdout=PIPE, stderr=PIPE)  

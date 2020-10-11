@@ -18,7 +18,7 @@ def opt(init, model, bounds, data_type):
     optimizer = torch.optim.AdamW([init] , lr=0.8)
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10)
     iteration = 0; equal = 0; z_old = 100; zs = []
-    while True:
+    while iteration < 200:
         cpu_old = deepcopy(init.data[:,0:-HOSTS]); alloc_old = deepcopy(init.data[:,-HOSTS:])
         z = model(init)
         optimizer.zero_grad(); z.backward(); optimizer.step(); scheduler.step()

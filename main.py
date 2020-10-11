@@ -54,7 +54,8 @@ DB_PORT = 0
 HOSTS_IP = []
 logFile = 'COSCO.log'
 
-with open(logFile, 'w'): os.utime(logFile, None)
+if len(sys.argv) > 1:
+	with open(logFile, 'w'): os.utime(logFile, None)
 
 def initalizeEnvironment(environment, logger):
 	if environment != '':
@@ -77,7 +78,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = RLScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = RandomScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -183,7 +184,6 @@ if __name__ == '__main__':
 			print("Setting up VLAN environment using Ansible")
 			HOSTS_IP = setupVLANEnvironment(configFile, mode)
 			print(HOSTS_IP)
-			exit()
 
 	datacenter, workload, scheduler, env, stats = initalizeEnvironment(env, logger)
 

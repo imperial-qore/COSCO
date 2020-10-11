@@ -36,7 +36,7 @@
       src: "../../framework/agent"
       dest: "~/"
 
-  - name: Change the permission of calIPS_ansible.sh file
+  - name: Change the permission of calIPS_clock.sh file
     shell: 'sudo chmod +x /home/"{{username}}"/agent/scripts/calIPS_clock.sh'
 
   - name: Change the permission of delete file

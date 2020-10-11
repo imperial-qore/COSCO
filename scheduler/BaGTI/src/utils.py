@@ -67,11 +67,11 @@ def load_energy_latency_data(HOSTS):
 
 def load_energy_latency2_data(HOSTS):
 	dataset_path = 'datasets/energy_latency2_'+str(HOSTS)+'_scheduling.csv'
-	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BaGTI/'+dataset_path)
+	data = pd.read_csv(dataset_path, header=None) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BaGTI/'+dataset_path, header=None)
 	data = data.values.astype(np.float)
 	max_ips_container = max(data.max(0)[HOSTS:2*HOSTS])
-	max_energy = max(data.max(0)[3*HOSTS+1])
-	max_response = max(data.max(0)[3*HOSTS+1])
+	max_energy = data.max(0)[3*HOSTS]
+	max_response = data.max(0)[3*HOSTS+1]
 	dataset = []
 	print("Dataset size", data.shape[0])
 	for i in range(data.shape[0]):
@@ -84,7 +84,7 @@ def load_energy_latency2_data(HOSTS):
 			alloc.append(oneHot)
 		cpuH = np.array([cpuH]).transpose(); cpuC = np.array([cpuC]).transpose()
 		alloc = np.array(alloc)
-		pred_vals = np.broadcast_to(np.array([data[i][3*HOSTS+1]/max_energy, data[i][3*HOSTS+2]/max_response]), (HOSTS, 2))
+		pred_vals = np.broadcast_to(np.array([data[i][3*HOSTS]/max_energy, data[i][3*HOSTS+1]/max_response]), (HOSTS, 2))
 		dataset.append(((np.concatenate((cpuH, cpuC, alloc, pred_vals), axis=1)), torch.Tensor([(data[i][-2]- data.min(0)[-2])/(data.max(0)[-2] - data.min(0)[-2]), abs(data[i][-1])/data.max(0)[-1]])))
 		# Normalization by (x - min)/(max - min)
 	return dataset, len(dataset), (max_ips_container, max_energy, max_response)

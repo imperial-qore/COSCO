@@ -50,5 +50,6 @@ class Datacenter():
             Ram = RAM(data['Total_Memory'], data['Ram_read'], data['Ram_write'])
             Disk_ = Disk(data['Total_Disk'], data['Disk_read'], data['Disk_write'])
             Bw = Bandwidth(data['Bandwidth'], data['Bandwidth'])
+            print(data)
             hosts.append((IP, IPS, Ram, Disk_, Bw, Power))
         return hosts
