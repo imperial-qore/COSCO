@@ -1,9 +1,0 @@
-- hosts: localhost
-  tasks:
-    - name: remove an instance
-      os_server:
-        name:  'worker123{{ item }}'
-        state: absent
-      register: openstackmaster
-      with_sequence: start=0 end={{num_hosts}}
-

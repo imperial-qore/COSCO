@@ -1,6 +1,6 @@
-from framework.metrics.Disk import *
-from framework.metrics.RAM import *
-from framework.metrics.Bandwidth import *
+from metrics.Disk import *
+from metrics.RAM import *
+from metrics.Bandwidth import *
 import json
 from subprocess import call
 from datetime import datetime

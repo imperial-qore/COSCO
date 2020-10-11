@@ -94,11 +94,12 @@ class Simulator():
 		disksizeav, diskreadav, diskwriteav = host.getDiskAvailable()
 		return (ipsreq <= ipsavailable and \
 				ramsizereq <= ramsizeav and \
-				ramreadreq <= ramreadav and \
-				ramwritereq <= ramwriteav and \
-				disksizereq <= disksizeav and \
-				diskreadreq <= diskreadav and \
-				diskwritereq <= diskwriteav)
+				# ramreadreq <= ramreadav and \
+				# ramwritereq <= ramwriteav and \
+				disksizereq <= disksizeav \
+				# diskreadreq <= diskreadav and \
+				# diskwritereq <= diskwriteav
+				)
 
 	def addContainersInit(self, containerInfoListInit):
 		self.interval += 1

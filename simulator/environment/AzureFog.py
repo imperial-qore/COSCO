@@ -18,6 +18,7 @@ class AzureFog():
 					'RAMSize': 4295,
 					'RAMRead': 372.0,
 					'RAMWrite': 200.0,
+					'DiskSize': 32212,
 					'DiskRead': 13.42,
 					'DiskWrite': 1.011,
 					'BwUp': 5000,
@@ -30,6 +31,7 @@ class AzureFog():
 					'RAMSize': 17180,
 					'RAMRead': 360.0,
 					'RAMWrite': 305.0,
+					'DiskSize': 32212,
 					'DiskRead': 10.38,
 					'DiskWrite': 0.619,
 					'BwUp': 5000,
@@ -42,6 +44,7 @@ class AzureFog():
 					'RAMSize': 34360,
 					'RAMRead': 376.54,
 					'RAMWrite': 266.75,
+					'DiskSize': 32212,
 					'DiskRead': 11.64,
 					'DiskWrite': 1.164,
 					'BwUp': 5000,
@@ -53,10 +56,11 @@ class AzureFog():
 	def generateHosts(self):
 		hosts = []
 		types = ['B2s', 'B2s', 'B2s', 'B2s', 'B4ms', 'B4ms', 'B4ms', 'B4ms', 'B8ms', 'B8ms']
-		for typeID in range(self.num_hosts):
+		for i in range(self.num_hosts):
+			typeID = types[i]
 			IPS = self.types[typeID]['IPS']
-			Ram = RAM(self.types[typeID]['RAMSize'], self.types[typeID]['RAMRead'], self.types[typeID]['RAMWrite'])
-			Disk_ = Disk(self.types[typeID]['DiskSize'], self.types[typeID]['DiskRead'], self.types[typeID]['DiskWrite'])
+			Ram = RAM(self.types[typeID]['RAMSize'], self.types[typeID]['RAMRead']*5, self.types[typeID]['RAMWrite']*5)
+			Disk_ = Disk(self.types[typeID]['DiskSize'], self.types[typeID]['DiskRead']*5, self.types[typeID]['DiskWrite']*10)
 			Bw = Bandwidth(self.types[typeID]['BwUp'], self.types[typeID]['BwDown'])
 			Power = eval(self.types[typeID]['Power']+'()')
 			hosts.append((IPS, Ram, Disk_, Bw, Power))

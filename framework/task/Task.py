@@ -1,6 +1,6 @@
-from framework.metrics.Disk import *
-from framework.metrics.RAM import *
-from framework.metrics.Bandwidth import *
+from metrics.Disk import *
+from metrics.RAM import *
+from metrics.Bandwidth import *
 from dateutil import parser
 from datetime import datetime
 

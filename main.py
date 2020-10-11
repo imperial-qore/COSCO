@@ -19,8 +19,10 @@ from framework.workload.DeFogWorkload import *
 
 # Simulator imports
 from simulator.Simulator import *
+from simulator.environment.AzureFog import *
 from simulator.environment.BitbrainFog import *
 from simulator.workload.BitbrainWorkload_GaussianDistribution import *
+from simulator.workload.BitbrainWorkload2 import *
 
 # Scheduler imports
 from scheduler.IQR_MMT_Random import IQRMMTRScheduler
@@ -45,7 +47,7 @@ CONTAINERS = 10
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
-NEW_CONTAINERS = 2
+NEW_CONTAINERS = 0
 DB_NAME = ''
 DB_HOST = ''
 DB_PORT = 0
@@ -60,22 +62,22 @@ def initalizeEnvironment(environment, logger):
 		db = Database(DB_NAME, DB_HOST, DB_PORT)
 
 	# Initialize simple fog datacenter
-	''' Can be SimpleFog, BitbrainFog // Datacenter '''
+	''' Can be SimpleFog, BitbrainFog, AzureFog // Datacenter '''
 	if environment != '':
 		datacenter = Datacenter(HOSTS_IP, environment, 'Virtual')
 	else:
-		datacenter = BitbrainFog(HOSTS)
+		datacenter = AzureFog(HOSTS)
 
 	# Initialize workload
-	''' Can be SWSD, BWGD // DFW '''
+	''' Can be SWSD, BWGD, BWGD2 // DFW '''
 	if environment != '':
 		workload = DFW(NEW_CONTAINERS, db)
 	else: 
-		workload = BWGD(NEW_CONTAINERS, 3)
+		workload = BWGD2(NEW_CONTAINERS, 1.5)
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = RandomScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = RLScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
