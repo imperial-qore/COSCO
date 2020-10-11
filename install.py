@@ -20,8 +20,8 @@ from getpass import getpass
 # Install Ansible
 password = getpass(color.BOLD+'Please enter linux password:'+color.ENDC)
 
-def run_cmd_pwd(cmd):
-	system("bash -c \"echo "+password+" | sudo -S "+cmd+" -f\"")
+def run_cmd_pwd(cmd, password):
+    os.system("bash -c \"echo "+password+" | sudo -S "+cmd+" &> /dev/null\"")
 
 def run_cmd(cmd):
 	system("bash -c \""+cmd+"\"")

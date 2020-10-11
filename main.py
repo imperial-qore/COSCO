@@ -178,7 +178,10 @@ if __name__ == '__main__':
 			HOSTS_IP = setupVagrantEnvironment(configFile, mode)
 			print(HOSTS_IP)
 		elif env == 'VLAN':
-			pass
+			print("Setting up VLAN environment using Ansible")
+			HOSTS_IP = setupVLANEnvironment(configFile, mode)
+			print(HOSTS_IP)
+			exit()
 
 	datacenter, workload, scheduler, env, stats = initalizeEnvironment(env, logger)
 

@@ -1,0 +1,22 @@
+{
+	"database" : {
+		"ip": "127.0.0.1",
+		"port":8086},
+	"ansible" : {
+		"uname" : "ansible",
+		"servers" : [
+			{
+				"ip" : "51.145.102.71",
+				"powermodel": "PMB1s"
+			},
+			{
+				"ip" : "51.132.237.3",
+				"powermodel": "PMB4ms"
+			},
+			{
+				"ip" : "52.249.252.28",
+				"powermodel": "PMB8ms"
+			}
+		]
+	}
+}

@@ -6,7 +6,11 @@ import requests
 import logging
 import os
 import platform
-from framework.node.Powermodels.PMXeon_X5570 import *
+from metrics.powermodels.PMRaspberryPi import *
+from metrics.powermodels.PMB2s import *
+from metrics.powermodels.PMB4ms import *
+from metrics.powermodels.PMB8ms import *
+from metrics.powermodels.PMXeon_X5570 import *
 from framework.metrics.Disk import *
 from framework.metrics.RAM import *
 from framework.metrics.Bandwidth import *
@@ -41,7 +45,7 @@ class Datacenter():
             data = json.loads(resp.text)
             logging.error("Host details collected from: {}".format(IP))
             print(color.BOLD+IP+color.ENDC, data)
-            IPS = instructions/(float(data['clock']) * 1000000) if self.env_type == 'Virtual' else data['MIPS']
+            IPS = (instructions * config[self.env.lower()]['servers'][i]['cpu'])/(float(data['clock']) * 1000000) if self.env_type == 'Virtual' else data['MIPS']
             Power = eval(powermodels[i]+"()")
             Ram = RAM(data['Total_Memory'], data['Ram_read'], data['Ram_write'])
             Disk_ = Disk(data['Total_Disk'], data['Disk_read'], data['Disk_write'])

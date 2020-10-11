@@ -2,8 +2,12 @@ import numpy as np
 from simulator.host.Disk import *
 from simulator.host.RAM import *
 from simulator.host.Bandwidth import *
-from simulator.host.Powermodels.PMRaspberryPi import *
-from simulator.host.Powermodels.PMConstant import *
+from metrics.powermodels.PMRaspberryPi import *
+from metrics.powermodels.PMB2s import *
+from metrics.powermodels.PMB4ms import *
+from metrics.powermodels.PMB8ms import *
+from metrics.powermodels.PMXeon_X5570 import *
+from metrics.powermodels.PMConstant import *
 
 class BitbrainFog():
 	def __init__(self, num_hosts):

@@ -1,0 +1,192 @@
+- hosts: all
+  become: true
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    interface: 'etho'
+    ipaddr: "{{ ansible_eth0.ipv4.address }}"
+    username: 'ansible'
+
+  tasks:
+
+  # Check SSH
+  - name: Wait for ssh to wake up
+    become: yes
+    wait_for_connection:
+      timeout: 200
+  # Add id_rsa to authorized keys
+  - name: Setup | authorized key upload
+    authorized_key: user={{ username }}
+      key="{{ lookup('file', '~/id_rsa.pub') }}"
+      path='/home/{{ username }}/.ssh/authorized_keys'
+      manage_dir=no
+    #sudo: true
+  
+  - name: Copy the key - id_rsa
+    become_user: "{{username}}"
+    copy:
+      src: "~/id_rsa" 
+      dest: "~/"
+
+  - name: Change the permission of key
+    shell: 'sudo chmod 600 /home/"{{username}}"/id_rsa'
+        
+  - name: Copy the agent repository
+    become_user: "{{username}}"
+    copy:
+      src: "../../framework/agent"
+      dest: "~/"
+
+  - name: Change the permission of calIPS_ansible.sh file
+    shell: 'sudo chmod +x /home/"{{username}}"/agent/scripts/calIPS_clock.sh'
+
+  - name: Change the permission of delete file
+    shell: 'sudo chmod +x /home/"{{username}}"/agent/scripts/delete.sh'
+
+  - name: Change the permission of agent file
+    shell: 'sudo chmod +x /home/"{{username}}"/agent/agent.py'
+
+  - name: Install aptitude using apt
+    become: yes
+    apt: name=aptitude state=latest update_cache=yes force_apt_get=yes
+
+  # Install apt packages
+  - name: Install required system packages
+    become: yes
+    apt: name={{ item }} state=latest update_cache=yes
+    loop: [ 'apt-transport-https', 'ca-certificates', 'curl', 'criu', 'software-properties-common', 'python3-pip', 'virtualenv', 'python3-setuptools', 'linux-tools-generic', 'linux-tools-4.15.0-72-generic', 'sysbench', 'ioping']
+    
+  # Install pip packages
+  - name: Installing flask_restful
+    pip: 
+      name: flask-restful
+    
+  - name: Installing psutil
+    pip: 
+      name: psutil
+    
+  - name: Installing inotify
+    pip: 
+      name: inotify
+  
+  - name: Installing Flask
+    pip: 
+      name: Flask
+
+  - name: Install Docker Module for Python
+    pip:
+      name: docker
+    
+  
+  # Update agent.py with new ip address from 198.68.0 to 10.0.0.4
+  - name: Replace interface in agent file
+    replace:
+      path: /home/{{username}}/agent/agent.py
+      regexp: '192.168.0'
+      replace: "{{ipaddr}}"
+  
+  # Installing docker
+  - name: Create target directory 
+    become: true
+    file: 
+      path=/etc/docker/ 
+      state=directory 
+      mode=0755
+
+  - name: Configure docker network address, ahead of time, to solve issues with docker default network collision with UT VPN
+    shell: 'sudo cp /home/{{username}}/agent/scripts/daemon.json /etc/docker/'
+  
+  - name: Add Docker GPG apt Key
+    become: true
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: Add Docker Repository
+    become: true
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      state: present
+
+  - name: Update apt and install docker-ce
+    apt: update_cache=yes name=docker-ce state=latest
+
+  - name: Add Docker GPG apt Key
+    apt_key:
+      url: https://download.docker.com/linux/ubuntu/gpg
+      state: present
+
+  - name: Add Docker Repository
+    become: true
+    apt_repository:
+      repo: deb https://download.docker.com/linux/ubuntu bionic stable
+      state: present
+
+  - name: Update apt and install docker-ce
+    become: true
+    apt: update_cache=yes name=docker-ce state=latest
+
+  - name: 'add user to docker group'
+    user:
+      name: '{{ username }}'
+      groups: 'docker'
+#  - name: Add user to docker group
+ #   shell: 'sudo usermod -aG docker $USER'
+
+  - name: Ensure group "somegroup" exists
+    group:
+      name: docker
+      state: present
+   
+  # - name: Change the group
+  #   shell: 'newgrp docker'
+
+  - name: Restart docker service
+    become: yes
+    shell: 'sudo service docker restart'
+
+  # Modofication to flask.conf and flask.service
+  - name: Replace vagrant in conf file
+    replace:
+      path: /home/{{username}}/agent/scripts/flask.conf
+      regexp: 'vangrant'
+      replace: "{{username}}"
+
+  - name: Replace vagrant in service file
+    replace:
+      path: /home/{{username}}/agent/scripts/flask.service
+      regexp: 'vagrant'
+      replace: "{{username}}"
+
+  - name: Create the system service for flask server- Part1
+    become: yes
+    shell: 'sudo cp /home/{{username}}/agent/scripts/flask.conf /etc/init.d/'
+        
+  - name: Create the system service for flask server- Part2
+    become: yes
+    shell: 'sudo cp /home/{{username}}/agent/scripts/flask.service /lib/systemd/system/flask.service'
+  
+  # - name: Reload the config in flask service 
+  #   #systemd:
+  #   daemon_reload: yes
+
+  - name: Start the flask service
+    become: yes
+    shell: 'sudo service flask start'
+ # - name: Start service flask, if not started
+  #  become: true
+   # systemd:
+    #  name: flask
+     # state: started
+
+  - name: pull yolo
+    docker_image:
+      name: shreshthtuli/yolo
+  
+  - name: pull pocketsphinx
+    docker_image:
+      name: shreshthtuli/pocketsphinx
+  
+  - name: pull aeneas
+    docker_image:
+      name: shreshthtuli/aeneas
+

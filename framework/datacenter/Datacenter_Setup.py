@@ -3,6 +3,8 @@ import logging
 import json
 import re
 from subprocess import call, Popen, PIPE
+from getpass import getpass
+from utils.Utils import *
 
 def setup(cfg):
     # For ansible setup
@@ -20,6 +22,38 @@ def setup(cfg):
     cfg = json.dumps(cfg)   
 
     call(["ansible-playbook","playbooks/client.yml","-e",cfg])
+
+# VLAN setup functions
+
+def run_cmd_pwd(cmd, password):
+    os.system("bash -c \"echo "+password+" | sudo -S "+cmd+" &> /dev/null\"")
+
+def run_cmd(cmd):
+    os.system("bash -c \""+cmd+"\"")
+
+def setupVLANEnvironment(cfg, mode):
+    with open(cfg, "r") as f:
+        config = json.load(f)
+    if mode in [0, 1]:
+        MAIN_DIR = os.getcwd().replace('\\', '/').replace('C:', '/mnt/c')
+        password = getpass(color.BOLD+'Please enter linux password:'+color.ENDC)
+        run_cmd_pwd("rm /etc/ansible/hosts", password)
+        HOST_IPS = [server['ip'] for server in config['ansible']['servers']]
+        run_cmd_pwd("cp framework/install_scripts/ssh_keys/id_rsa ~/id_rsa", password)
+        run_cmd_pwd("cp framework/install_scripts/ssh_keys/id_rsa.pub ~/id_rsa.pub", password)
+        with open("framework/config/hosts", "w") as f:
+            f.write("[agents]\n")
+            for ip in HOST_IPS:
+                f.write(ip+" ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible\n")
+        run_cmd_pwd("cp framework/config/hosts /etc/ansible/hosts", password)
+        run_cmd_pwd("cp framework/config/ansible.cfg /etc/ansible/ansible.cfg", password)
+        run_cmd("ansible-playbook framework/config/VLAN_ansible.yml")
+        return HOST_IPS
+    HOST_IPS = ['192.168.0.'+str(i+2) for i in range(len(config['vagrant']['servers']))]
+    uname = "ansible"
+    for ip in HOST_IPS:
+        res = call(["ssh", "-o", "StrictHostKeyChecking=no", "-i", "framework/install_scripts/ssh_keys/id_rsa", uname+"@"+ip, "~/agent/scripts/delete.sh"], shell=True, stdout=PIPE, stderr=PIPE)  
+    return HOST_IPS
 
 # Vagrant setup functions
 
