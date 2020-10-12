@@ -14,6 +14,13 @@ Coupled Simulation and Container Orchestration Framework for integrated Edge and
 - sudo python3 install.py
 - python3 install.py (run in windows powershell (as admin))
 
+## VLAN Requirements
+* All agents should run Ubuntu 18.04 LTS
+* All agents should have kernel 4.15.xx 
+* Server and agents should be able to communicate visa flask API on port 8081
+* SSH should be using discoverable IP in a VLAN and SSH should using public-private key pair
+* All agents should have username as 'ansible'
+
 ## To be done by the user:
 * Set environment type based on VMs/PMs of Datacenter object
 * Power model required to be implemented in 'framework/node/Powermodels' or set from existing
