@@ -93,7 +93,7 @@ class RequestHandler():
         start = time()
         payload = {
                 "opcode": "migrate",
-                "uname": 'vagrant' if self.env.environment == 'Vagrant' else 'ubuntu',
+                "uname": 'vagrant' if self.env.environment == 'Vagrant' else 'ansible',
                 "c_name": str(ccid)+"_"+str(cid),
                 "name": str(ccid)+"_"+str(cid),
                 "targetIP": tar_host_ip

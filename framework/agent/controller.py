@@ -16,6 +16,9 @@ import psutil
 import time
 import re
 
+logging.basicConfig(filename='COSCO.log', level=logging.DEBUG,
+                            format='%(asctime)s - %(levelname)s - %(message)s')
+
 class RequestRouter():
     def __init__(self, config):
         self.containerClient = dockerclient.DockerClient(config["dockerurl"])
@@ -137,6 +140,8 @@ class RequestRouter():
 
     def handleRequestOp(self, payload):
         opcode = payload["opcode"]
+        logging.debug('Got Opcode')
+        logging.debug('Data = '+str(payload))
         if opcode == "create":
             return self.containerClient.create(payload)
         elif opcode == "start":
@@ -166,10 +171,12 @@ class RequestRouter():
         container_name = payload["name"]
         checkpoint_name = payload["c_name"]
         rc, data = codes.SUCCESS, "Checkpoint successful"
+        logging.debug('Inside checkpoint function')
+        logging.debug(str(["sudo", "docker", "checkpoint", "create", container_name, checkpoint_name]))
         try:
             subprocess.call(["sudo", "docker", "checkpoint", "create", container_name, checkpoint_name])
-        except ValueError:
-            rc, data = codes.ERROR, "Checkpoint not created"
+        except Exception as e:
+            rc, data = codes.ERROR, str(e)
         return rc, json.dumps({'message': data})
 
     def migrate(self, payload):
@@ -186,8 +193,8 @@ class RequestRouter():
             self.containerClient.delete(container_name)
             subprocess.call(["scp", "-o", "StrictHostKeyChecking=no", "-i", "~/agent/id_rsa","/tmp/"+container_name+"."+checkpoint_name+".tgz", uname+"@"+targetIP+":/tmp/"])
             subprocess.call(["sudo","rm","-rf","/tmp/"+container_name+"."+checkpoint_name+".tgz"])
-        except ValueError:
-            data = "Migrate checkpoint to "+targetIP+" not successful"
+        except Exception as e:
+            data = "Migrate checkpoint to "+targetIP+" not successful, Error:"+str(e)
             rc = codes.ERROR
         return rc, json.dumps({'message': data if rc == codes.SUCCESS else 'error'})
 
