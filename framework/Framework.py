@@ -3,6 +3,10 @@ from framework.task.Task import *
 from framework.server.controller import *
 from time import time, sleep
 from pdb import set_trace as bp
+import multiprocessing
+from joblib import Parallel, delayed
+
+num_cores = multiprocessing.cpu_count()
 
 class Framework():
 	# Total power in watt
@@ -166,6 +170,15 @@ class Framework():
 	def getContainersInHosts(self):
 		return [len(self.getContainersOfHost(host)) for host in range(self.hostlimit)]
 
+	def parallelizedFunc(self, i):
+		cid, hid = i
+		container = self.getContainerByID(cid)
+		if self.containerlist[cid].hostid != -1:
+			container.allocateAndrestore(hid)
+		else:
+			container.allocateAndExecute(hid)
+		return container
+
 	def simulationStep(self, decision):
 		start = time()
 		migrations = []
@@ -178,12 +191,11 @@ class Framework():
 			currentHost = self.getHostByID(currentHostID)
 			targetHost = self.getHostByID(hid)
 			if hid != self.containerlist[cid].hostid and self.getPlacementPossible(cid, hid):
-				if self.containerlist[cid].hostid != -1:
-					container.allocateAndrestore(hid)
-				else:
-					container.allocateAndExecute(hid)
 				containerIDsAllocated.append(cid)
 				migrations.append((cid, hid))
+		outputContainers = Parallel(n_jobs=num_cores)(delayed(self.parallelizedFunc)(i) for i in migrations)
+		for i, (cid, hid) in enumerate(migrations):
+			self.containerlist[cid] = outputContainers[i]
 		# destroy pointer to unallocated containers as book-keeping is done by workload model
 		for (cid, hid) in decision:
 			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None

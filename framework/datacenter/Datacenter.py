@@ -16,6 +16,11 @@ from metrics.RAM import *
 from metrics.Bandwidth import *
 from utils.Utils import *
 
+import multiprocessing
+from joblib import Parallel, delayed
+
+num_cores = multiprocessing.cpu_count()
+
 class Datacenter():
     
     def __init__(self, hosts, env, env_type):
@@ -24,7 +29,13 @@ class Datacenter():
         self.env = env
         self.env_type = env_type
         self.types = {'Power' : [1]}
-        
+
+    def parallelizedFunc(self, IP):
+        payload = {"opcode": "hostDetails"+self.env_type}
+        resp = requests.get("http://"+IP+":8081/request", data=json.dumps(payload))
+        data = json.loads(resp.text)
+        return data
+
     def generateHosts(self):
         print(color.HEADER+"Obtaining host information and generating hosts"+color.ENDC)
         hosts = []
@@ -39,10 +50,9 @@ class Datacenter():
             else:
                 instructions = subprocess.run("bash -c framework/server/scripts/callIPS_instr.sh", shell=True,stdout=subprocess.PIPE)
                 instructions  = int((instructions.stdout.decode()).splitlines()[0])
-        for i, IP in enumerate(self.hosts):
-            payload = {"opcode": "hostDetails"+self.env_type}
-            resp = requests.get("http://"+IP+":8081/request", data=json.dumps(payload))
-            data = json.loads(resp.text)
+        outputHostsData = Parallel(n_jobs=num_cores)(delayed(self.parallelizedFunc)(i) for i in self.hosts)
+        for i, data in enumerate(outputHostsData):
+            IP = self.hosts[i]
             logging.error("Host details collected from: {}".format(IP))
             print(color.BOLD+IP+color.ENDC, data)
             IPS = (instructions * config[self.env.lower()]['servers'][i]['cpu'])/(float(data['clock']) * 1000000) if self.env_type == 'Virtual' else data['MIPS']
