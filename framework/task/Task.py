@@ -93,7 +93,6 @@ class Task():
 		self.totalMigrationTime += lastMigrationTime
 		execTime = self.env.intervaltime - lastMigrationTime
 		self.totalExecTime += execTime
-		# self.env.db.insert([self.json_body])
 
 	def allocateAndrestore(self, hostID):
 		# self.env.logger.debug("Migrating container "+self.json_body['fields']['name']+" from host "+self.getHost().ip+
@@ -109,7 +108,6 @@ class Task():
 		self.totalMigrationTime += lastMigrationTime
 		execTime = self.env.intervaltime - lastMigrationTime
 		self.totalExecTime += execTime
-		# self.env.db.insert([self.json_body])
 		
 	def destroy(self):
 		assert not self.active

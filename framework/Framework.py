@@ -127,7 +127,7 @@ class Framework():
 		self.logger.debug("First allocation: "+str(decision))
 		self.logger.debug('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
 		print('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
-		sleep(self.intervaltime - self.intervalAllocTimings[-1])
+		self.visualSleep(self.intervaltime - self.intervalAllocTimings[-1])
 		for host in self.hostlist:
 			host.updateUtilizationMetrics()
 		return migrations
@@ -179,6 +179,14 @@ class Framework():
 			container.allocateAndExecute(hid)
 		return container
 
+	def visualSleep(self, t):
+		total = str(int(t//60))+" min, "+str(t%60)+" sec"
+		for i in range(int(t)):
+			print("\r>> Interval timer "+str(i//60)+" min, "+str(i%60)+" sec of "+total, end=' ')
+			sleep(1)
+		sleep(t % 1)
+		print()
+
 	def simulationStep(self, decision):
 		start = time()
 		migrations = []
@@ -200,7 +208,7 @@ class Framework():
 		self.logger.debug("Decision: "+str(decision))
 		self.logger.debug('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
 		print('Interval allocation time for interval '+str(self.interval)+' is '+str(self.intervalAllocTimings[-1]))
-		sleep(max(0, self.intervaltime - self.intervalAllocTimings[-1]))
+		self.visualSleep(max(0, self.intervaltime - self.intervalAllocTimings[-1]))
 		for host in self.hostlist:
 			host.updateUtilizationMetrics()
 		return migrations

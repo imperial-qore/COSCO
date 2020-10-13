@@ -118,7 +118,10 @@ class RequestRouter():
                     if c_name in line:
                         disk_stat = re.search('(virtual (.+?)B)', line).group(1)
                         break
-                disk_size = disk_stat.split(' ')[1][:-1]
+                try:
+                    disk_size = disk_stat.split(' ')[1][:-1]
+                except:
+                    disk_size = 0
             payload = {
                         "name": c_name,
                         "time": time_stamp,

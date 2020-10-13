@@ -2,6 +2,7 @@ from .Workload import *
 from datetime import datetime
 from framework.database.Database import *
 from random import gauss, randint
+import random
 
 class DFW(Workload):
     def __init__(self, num_workloads, std_dev, database):
@@ -16,7 +17,7 @@ class DFW(Workload):
         applications = ['shreshthtuli/yolo', 'shreshthtuli/pocketsphinx', 'shreshthtuli/aeneas']
         for i in range(max(1,int(gauss(self.num_workloads, self.std_dev)))):
             CreationID = self.creation_id
-            appSelection = np.random.randint(0,2)
+            appSelection = random.randint(0,2)
             SLA = np.random.randint(5,8) ## Update this based on intervals taken
             application = applications[appSelection]
             workloadlist.append((CreationID, interval, SLA, application))

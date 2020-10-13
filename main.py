@@ -105,6 +105,7 @@ def initalizeEnvironment(environment, logger):
 
 def stepSimulation(workload, scheduler, env, stats):
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
+	print(newcontainerinfos)
 	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
 	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
