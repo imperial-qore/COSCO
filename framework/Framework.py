@@ -193,10 +193,7 @@ class Framework():
 			if hid != self.containerlist[cid].hostid and self.getPlacementPossible(cid, hid):
 				containerIDsAllocated.append(cid)
 				migrations.append((cid, hid))
-		outputContainers = Parallel(n_jobs=num_cores)(delayed(self.parallelizedFunc)(i) for i in migrations)
-		for i, (cid, hid) in enumerate(migrations):
-			self.containerlist[cid] = outputContainers[i]
-		# destroy pointer to unallocated containers as book-keeping is done by workload model
+		Parallel(n_jobs=num_cores, backend='threading')(delayed(self.parallelizedFunc)(i) for i in migrations)
 		for (cid, hid) in decision:
 			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None
 		self.intervalAllocTimings.append(time() - start)

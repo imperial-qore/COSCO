@@ -86,18 +86,18 @@ class Task():
 		return self.env.getHostByID(self.hostid)
 
 	def allocateAndExecute(self, hostID):
-		self.env.logger.debug("Allocating container "+self.json_body['fields']['name']+" to host "+self.env.getHostByID(hostID).ip)
+		# self.env.logger.debug("Allocating container "+self.json_body['fields']['name']+" to host "+self.env.getHostByID(hostID).ip)
 		self.hostid = hostID
 		self.json_body["fields"]["Host_id"] = hostID
 		_, lastMigrationTime = self.env.controller.create(self.json_body, self.env.getHostByID(self.hostid).ip)
 		self.totalMigrationTime += lastMigrationTime
 		execTime = self.env.intervaltime - lastMigrationTime
 		self.totalExecTime += execTime
-		self.env.db.insert([self.json_body])
+		# self.env.db.insert([self.json_body])
 
 	def allocateAndrestore(self, hostID):
-		self.env.logger.debug("Migrating container "+self.json_body['fields']['name']+" from host "+self.getHost().ip+
-			" to host "+self.env.getHostByID(hostID).ip)
+		# self.env.logger.debug("Migrating container "+self.json_body['fields']['name']+" from host "+self.getHost().ip+
+		# 	" to host "+self.env.getHostByID(hostID).ip)
 		cur_host_ip = self.getHost().ip
 		self.hostid = hostID
 		tar_host_ip = self.getHost().ip
@@ -109,13 +109,13 @@ class Task():
 		self.totalMigrationTime += lastMigrationTime
 		execTime = self.env.intervaltime - lastMigrationTime
 		self.totalExecTime += execTime
-		self.env.db.insert([self.json_body])
+		# self.env.db.insert([self.json_body])
 		
 	def destroy(self):
 		assert not self.active
 		rc = self.env.controller.destroy(self.json_body, self.getHost().ip)
-		query = "DELETE FROM CreatedContainers WHERE creation_id="+"'"+str(self.creationID)+"'"+";"
-		self.env.db.delete_measurement(query)
+		# query = "DELETE FROM CreatedContainers WHERE creation_id="+"'"+str(self.creationID)+"'"+";"
+		# self.env.db.delete_measurement(query)
 		self.json_body["tags"]["active"] = False
 		self.json_body["fields"]["Host_id"] = -1
 		self.destroyAt = self.env.interval
