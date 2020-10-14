@@ -43,13 +43,9 @@ class Datacenter():
             config = json.load(f)
         powermodels = [server["powermodel"] for server in config[self.env.lower()]['servers']]
         if self.env_type == 'Virtual':
-            if 'Windows' in platform.system():
-                with open('framework/server/scripts/instructions_arch.json') as f:
-                    arch_dict = json.load(f)
-                instructions = arch_dict[platform.machine()]
-            else:
-                instructions = subprocess.run("bash -c framework/server/scripts/callIPS_instr.sh", shell=True,stdout=subprocess.PIPE)
-                instructions  = int((instructions.stdout.decode()).splitlines()[0])
+            with open('framework/server/scripts/instructions_arch.json') as f:
+                arch_dict = json.load(f)
+            instructions = arch_dict[platform.machine()]
         outputHostsData = Parallel(n_jobs=num_cores)(delayed(self.parallelizedFunc)(i) for i in self.hosts)
         for i, data in enumerate(outputHostsData):
             IP = self.hosts[i]
