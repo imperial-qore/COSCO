@@ -8,7 +8,7 @@ import shutil
 import sqlite3
 import platform
 from subprocess import call
-from os import startfile, system, rename
+from os import system, rename
 
 # Framework imports
 from framework.Framework import *
@@ -164,7 +164,7 @@ if __name__ == '__main__':
 		# Start InfluxDB service
 		print(color.HEADER+'InfluxDB service runs as a separate front-end window. Please minimize this window.'+color.ENDC)
 		if 'Windows' in platform.system():
-			startfile('C:/Program Files/InfluxDB/influxdb-1.8.3-1/influxd.exe')
+			os.startfile('C:/Program Files/InfluxDB/influxdb-1.8.3-1/influxd.exe')
 
 		configFile = 'framework/config/' + opts.env + '_config.json'
 	    
