@@ -113,12 +113,12 @@ class RequestRouter():
                     cpu_percent = cpu_delta / system_delta * 100.0
                 if stats["memory_stats"]["limit"] != 0:
                     memory_percent = float(stats["memory_stats"]["usage"]) / float(stats["memory_stats"]["limit"]) * 100.0
-                disk_stat = subprocess.run(["docker", "ps", "--size", "-a"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-                for line in disk_stat.stdout.splitlines():
-                    if c_name in line:
-                        disk_stat = re.search('(virtual (.+?)B)', line).group(1)
-                        break
                 try:
+                    disk_stat = subprocess.run(["docker", "ps", "--size", "-a"], universal_newlines=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+                    for line in disk_stat.stdout.splitlines():
+                        if c_name in line:
+                            disk_stat = re.search('(virtual (.+?)B)', line).group(1)
+                            break
                     disk_size = disk_stat.split(' ')[1][:-1]
                 except:
                     disk_size = 0

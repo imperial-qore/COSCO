@@ -121,7 +121,7 @@ def stepSimulation(workload, scheduler, env, stats):
 
 	stats.saveStats(deployed, migrations, destroyed, selected, decision)
 
-def saveStats(stats, datacenter, workload, env):
+def saveStats(stats, datacenter, workload, env, end=True):
 	dirname = "logs/" + datacenter.__class__.__name__
 	dirname += "_" + workload.__class__.__name__
 	dirname += "_" + str(NUM_SIM_STEPS) 
@@ -136,6 +136,7 @@ def saveStats(stats, datacenter, workload, env):
 	os.mkdir(dirname)
 	# stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
+	if not end: return
 	stats.env, stats.workload, stats.datacenter, stats.scheduler = None, None, None, None
 	if 'Datacenter' in datacenter.__class__.__name__:
 		stats.simulated_scheduler = None
@@ -191,6 +192,7 @@ if __name__ == '__main__':
 	for step in range(NUM_SIM_STEPS):
 		print(color.BOLD+"Simulation Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, env, stats)
+		if env != '' and step % 10 == 0: saveStats(stats, datacenter, workload, env, end = False)
 
 	if opts.env != '':
 		# Destroy environment if required
