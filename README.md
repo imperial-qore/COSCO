@@ -13,6 +13,7 @@ Coupled Simulation and Container Orchestration Framework for integrated Edge and
 ## Installation
 - sudo python3 install.py
 - python3 install.py (run in windows powershell (as admin))
+- Install pytorch 1.5.0+cpu or above version.
 
 ## VLAN Requirements
 * All agents should run Ubuntu 18.04 LTS
