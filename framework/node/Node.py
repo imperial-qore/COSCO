@@ -86,7 +86,7 @@ class Node():
 
 	def getRAMAvailable(self):
 		size, read, write = self.getCurrentRAM()
-		return 0.8 * (self.ramCap.size - size), self.ramCap.read - read, self.ramCap.write - write
+		return max(0, 0.8 * self.ramCap.size - size), self.ramCap.read - read, self.ramCap.write - write
 
 	def getCurrentDisk(self):
 		return self.disk.size, self.disk.read, self.disk.write
