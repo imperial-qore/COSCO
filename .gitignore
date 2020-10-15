@@ -6,7 +6,7 @@ simulator/workload/datasets
 scheduler/A2C/dataset
 .vagrant
 framework/agent/DockerImages
-datasets
+all_datasets
 
 # C extensions
 *.so
