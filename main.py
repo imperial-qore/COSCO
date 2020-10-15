@@ -186,7 +186,7 @@ if __name__ == '__main__':
 			print("Setting up VLAN environment using Ansible")
 			HOSTS_IP = setupVLANEnvironment(configFile, mode)
 			print(HOSTS_IP)
-		# exit()
+		exit()
 
 	datacenter, workload, scheduler, env, stats = initalizeEnvironment(env, logger)
 

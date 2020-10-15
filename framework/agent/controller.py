@@ -121,7 +121,7 @@ class RequestRouter():
                             break
                     disk_size = disk_stat.split(' ')[1][:-1]
                 except:
-                    disk_size = 0
+                    disk_size = '0M'
             payload = {
                         "name": c_name,
                         "time": time_stamp,
