@@ -7,6 +7,7 @@ import pickle
 import shutil
 import sqlite3
 import platform
+from time import time
 from subprocess import call
 from os import system, rename
 
@@ -90,7 +91,9 @@ def initalizeEnvironment(environment, logger):
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
 	deployed = env.addContainersInit(newcontainerinfos) # Deploy new containers and get container IDs
+	start = time()
 	decision = scheduler.placement(deployed) # Decide placement using container ids
+	schedulingTime = time() - start
 	migrations = env.allocateInit(decision) # Schedule containers
 	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload allocated using creation IDs
 	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
@@ -100,15 +103,17 @@ def initalizeEnvironment(environment, logger):
 
 	# Initialize stats
 	stats = Stats(env, workload, datacenter, scheduler)
-	stats.saveStats(deployed, migrations, [], deployed, decision)
+	stats.saveStats(deployed, migrations, [], deployed, decision, schedulingTime)
 	return datacenter, workload, scheduler, env, stats
 
 def stepSimulation(workload, scheduler, env, stats):
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
 	print(newcontainerinfos)
 	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
+	start = time()
 	selected = scheduler.selection() # Select container IDs for migration
 	decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
+	schedulingTime = time() - start
 	migrations = env.simulationStep(decision) # Schedule containers
 	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
 	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
@@ -119,7 +124,7 @@ def stepSimulation(workload, scheduler, env, stats):
 	print("Host allocation:", [(c.getHostID() if c else -1)for c in env.containerlist])
 	printDecisionAndMigrations(decision, migrations)
 
-	stats.saveStats(deployed, migrations, destroyed, selected, decision)
+	stats.saveStats(deployed, migrations, destroyed, selected, decision, schedulingTime)
 
 def saveStats(stats, datacenter, workload, env, end=True):
 	dirname = "logs/" + datacenter.__class__.__name__
@@ -136,6 +141,7 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	os.mkdir(dirname)
 	# stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
+	stats.generateCompleteDatasets(dirname)
 	if not end: return
 	stats.env, stats.workload, stats.datacenter, stats.scheduler = None, None, None, None
 	if 'Datacenter' in datacenter.__class__.__name__:
