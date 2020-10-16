@@ -139,7 +139,7 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	# stats.generateGraphs(dirname)
+	stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
 	stats.generateCompleteDatasets(dirname)
 	if not end: return
