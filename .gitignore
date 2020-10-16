@@ -7,6 +7,7 @@ scheduler/A2C/dataset
 .vagrant
 framework/agent/DockerImages
 all_datasets
+results
 
 # C extensions
 *.so

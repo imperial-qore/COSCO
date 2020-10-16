@@ -41,7 +41,7 @@ from utils.Utils import *
 from pdb import set_trace as bp
 
 # Global constants
-NUM_SIM_STEPS = 200
+NUM_SIM_STEPS = 100
 HOSTS = 10
 CONTAINERS = 10
 TOTAL_POWER = 1000
@@ -78,7 +78,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = RandomScheduler() # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

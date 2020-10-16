@@ -87,7 +87,7 @@ def load_energy_latency2_data(HOSTS):
 		cpuH = np.array([cpuH]).transpose(); cpuC = np.array([cpuC]).transpose()
 		alloc = np.array(alloc)
 		pred_vals = np.broadcast_to(np.array([data[i][3*HOSTS]/max_energy, data[i][3*HOSTS+1]/max_response]), (HOSTS, 2))
-		dataset.append(((np.concatenate((cpuH, cpuC, alloc, pred_vals), axis=1)), torch.Tensor([(data[i][-2]- data.min(0)[-2])/(data.max(0)[-2] - data.min(0)[-2]), abs(data[i][-1])/data.max(0)[-1]])))
+		dataset.append(((np.concatenate((cpuH, cpuC, alloc, pred_vals), axis=1)), torch.Tensor([(data[i][-2]- data.min(0)[-2])/(data.max(0)[-2] - data.min(0)[-2]), max(0, data[i][-1])/data.max(0)[-1]])))
 		# Normalization by (x - min)/(max - min)
 	return dataset, len(dataset), (max_ips_container, max_energy, max_response)
 
