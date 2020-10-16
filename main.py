@@ -139,10 +139,10 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
-	stats.generateGraphs(dirname)
 	stats.generateDatasets(dirname)
-	stats.generateCompleteDatasets(dirname)
 	if not end: return
+	stats.generateGraphs(dirname)
+	stats.generateCompleteDatasets(dirname)
 	stats.env, stats.workload, stats.datacenter, stats.scheduler = None, None, None, None
 	if 'Datacenter' in datacenter.__class__.__name__:
 		stats.simulated_scheduler = None
