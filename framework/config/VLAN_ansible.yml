@@ -172,6 +172,10 @@
   - name: Start the flask service
     become: yes
     shell: 'sudo service flask start'
+
+  - name: Restart the flask service
+    become: yes
+    shell: 'sudo service flask restart'
  # - name: Start service flask, if not started
   #  become: true
    # systemd:
