@@ -53,6 +53,9 @@ def setupVLANEnvironment(cfg, mode):
         res = call(["ssh", "-o", "StrictHostKeyChecking=no", "-i", "framework/install_scripts/ssh_keys/id_rsa", uname+"@"+ip, "~/agent/scripts/delete.sh"], shell=True, stdout=PIPE, stderr=PIPE)  
     return HOST_IPS
 
+def destroyVLANEnvironment(cfg, mode):
+    return
+
 # Vagrant setup functions
 
 def setupVagrantEnvironment(cfg, mode):
