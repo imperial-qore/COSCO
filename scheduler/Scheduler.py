@@ -3,6 +3,7 @@ from utils.MathUtils import *
 from utils.MathConstants import *
 import pandas as pd
 from statistics import median
+import numpy as np
 
 class Scheduler():
     def __init__(self):
@@ -144,7 +145,7 @@ class Scheduler():
                     X1 = np.c_[x, np.ones(x.shape[0])]
                     y_pred = np.dot(X1, np.dot(np.linalg.pinv(np.dot(np.transpose(X1), X1)), np.dot(np.transpose(X1), y)))
                     corr = np.corrcoef(np.column_stack((y,y_pred)), rowvar=False)
-                    RSquared.append(corr[0][1])
+                    RSquared.append(corr[0][1] if not np.isnan(corr).any() else 0)
                 selectedContainerIDs.append(containerIDs[RSquared.index(max(RSquared))])
         return selectedContainerIDs
 

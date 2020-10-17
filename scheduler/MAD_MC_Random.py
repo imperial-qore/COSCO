@@ -7,7 +7,12 @@ class MADMCRScheduler(Scheduler):
     def __init__(self):
         super().__init__()
         self.utilHistory = []
+        self.utilHistoryContainer= []
 
+    def updateUtilHistoryContainer(self):
+        containerUtil = [(cid.getBaseIPS() if cid else 0) for cid in self.env.containerlist]
+        self.utilHistoryContainer.append(containerUtil)
+    
     def updateUtilHistory(self):
         hostUtils = []
         for host in self.env.hostlist:
