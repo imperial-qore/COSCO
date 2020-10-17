@@ -28,6 +28,7 @@ from simulator.workload.BitbrainWorkload2 import *
 # Scheduler imports
 from scheduler.IQR_MMT_Random import IQRMMTRScheduler
 from scheduler.MAD_MMT_Random import MADMMTRScheduler
+from scheduler.MAD_MC_Random import MADMCRScheduler
 from scheduler.LR_MMT_Random import LRMMTRScheduler
 from scheduler.Random_Random_FirstFit import RFScheduler
 from scheduler.Random_Random_LeastFull import RLScheduler
