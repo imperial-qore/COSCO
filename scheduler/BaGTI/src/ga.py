@@ -4,9 +4,10 @@ import numpy as np
 from src.constants import *  
  
 class Individual(object): 
-    def __init__(self, dataset, f, bounds, data_type, chromosome=[]): 
+    def __init__(self, dataset, f, bounds, data_type, hosts, chromosome=[]): 
         self.dataset = dataset
         self.f = f
+        self.hosts = hosts
         self.data_type = data_type
         self.chromosome = torch.tensor(chromosome if chromosome != [] else random.choice(dataset)[0], dtype=torch.float)
         self.fitness = self.cal_fitness() 
@@ -24,22 +25,22 @@ class Individual(object):
                 child_chromosome.append(random.choice(self.dataset)[0][len(child_chromosome)]) 
         alloc = []
         for i in child_chromosome:
-            oneHot = [0] * 50; alist = i.tolist()[-50:]
+            oneHot = [0] * self.hosts; alist = i.tolist()[-self.hosts:]
             oneHot[alist.index(max(alist))] = 1; alloc.append(oneHot)
-        child_chromosome = np.concatenate((self.chromosome[:,0:-50], np.array(alloc)), axis=1)
-        return Individual(self.dataset, self.f, self.bounds, self.data_type, child_chromosome) 
+        child_chromosome = np.concatenate((self.chromosome[:,0:-self.hosts], np.array(alloc)), axis=1)
+        return Individual(self.dataset, self.f, self.bounds, self.data_type, self.hosts, child_chromosome) 
   
     def cal_fitness(self): 
         res = self.f(self.chromosome)
         return res
   
-def ga(dataset, f, bounds, data_type): 
+def ga(dataset, f, bounds, data_type, hosts): 
     generation = 1
     population = [] 
     best_fitness = []
   
     for _ in range(POPULATION_SIZE): 
-        population.append(Individual(dataset, f, bounds, data_type)) 
+        population.append(Individual(dataset, f, bounds, data_type, hosts)) 
   
     while True: 
         population = sorted(population, key = lambda x:x.fitness) 

@@ -35,6 +35,7 @@ from scheduler.Random_Random_LeastFull import RLScheduler
 from scheduler.RLR_MMT_Random import RLRMMTRScheduler
 from scheduler.Threshold_MC_Random import TMCRScheduler
 from scheduler.Random_Random_Random import RandomScheduler
+from scheduler.GA import GAScheduler
 from scheduler.GOBI import GOBIScheduler
 from scheduler.DRL import DRLScheduler
 
@@ -44,7 +45,7 @@ from utils.Utils import *
 from pdb import set_trace as bp
 
 # Global constants
-NUM_SIM_STEPS = 300
+NUM_SIM_STEPS = 100
 HOSTS = 10
 CONTAINERS = 10
 TOTAL_POWER = 1000
@@ -81,7 +82,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = DRLScheduler('energy_latency_10') # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = GAScheduler('energy_latency_10') # GOBIScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
