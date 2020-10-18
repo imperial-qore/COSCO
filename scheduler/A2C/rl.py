@@ -32,7 +32,7 @@ def save_model(model, optimizer, epoch, accuracy_list):
 
 def load_model(filename, model, data_type):
 	optimizer = torch.optim.AdamW(model.parameters() , lr=0.0001, weight_decay=1e-5)
-	file_path = MODEL_SAVE_PATH + "/" + filename + "_Trained.ckpt"
+	file_path = MODEL_SAVE_PATH + "/" + model.name + "_Trained.ckpt"
 	if os.path.exists(file_path):
 		print(color.GREEN+"Loading pre-trained model: "+filename+color.ENDC)
 		checkpoint = torch.load(file_path)
