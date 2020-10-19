@@ -182,6 +182,22 @@
     #  name: flask
      # state: started
 
+  - name: Allocate 4G swap file
+    become: yes
+    shell: 'sudo fallocate -l 4G /swapfile'
+
+  - name: Change permissions of swap file
+    become: yes
+    shell: 'sudo chmod 600 /swapfile'
+
+  - name: Make swapfile as swap space
+    become: yes
+    shell: 'sudo mkswap /swapfile'
+
+  - name: Enable swap space
+    become: yes
+    shell: 'sudo swapon /swapfile'
+
   - name: pull yolo
     docker_image:
       name: shreshthtuli/yolo
