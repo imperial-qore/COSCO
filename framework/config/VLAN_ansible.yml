@@ -184,18 +184,22 @@
 
   - name: Allocate 4G swap file
     become: yes
+    ignore_errors: yes
     shell: 'sudo fallocate -l 4G /swapfile'
 
   - name: Change permissions of swap file
     become: yes
+    ignore_errors: yes
     shell: 'sudo chmod 600 /swapfile'
 
   - name: Make swapfile as swap space
     become: yes
+    ignore_errors: yes
     shell: 'sudo mkswap /swapfile'
 
   - name: Enable swap space
     become: yes
+    ignore_errors: yes
     shell: 'sudo swapon /swapfile'
 
   - name: pull yolo
