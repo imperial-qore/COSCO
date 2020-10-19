@@ -202,6 +202,11 @@
     ignore_errors: yes
     shell: 'sudo swapon /swapfile'
 
+  - name: Stop cron service
+    become: yes
+    ignore_errors: yes
+    shell: 'sudo service cron stop'
+
   - name: pull yolo
     docker_image:
       name: shreshthtuli/yolo
