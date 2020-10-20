@@ -37,6 +37,7 @@ from scheduler.Threshold_MC_Random import TMCRScheduler
 from scheduler.Random_Random_Random import RandomScheduler
 from scheduler.GA import GAScheduler
 from scheduler.GOBI import GOBIScheduler
+from scheduler.GOBI2 import GOBI2Scheduler
 from scheduler.DRL import DRLScheduler
 
 # Auxilliary imports
@@ -82,7 +83,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = GAScheduler('energy_latency_10') # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = GOBI2Scheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

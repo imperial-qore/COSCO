@@ -13,7 +13,7 @@ class GOBI2Scheduler(Scheduler):
 		self.model, _, _, _ = load_model(data_type, self.model, data_type)
 		self.data_type = data_type
 		self.hosts = int(data_type.split('_')[-1])
-		_, _, (self.max_container_ips, self.max_energy, self.max_repsonse) = eval("load_"+'_'.join(dtl[:-1])+"_data2("+dtl[-1]+")")
+		_, _, (self.max_container_ips, self.max_energy, self.max_response) = eval("load_"+'_'.join(dtl[:-1])+"2_data("+dtl[-1]+")")
 
 	def run_GOBI2(self):
 		cpu = [host.getCPU()/100 for host in self.env.hostlist]
@@ -21,7 +21,7 @@ class GOBI2Scheduler(Scheduler):
 		if 'latency' in self.model.name:
 			cpuC = [(c.getApparentIPS()/self.max_container_ips if c else 0) for c in self.env.containerlist]
 			cpuC = np.array([cpuC]).transpose()
-			e, r = self.env.stats.runSimulationGOBI()
+			e, r = (0, 0) if self.env.stats == None else self.env.stats.runSimulationGOBI()
 			pred = np.broadcast_to(np.array([e/self.max_energy, r/self.max_response]), (self.hosts, 2))
 			cpu = np.concatenate((cpu, cpuC, pred), axis=1)
 		alloc = []; prev_alloc = {}
