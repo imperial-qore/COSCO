@@ -8,6 +8,7 @@ scheduler/A2C/dataset
 framework/agent/DockerImages
 all_datasets
 results
+modstat.py
 
 # C extensions
 *.so
