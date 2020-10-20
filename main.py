@@ -143,6 +143,12 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
 	stats.generateDatasets(dirname)
+	if 'Datacenter' in datacenter.__class__.__name__:
+		saved_env, saved_workload, saved_datacenter, saved_scheduler, saved_sim_scheduler = stats.env, stats.workload, stats.datacenter, stats.scheduler, stats.simulated_scheduler
+		stats.env, stats.workload, stats.datacenter, stats.scheduler, stats.simulated_scheduler = None, None, None, None, None
+		with open(dirname + '/' + dirname.split('/')[1] +'.pk', 'wb') as handle:
+		    pickle.dump(stats, handle)
+		stats.env, stats.workload, stats.datacenter, stats.scheduler, stats.simulated_scheduler = saved_env, saved_workload, saved_datacenter, saved_scheduler, saved_sim_scheduler
 	if not end: return
 	stats.generateGraphs(dirname)
 	stats.generateCompleteDatasets(dirname)

@@ -207,6 +207,17 @@
     ignore_errors: yes
     shell: 'sudo service cron stop'
 
+  - name: Stop unattended-upgrades
+    become: yes
+    ignore_errors: yes
+    shell: '{{item}}'
+    with_items:
+      - sudo apt-get remove unattended-upgrades
+      - sudo systemctl stop apt-daily.timer
+      - sudo systemctl disable apt-daily.timer
+      - sudo systemctl disable apt-daily.service
+      - sudo systemctl daemon-reload
+
   - name: pull yolo
     docker_image:
       name: shreshthtuli/yolo
