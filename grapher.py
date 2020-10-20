@@ -25,8 +25,8 @@ plt.rcParams["text.usetex"] = True
 def reduce(l):
 	n = 5
 	res = []
-	for i in range(0, len(l), n):
-		res.append(statistics.mean(l[i:i+n]))
+	for i in range(0, len(l)):
+		res.append(statistics.mean(l[max(0, i-n):min(len(l), i+n)]))
 	return res
 
 def mean_confidence_interval(data, confidence=0.95):
@@ -105,11 +105,11 @@ for ylabel in yLabelsStatic:
 			d = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
 		if ylabel == 'Average Response Time (seconds)':
-			d = np.array([i['avgresponsetime'] for i in stats.metrics]) if stats else np.array([0])
+			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d[d2>0]), mean_confidence_interval(d[d2>0])
 		if ylabel == 'Total Response Time (seconds)':
-			d = np.array([i['avgresponsetime'] for i in stats.metrics]) if stats else np.array([0.])
+			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0.])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d[d2>0]*d2[d2>0]), 0
 		# SLA Violations, Cost (USD)
@@ -206,6 +206,7 @@ for ylabel in yLabelsStatic:
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 		if ylabel == 'Average Wait Time':
 			d = np.array([(np.average(i['waittime']) if i != [] else 0) for i in stats.metrics]) if stats else np.array([0.])
+			d[np.isnan(d)] = 0
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 		# Host metrics
 		if ylabel == 'Average CPU Utilization (%)':
@@ -225,6 +226,7 @@ for ylabel in yLabelsStatic:
 			d = np.array([i['migrationTime'] for i in stats.schedulerinfo]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 
+print(Data['Average Wait Time'])
 
 # Time series data
 for ylabel in yLabelsStatic:
