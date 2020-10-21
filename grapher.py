@@ -29,7 +29,7 @@ def reduce(l):
 		res.append(statistics.mean(l[max(0, i-n):min(len(l), i+n)]))
 	return res
 
-def mean_confidence_interval(data, confidence=0.95):
+def mean_confidence_interval(data, confidence=0.90):
     a = 1.0 * np.array(data)
     n = len(a)
     h = scipy.stats.sem(a) * scipy.stats.t.ppf((1 + confidence) / 2., n-1)
@@ -225,8 +225,6 @@ for ylabel in yLabelsStatic:
 		if 'f' in env and ylabel == 'Interval Allocation Time (seconds)':
 			d = np.array([i['migrationTime'] for i in stats.schedulerinfo]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
-
-print(Data['Average Wait Time'])
 
 # Time series data
 for ylabel in yLabelsStatic:

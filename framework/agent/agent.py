@@ -39,6 +39,7 @@ if __name__ == '__main__':
         app.run(
             host=ipaddr,
             port=int(port),
+            threaded=True
                     )
     except socket.error as msg:
         print(msg)
