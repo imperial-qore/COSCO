@@ -46,13 +46,13 @@ from utils.Utils import *
 from pdb import set_trace as bp
 
 # Global constants
-NUM_SIM_STEPS = 100
-HOSTS = 10
-CONTAINERS = 10
+NUM_SIM_STEPS = 400
+HOSTS = 10 * 5
+CONTAINERS = HOSTS
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
-NEW_CONTAINERS = 0
+NEW_CONTAINERS = 0 if HOSTS == 10 else 5
 DB_NAME = ''
 DB_HOST = ''
 DB_PORT = 0

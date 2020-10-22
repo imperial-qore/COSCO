@@ -55,7 +55,7 @@ class AzureFog():
 
 	def generateHosts(self):
 		hosts = []
-		types = ['B2s', 'B2s', 'B2s', 'B2s', 'B4ms', 'B4ms', 'B4ms', 'B4ms', 'B8ms', 'B8ms']
+		types = ['B2s', 'B2s', 'B2s', 'B2s', 'B4ms', 'B4ms', 'B4ms', 'B4ms', 'B8ms', 'B8ms'] * 5
 		for i in range(self.num_hosts):
 			typeID = types[i]
 			IPS = self.types[typeID]['IPS']
