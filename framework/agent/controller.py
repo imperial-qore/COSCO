@@ -216,6 +216,7 @@ class RequestRouter():
             rc, data = codes.ERROR, json.dumps({'message': "restore not successful"})
         output = subprocess.run("docker start --checkpoint "+checkpoint_name+" "+container_name, shell=True,stderr=subprocess.PIPE)
         output = output.stderr.decode()
+        subprocess.call(["sudo", "docker", "checkpoint", "rm", container_name, checkpoint_name])
         if 'Error' in output:
             rc, data = codes.ERROR, output.split(":")[1]
         return rc, json.dumps({'message': data if rc == codes.SUCCESS else 'error'})
