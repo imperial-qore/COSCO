@@ -177,7 +177,11 @@ class RequestRouter():
         logging.debug('Inside checkpoint function')
         logging.debug(str(["sudo", "docker", "checkpoint", "create", container_name, checkpoint_name]))
         try:
-            subprocess.call(["sudo", "docker", "checkpoint", "create", container_name, checkpoint_name])
+            cid = subprocess.run("docker inspect -f '{{.Id}}' "+container_name, shell=True, stdout=subprocess.PIPE)
+            cid = cid.stdout.decode('utf-8').strip()
+            running = self.containerClient.dclient1.inspect_container(cid)['State']['Running']
+            if running:
+                subprocess.call(["sudo", "docker", "checkpoint", "create", container_name, checkpoint_name])
         except Exception as e:
             rc, data = codes.ERROR, str(e)
         return rc, json.dumps({'message': data})
@@ -191,11 +195,14 @@ class RequestRouter():
         try:
             cid = subprocess.run("docker inspect -f '{{.Id}}' "+container_name, shell=True, stdout=subprocess.PIPE)
             cid = cid.stdout.decode('utf-8').strip()
-            cmd = "sudo tar -zcf /tmp/"+container_name+"."+checkpoint_name+".tgz -C /var/lib/docker/containers/"+cid+"/"+"checkpoints/ "+checkpoint_name+"/"
-            subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
-            self.containerClient.delete(container_name)
-            subprocess.call(["scp", "-o", "StrictHostKeyChecking=no", "-i", "~/agent/id_rsa","/tmp/"+container_name+"."+checkpoint_name+".tgz", uname+"@"+targetIP+":/tmp/"])
-            subprocess.call(["sudo","rm","-rf","/tmp/"+container_name+"."+checkpoint_name+".tgz"])
+            running = checkpoint_name in subprocess.run(["docker", 'checkpoint', 'ls', container_name], stdout=subprocess.PIPE).stdout.decode('utf-8').strip()
+            logging.debug('Inside migration function, checkpoint is running = '+str(running))
+            if running:
+                cmd = "sudo tar -zcf /tmp/"+container_name+"."+checkpoint_name+".tgz -C /var/lib/docker/containers/"+cid+"/"+"checkpoints/ "+checkpoint_name+"/"
+                subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, universal_newlines=True)
+                self.containerClient.delete(container_name)
+                subprocess.call(["scp", "-o", "StrictHostKeyChecking=no", "-i", "~/agent/id_rsa","/tmp/"+container_name+"."+checkpoint_name+".tgz", uname+"@"+targetIP+":/tmp/"])
+                subprocess.call(["sudo","rm","-rf","/tmp/"+container_name+"."+checkpoint_name+".tgz"])
         except Exception as e:
             data = "Migrate checkpoint to "+targetIP+" not successful, Error:"+str(e)
             rc = codes.ERROR
@@ -206,17 +213,23 @@ class RequestRouter():
         checkpoint_name = payload["c_name"]
         container_image = payload["image"]
         rc, data = codes.SUCCESS,"Container "+container_name+" restored successfully"
+        running = True
         try:
             cmd = "docker create --name "+container_name+" "+container_image
             cid = subprocess.Popen(cmd, shell=True,stdout=subprocess.PIPE).communicate()[0].decode('utf-8').strip()
-            cmd = "sudo tar -zxf /tmp/"+container_name+"."+checkpoint_name+".tgz -C /var/lib/docker/containers/"+str(cid)+"/"+"checkpoints/"
-            subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,universal_newlines=True)
-            subprocess.call(["sudo","rm","-rf","/tmp/"+container_name+"."+checkpoint_name+".tgz"])
+            running = os.path.exists('/tmp/'+container_name+"."+checkpoint_name+".tgz")
+            logging.debug('Inside restore function, checkpoint present = '+str(running))
+            if running:
+                cmd = "sudo tar -zxf /tmp/"+container_name+"."+checkpoint_name+".tgz -C /var/lib/docker/containers/"+str(cid)+"/"+"checkpoints/"
+                subprocess.run(cmd, shell=True, stdout=subprocess.PIPE,universal_newlines=True)
+                subprocess.call(["sudo","rm","-rf","/tmp/"+container_name+"."+checkpoint_name+".tgz"])
         except ValueError:
             rc, data = codes.ERROR, json.dumps({'message': "restore not successful"})
-        output = subprocess.run("docker start --checkpoint "+checkpoint_name+" "+container_name, shell=True,stderr=subprocess.PIPE)
-        output = output.stderr.decode()
-        subprocess.call(["sudo", "docker", "checkpoint", "rm", container_name, checkpoint_name])
+        if running:
+            output = subprocess.run(["docker", "start", "--checkpoint", checkpoint_name, container_name], stderr=subprocess.PIPE)
+            output = output.stderr.decode()
+            subprocess.call(["sudo", "docker", "checkpoint", "rm", container_name, checkpoint_name])
+        else: output = 'INFO : Container '+container_name+" was not running in source host so has not been restored"
         if 'Error' in output:
             rc, data = codes.ERROR, output.split(":")[1]
         return rc, json.dumps({'message': data if rc == codes.SUCCESS else 'error'})
