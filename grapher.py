@@ -22,6 +22,11 @@ from sys import argv
 plt.style.use(['science', 'ieee'])
 plt.rcParams["text.usetex"] = True
 
+def fairness(l):
+	a = np.mean(l)-(scipy.stats.hmean(l)+0.001)
+	if a: return a
+	return 0
+
 def reduce(l):
 	n = 5
 	res = []
@@ -44,13 +49,14 @@ Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'LR-MMT', 'MAD-MC']
 rot = 15
 xLabel = 'Simulation Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'pink', 'cyan']
+apps = ['yolo', 'pocketsphinx', 'aeneas']
 
 yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', 'Interval Energy (Kilowatt-hr)', 'Average Interval Energy (Kilowatt-hr)',\
 	'Number of completed tasks', 'Number of completed tasks per interval', 'Average Response Time (seconds)', 'Total Response Time (seconds)',\
-	'Average Migration Time (seconds)', 'Total Migration Time (seconds)', 'Number of Task migrations', 'Average Wait Time',\
-	'Average Completion Time (seconds)', 'Total Completion Time (seconds)',\
-	'Total Cost (US Dollar)', 'Fraction of SLA Violations', \
-	'Interval Allocation Time (seconds)',\
+	'Average Migration Time (seconds)', 'Total Migration Time (seconds)', 'Number of Task migrations', 'Average Wait Time (intervals)', 'Average Wait Time (intervals) per application',\
+	'Average Completion Time (seconds)', 'Total Completion Time (seconds)', 'Average Response Time (seconds) per application',\
+	'Cost per container (US Dollars)', 'Fraction of total SLA Violations', 'Fraction of SLA Violations per application', \
+	'Interval Allocation Time (seconds)', 'Number of completed tasks per application', 'Fairness', 'Fairness per application', \
 	'Average CPU Utilization (%)', 'Average number of containers per Interval', 'Average RAM Utilization (%)', 'Scheduling Time (seconds)']
 
 yLabelStatic2 = {
@@ -76,12 +82,27 @@ for model in Models:
 
 all_stats = dict(zip(Models, all_stats_list))
 
+cost = (100 * 300 // 60) * (4 * 0.0472 + 2 * 0.189 + 2 * 0.166 + 2 * 0.333) # Hours * cost per hour
+
+if env == 'framework':
+	sla = {}
+	r = all_stats['A3C'].allcontainerinfo[-1]
+	start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
+	for app in apps:
+		response_times = np.fmax(0, end - start)[application == 'shreshthtuli/'+app]
+		response_times.sort()
+		sla[app] = response_times[int(0.95*len(response_times))]
+else:
+	sla = dict(zip(apps, [0]*3))
+print(sla)
+
 Data = dict()
 CI = dict()
 
 for ylabel in yLabelsStatic:
 	Data[ylabel], CI[ylabel] = {}, {}
 	for model in Models:
+		# print(ylabel, model)
 		stats = all_stats[model]
 		# Major metrics
 		if ylabel == 'Total Energy (Kilowatt-hr)':
@@ -101,6 +122,16 @@ for ylabel in yLabelsStatic:
 		if ylabel == 'Number of completed tasks':
 			d = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d), 0
+		if ylabel == 'Cost per container (US Dollars)':
+			d = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([0])
+			Data[ylabel][model], CI[ylabel][model] = cost / float(np.sum(d)) if len(d) != 1 else 0, 0
+		if 'f' in env and ylabel == 'Number of completed tasks per application':
+			r = stats.allcontainerinfo[-1]['application'] if stats else []
+			application = np.array(r)
+			total = []
+			for app in apps:
+				total.append(len(application[application == 'shreshthtuli/'+app]))
+			Data[ylabel][model], CI[ylabel][model] = total, [0]*3
 		if ylabel == 'Number of completed tasks per interval':
 			d = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
@@ -108,11 +139,49 @@ for ylabel in yLabelsStatic:
 			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d[d2>0]), mean_confidence_interval(d[d2>0])
+		if 'f' in env and ylabel == 'Average Response Time (seconds) per application':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
+			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
+			response_times, errors = [], []
+			for app in apps:
+				response_time = np.fmax(0, end[end!=-1] - start[end!=-1])[application[end!=-1] == 'shreshthtuli/'+app] *300
+				response_times.append(np.mean(response_time))
+				er = mean_confidence_interval(response_time)
+				errors.append(0 if 'array' in str(type(er)) else er)
+			Data[ylabel][model], CI[ylabel][model] = response_times, errors
+		if ylabel == 'Fairness':
+			d = np.array([1/fairness(np.array(i['ips'])) for i in stats.activecontainerinfo]) if stats else np.array([0])
+			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
+		if 'f' in env and ylabel == 'Fairness per application':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
+			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
+			response_times = []
+			for app in apps:
+				response_time = np.fmax(0, end[end!=-1] - start[end!=-1])[application[end!=-1] == 'shreshthtuli/'+app] *300
+				er = 1/(np.mean(response_time)-scipy.stats.hmean(response_time))
+				response_times.append(0 if 'array' in str(type(er)) else er)
+			Data[ylabel][model], CI[ylabel][model] = response_times, [0]*3
 		if ylabel == 'Total Response Time (seconds)':
 			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0.])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d[d2>0]*d2[d2>0]), 0
-		# SLA Violations, Cost (USD)
+		if 'f' in env and ylabel == 'Fraction of total SLA Violations':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
+			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
+			violations, total = 0, 0
+			for app in apps:
+				response_times = np.fmax(0, end[end!=-1] - start[end!=-1])[application[end!=-1] == 'shreshthtuli/'+app]
+				violations += len(response_times > sla[app])
+				total += len(response_times)
+			Data[ylabel][model], CI[ylabel][model] = violations / (total+0.01), 0
+		if 'f' in env and ylabel == 'Fraction of SLA Violations per application':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
+			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
+			violations = []
+			for app in apps:
+				response_times = np.fmax(0, end[end!=-1] - start[end!=-1])[application[end!=-1] == 'shreshthtuli/'+app]
+				violations.append(len(response_times > sla[app])/(len(response_times)+0.001))
+			Data[ylabel][model], CI[ylabel][model] = violations, [0]*3
 		# Auxilliary metrics
 		if ylabel == 'Average Migration Time (seconds)':
 			d = np.array([i['avgmigrationtime'] for i in stats.metrics]) if stats else np.array([0])
@@ -125,9 +194,19 @@ for ylabel in yLabelsStatic:
 		if ylabel == 'Number of Task migrations':
 			d = np.array([i['nummigrations'] for i in stats.metrics]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d), mean_confidence_interval(d)
-		if ylabel == 'Average Wait Time':
-			d = np.array([(np.average(i['waittime']) if i != [] else 0) for i in stats.metrics]) if stats else np.array([0.])
+		if ylabel == 'Average Wait Time (intervals)':
+			d = np.array([(np.average(i['waittime'])-1 if i != [] else 0) for i in stats.metrics]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d[d>0]), mean_confidence_interval(d[d>0])
+		if 'f' in env and ylabel == 'Average Wait Time (intervals) per application':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'create': [], 'application': []}
+			start, end, application = np.array(r['create']), np.array(r['start']), np.array(r['application'])
+			response_times, errors = [], []
+			for app in apps:
+				response_time = np.fmax(0, end - start - 1)[application == 'shreshthtuli/'+app]
+				response_times.append(np.mean(response_time))
+				er = mean_confidence_interval(response_time)
+				errors.append(0 if 'array' in str(type(er)) else er)
+			Data[ylabel][model], CI[ylabel][model] = response_times, errors
 		# Host metrics
 		if ylabel == 'Average CPU Utilization (%)':
 			d = np.array([(np.average(i['cpu']) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
@@ -152,6 +231,7 @@ print(Data)
 
 for ylabel in yLabelsStatic:
 	if Models[0] not in Data[ylabel]: continue
+	if 'per application' in ylabel: continue
 	print(color.BOLD+ylabel+color.ENDC)
 	plt.xlabel('Model')
 	plt.ylabel(ylabel.replace('%', '\%'))
@@ -170,6 +250,23 @@ for ylabel in yLabelsStatic:
 		plt.ylim(0, max(values2)+10*statistics.stdev(values2))
 		p2 = plt.errorbar(range(len(values2)), values2, color='black', alpha=0.7, yerr=errors2, capsize=2, label=ylabel2, marker='.', linewidth=2)
 		plt.legend((p2[0],), (ylabel2,), loc=1)
+	plt.savefig(SAVE_PATH+'Bar-'+ylabel.replace(' ', '_')+".pdf")
+	plt.clf()
+
+for ylabel in yLabelsStatic:
+	if Models[0] not in Data[ylabel]: continue
+	if 'per application' not in ylabel: continue
+	print(color.BOLD+ylabel+color.ENDC)
+	plt.xlabel('Model')
+	values = [[Data[ylabel][model][i] for model in Models] for i in range(len(apps))]
+	errors = [[CI[ylabel][model][i] for model in Models] for i in range(len(apps))]
+	print(values, '\n', errors)
+	width = 0.25
+	x = np.arange(len(values[0]))
+	for i in range(len(apps)):
+		p1 = plt.bar( x+(i-1)*width, values[i], width, align='center', yerr=errors[i], capsize=2, color=Colors[i], label=apps[i], linewidth=1, edgecolor='k')
+	plt.legend()
+	plt.xticks(range(len(values[i])), Models, rotation=rot)
 	plt.savefig(SAVE_PATH+'Bar-'+ylabel.replace(' ', '_')+".pdf")
 	plt.clf()
 
