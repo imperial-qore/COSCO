@@ -1,10 +1,9 @@
 import requests
 import json
 from string import Template
-from enum import Enum
 import framework.server.common.codes as codes
 
-class InvalidResponse(Enum):
+class InvalidResponse():
 	text = 'invalid'
 
 REQUEST_TEMPLATE = Template("http://$HOST:$PORT/request")
@@ -15,7 +14,7 @@ def HandleRequest(payload, host, framework):
     clientUrl = REQUEST_TEMPLATE.substitute(HOST = host, PORT = CONTAINER_PORT)
     print(json.dumps(payload), clientUrl)
     try:
-        resp = requests.get(clientUrl, data=json.dumps(payload), timeout = 420)
+        resp = requests.get(clientUrl, data=json.dumps(payload), timeout = 180)
     except Exception as e:
         resp = InvalidResponse()
         resp.text = e + ' for payload = ' + json.dumps(payload)
