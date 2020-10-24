@@ -17,6 +17,6 @@ def HandleRequest(payload, host, framework):
         resp = requests.get(clientUrl, data=json.dumps(payload), timeout = 360)
     except Exception as e:
         resp = InvalidResponse()
-        resp.text = e + ' for payload = ' + json.dumps(payload)
+        resp.text = str(e) + ' for payload = ' + json.dumps(payload)
     framework.logger.debug("Response received by server from agent "+host+" : "+resp.text)
     return json.loads(resp.text)
