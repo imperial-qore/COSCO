@@ -14,7 +14,7 @@ def HandleRequest(payload, host, framework):
     clientUrl = REQUEST_TEMPLATE.substitute(HOST = host, PORT = CONTAINER_PORT)
     print(json.dumps(payload), clientUrl)
     try:
-        resp = requests.get(clientUrl, data=json.dumps(payload), timeout = 180)
+        resp = requests.get(clientUrl, data=json.dumps(payload), timeout = 360)
     except Exception as e:
         resp = InvalidResponse()
         resp.text = e + ' for payload = ' + json.dumps(payload)
