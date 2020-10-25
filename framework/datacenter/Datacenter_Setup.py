@@ -51,6 +51,7 @@ def setupVLANEnvironment(cfg, mode):
     uname = "ansible"
     for ip in HOST_IPS:
         res = call(["ssh", "-o", "StrictHostKeyChecking=no", "-i", "framework/install_scripts/ssh_keys/id_rsa", uname+"@"+ip, "~/agent/scripts/delete.sh"], shell=True, stdout=PIPE, stderr=PIPE)  
+        res = call(["ssh", "-o", "StrictHostKeyChecking=no", "-i", "framework/install_scripts/ssh_keys/id_rsa", "-t", uname+"@"+ip, "sudo service docker restart"], shell=True, stdout=PIPE, stderr=PIPE)  
     return HOST_IPS
 
 def destroyVLANEnvironment(cfg, mode):

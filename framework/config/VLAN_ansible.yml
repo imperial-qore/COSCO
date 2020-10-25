@@ -218,6 +218,14 @@
       - sudo systemctl disable apt-daily.service
       - sudo systemctl daemon-reload
 
+  - name: Stop timesyncd service
+    become: yes
+    ignore_errors: yes
+    shell: '{{item}}'
+    with_items:
+      - sudo systemctl stop systemd-timesyncd
+      - sudo systemctl disable systemd-timesyncd
+
   - name: pull yolo
     docker_image:
       name: shreshthtuli/yolo
