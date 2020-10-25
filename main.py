@@ -46,7 +46,7 @@ from utils.Utils import *
 from pdb import set_trace as bp
 
 # Global constants
-NUM_SIM_STEPS = 200
+NUM_SIM_STEPS = 100
 HOSTS = 10 # * 5
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000

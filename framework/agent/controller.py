@@ -207,6 +207,7 @@ class RequestRouter():
                 self.containerClient.delete(container_name)
                 subprocess.call(["scp", "-o", "StrictHostKeyChecking=no", "-i", "~/agent/id_rsa","/tmp/"+container_name+"."+checkpoint_name+".tgz", uname+"@"+targetIP+":/tmp/"])
                 subprocess.call(["sudo","rm","-rf","/tmp/"+container_name+"."+checkpoint_name+".tgz"])
+                subprocess.call(["sudo", "docker", "rm", container_name])
         except Exception as e:
             data = "Migrate checkpoint to "+targetIP+" not successful, Error:"+str(e)
             rc = codes.ERROR

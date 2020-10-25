@@ -52,27 +52,28 @@ class RequestHandler():
                                 "disk": data["disk"]
                             },
                     "time": datetime.utcnow().isoformat(sep='T'),
-                }
+                } if 'server_error' not in data else {}
         self.env.logger.debug(datapoint)
-        result = self.db.insert([datapoint])
+        if 'server_error' not in data: self.db.insert([datapoint])
         return datapoint, message
                
     def getContainerStat(self, hostIP):
         message = "Container stats collected successfully"
         data = rclient.HandleRequest({"opcode": "ContainerStat"}, hostIP, self.env)
         datapoints = []
-        for container_dict in data['stats']:
-            datapoints.append({
-                    "measurement": "ContainerStat",
-                    "tags": {
-                                "host_ip": data["hostIP"],
-                                "container_name": container_dict['name']
-                            },
-                    "fields": container_dict,
-                    "time": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'),
-                })
+        if 'server_error' not in data:
+            for container_dict in data['stats']:
+                datapoints.append({
+                        "measurement": "ContainerStat",
+                        "tags": {
+                                    "host_ip": data["hostIP"],
+                                    "container_name": container_dict['name']
+                                },
+                        "fields": container_dict,
+                        "time": datetime.utcnow().strftime('%Y-%m-%dT%H:%M:%S'),
+                    })
         self.env.logger.debug(datapoints)
-        self.db.insert(datapoints)
+        if 'server_error' not in data: self.db.insert(datapoints)
         return datapoints, message
             
     def checkpoint(self, ccid, cid, cur_host_ip):

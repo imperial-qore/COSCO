@@ -86,7 +86,7 @@ class Node():
 
 	def getRAMAvailable(self):
 		size, read, write = self.getCurrentRAM()
-		return max(0, (0.7 if self.ramCap.size < 4000 else 0.8) * self.ramCap.size - size), self.ramCap.read - read, self.ramCap.write - write
+		return max(0, (0.6 if self.ramCap.size < 4000 else 0.8) * self.ramCap.size - size), self.ramCap.read - read, self.ramCap.write - write
 
 	def getCurrentDisk(self):
 		return self.disk.size, self.disk.read, self.disk.write
@@ -102,9 +102,10 @@ class Node():
 			container = self.env.getContainerByCID(ccid)
 			container.updateUtilizationMetrics(container_d['fields'])
 		host_data, _ = self.env.controller.gethostStat(self.ip)
-		self.ips = host_data['fields']['cpu'] * self.ipsCap / 100
-		self.ram.size = host_data['fields']['memory']
-		self.disk.size = host_data['fields']['disk']
+		if 'fields' in host_data:
+			self.ips = host_data['fields']['cpu'] * self.ipsCap / 100
+			self.ram.size = host_data['fields']['memory']
+			self.disk.size = host_data['fields']['disk']
 		self.ram.read, self.ram.write = 0, 0
 		self.disk.read, self.disk.write = 0, 0
 		for cid in self.env.getContainersOfHost(self.id):
