@@ -4,7 +4,7 @@ from string import Template
 import framework.server.common.codes as codes
 
 class InvalidResponse():
-	text = 'invalid'
+	text = {'server_error': ''}
 
 REQUEST_TEMPLATE = Template("http://$HOST:$PORT/request")
 CONTAINER_PORT = 8081
@@ -17,6 +17,6 @@ def HandleRequest(payload, host, framework):
         resp = requests.get(clientUrl, data=json.dumps(payload), timeout = 360)
     except Exception as e:
         resp = InvalidResponse()
-        resp.text = str(e) + ' for payload = ' + json.dumps(payload)
+        resp.text['server_error'] = str(e) + ' for payload = ' + json.dumps(payload)
     framework.logger.debug("Response received by server from agent "+host+" : "+resp.text)
     return json.loads(resp.text)
