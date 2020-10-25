@@ -137,6 +137,10 @@ class RequestRouter():
                         "error": error
                     }
             Stat.append(payload)
+        if len(containers) == 0:
+            logging.debug('Inside containerstat function')
+            logging.debug('Restarting docker service to clean up memory')
+            subprocess.run(["sudo", "service", "docker", "restart"], stderr=subprocess.PIPE)
         Stats["stats"] = Stat
         data = json.dumps(Stats)    
         return rc, data
