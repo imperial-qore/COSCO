@@ -23,7 +23,12 @@ plt.style.use(['science', 'ieee'])
 plt.rcParams["text.usetex"] = True
 
 def fairness(l):
-	a = np.mean(l)-(scipy.stats.hmean(l)+0.001)
+	a = 1 / (np.mean(l)-(scipy.stats.hmean(l)+0.001)) # 1 / slowdown i.e. 1 / (am - hm)
+	if a: return a
+	return 0
+
+def jains_fairness(l):
+	a = np.sum(l)**2 / (len(l) * np.sum(l**2)) # Jain's fairness index
 	if a: return a
 	return 0
 
@@ -56,7 +61,7 @@ yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', '
 	'Average Migration Time (seconds)', 'Total Migration Time (seconds)', 'Number of Task migrations', 'Average Wait Time (intervals)', 'Average Wait Time (intervals) per application',\
 	'Average Completion Time (seconds)', 'Total Completion Time (seconds)', 'Average Response Time (seconds) per application',\
 	'Cost per container (US Dollars)', 'Fraction of total SLA Violations', 'Fraction of SLA Violations per application', \
-	'Interval Allocation Time (seconds)', 'Number of completed tasks per application', 'Fairness', 'Fairness per application', \
+	'Interval Allocation Time (seconds)', 'Number of completed tasks per application', "Fairness (Jain's index)", 'Fairness', 'Fairness per application', \
 	'Average CPU Utilization (%)', 'Average number of containers per Interval', 'Average RAM Utilization (%)', 'Scheduling Time (seconds)']
 
 yLabelStatic2 = {
@@ -150,7 +155,10 @@ for ylabel in yLabelsStatic:
 				errors.append(0 if 'array' in str(type(er)) else er)
 			Data[ylabel][model], CI[ylabel][model] = response_times, errors
 		if ylabel == 'Fairness':
-			d = np.array([1/fairness(np.array(i['ips'])) for i in stats.activecontainerinfo]) if stats else np.array([0])
+			d = np.array([fairness(np.array(i['ips'])) for i in stats.activecontainerinfo]) if stats else np.array([0])
+			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
+		if ylabel == "Fairness (Jain's index)":
+			d = np.array([jains_fairness(np.array(i['ips'])) for i in stats.activecontainerinfo]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
 		if 'f' in env and ylabel == 'Fairness per application':
 			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
