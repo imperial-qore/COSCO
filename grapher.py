@@ -7,6 +7,7 @@
 # Estimates of GOBI vs GOBI* (accuracy)
 
 import matplotlib.pyplot as plt
+import matplotlib
 import itertools
 import statistics
 import pickle
@@ -21,6 +22,7 @@ from sys import argv
 
 plt.style.use(['science', 'ieee'])
 plt.rcParams["text.usetex"] = True
+size = (2.9, 2.5)
 env = argv[1]
 
 def fairness(l):
@@ -49,10 +51,10 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'LR-MMT', 'MAD-MC', 'POND']
+Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC']
 rot = 15
 xLabel = 'Simulation Time (minutes)'
-Colors = ['red', 'blue', 'green', 'orange', 'pink', 'cyan', 'yellow']
+Colors = ['red', 'blue', 'green', 'orange', 'yellow', 'pink', 'cyan']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
 
 yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', 'Interval Energy (Kilowatt-hr)', 'Average Interval Energy (Kilowatt-hr)',\
@@ -249,6 +251,7 @@ for ylabel in yLabelsStatic:
 	if Models[0] not in Data[ylabel]: continue
 	if 'per application' in ylabel: continue
 	print(color.BOLD+ylabel+color.ENDC)
+	plt.figure(figsize=size)
 	plt.xlabel('Model')
 	plt.ylabel(ylabel.replace('%', '\%'))
 	values = [Data[ylabel][model] for model in Models]
@@ -273,6 +276,7 @@ for ylabel in yLabelsStatic:
 	if Models[0] not in Data[ylabel]: continue
 	if 'per application' not in ylabel: continue
 	print(color.BOLD+ylabel+color.ENDC)
+	plt.figure(figsize=size)
 	plt.xlabel('Model')
 	plt.ylabel(ylabel.replace('%', '\%'))
 	if 'Wait' in ylabel: plt.gca().set_ylim(bottom=0)
@@ -350,6 +354,7 @@ for ylabel in yLabelsStatic:
 for ylabel in yLabelsStatic:
 	if Models[0] not in Data[ylabel]: continue
 	print(color.GREEN+ylabel+color.ENDC)
+	plt.figure(figsize=size)
 	plt.xlabel('Simulation Time (Hours)')
 	plt.ylabel(ylabel.replace('%', '\%'))
 	for model in Models:
