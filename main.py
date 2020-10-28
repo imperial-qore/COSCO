@@ -39,15 +39,25 @@ from scheduler.GA import GAScheduler
 from scheduler.GOBI import GOBIScheduler
 from scheduler.GOBI2 import GOBI2Scheduler
 from scheduler.DRL import DRLScheduler
+from scheduler.POND import PONDScheduler
 
 # Auxilliary imports
 from stats.Stats import *
 from utils.Utils import *
 from pdb import set_trace as bp
 
+usage = "usage: python main.py -e <environment> -m <mode> # empty environment run simulator"
+
+parser = optparse.OptionParser(usage=usage)
+parser.add_option("-e", "--environment", action="store", dest="env", default="", 
+					help="Environment is AWS, Openstack, Azure, VLAN, Vagrant")
+parser.add_option("-m", "--mode", action="store", dest="mode", default="0", 
+					help="Mode is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
+opts, args = parser.parse_args()
+
 # Global constants
 NUM_SIM_STEPS = 100
-HOSTS = 10 # * 5
+HOSTS = 10 * 5 if opts.env == '' else 10
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
@@ -83,7 +93,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = DRLScheduler('energy_latency_'+str(HOSTS))
+	scheduler = PONDScheduler('energy_latency_'+str(HOSTS)) # DRLScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -163,14 +173,6 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	    pickle.dump(stats, handle)
 
 if __name__ == '__main__':
-	usage = "usage: python main.py -e <environment> -m <mode> # empty environment run simulator"
-
-	parser = optparse.OptionParser(usage=usage)
-	parser.add_option("-e", "--environment", action="store", dest="env", default="", 
-						help="Environment is AWS, Openstack, Azure, VLAN, Vagrant")
-	parser.add_option("-m", "--mode", action="store", dest="mode", default="0", 
-						help="Mode is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
-	opts, args = parser.parse_args()
 	env, mode = opts.env, int(opts.mode)
 
 	if env != '':

@@ -21,6 +21,7 @@ from sys import argv
 
 plt.style.use(['science', 'ieee'])
 plt.rcParams["text.usetex"] = True
+env = argv[1]
 
 def fairness(l):
 	a = 1 / (np.mean(l)-(scipy.stats.hmean(l)+0.001)) # 1 / slowdown i.e. 1 / (am - hm)
@@ -45,8 +46,6 @@ def mean_confidence_interval(data, confidence=0.90):
     h = scipy.stats.sem(a) * scipy.stats.t.ppf((1 + confidence) / 2., n-1)
     return h
 
-env = argv[1]
-
 PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
@@ -70,7 +69,7 @@ yLabelStatic2 = {
 
 yLabelsTime = ['Interval Energy (Kilowatts)', 'Number of completed tasks', 'Interval Response Time (seconds)', \
 	'Interval Migration Time (seconds)', 'Interval Completion Time (seconds)', 'Interval Cost (US Dollar)', \
-	'Fraction of SLA Violations', 'Number of Task migrations', 'Number of Task migrations']
+	'Fraction of SLA Violations', 'Number of Task migrations', 'Number of Task migrations', 'Average Wait Time (intervals)']
 
 all_stats_list = []
 for model in Models:
@@ -179,7 +178,7 @@ for ylabel in yLabelsStatic:
 			violations, total = 0, 0
 			for app in apps:
 				response_times = np.fmax(0, end[end!=-1] - start[end!=-1])[application[end!=-1] == 'shreshthtuli/'+app]
-				violations += len(response_times > sla[app])
+				violations += len(response_times[response_times > sla[app]])
 				total += len(response_times)
 			Data[ylabel][model], CI[ylabel][model] = violations / (total+0.01), 0
 		if 'f' in env and ylabel == 'Fraction of SLA Violations per application':
@@ -188,7 +187,7 @@ for ylabel in yLabelsStatic:
 			violations = []
 			for app in apps:
 				response_times = np.fmax(0, end[end!=-1] - start[end!=-1])[application[end!=-1] == 'shreshthtuli/'+app]
-				violations.append(len(response_times > sla[app])/(len(response_times)+0.001))
+				violations.append(len(response_times[response_times > sla[app]])/(len(response_times)+0.001))
 			Data[ylabel][model], CI[ylabel][model] = violations, [0]*3
 		# Auxilliary metrics
 		if ylabel == 'Average Migration Time (seconds)':
@@ -205,6 +204,15 @@ for ylabel in yLabelsStatic:
 		if ylabel == 'Average Wait Time (intervals)':
 			d = np.array([(np.average(i['waittime'])-1 if i != [] else 0) for i in stats.metrics]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d[d>0]), mean_confidence_interval(d[d>0])
+		if 'f' in env and ylabel == 'Average Wait Time (intervals)':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'create': [], 'application': []}
+			start, end, application = np.array(r['create']), np.array(r['start']), np.array(r['application'])
+			response_times, errors = [], []
+			response_time = np.fmax(0, end - start - 1)
+			response_times = np.mean(response_time)
+			er = mean_confidence_interval(response_time)
+			errors = 0 if 'array' in str(type(er)) else er
+			Data[ylabel][model], CI[ylabel][model] = response_times, errors
 		if 'f' in env and ylabel == 'Average Wait Time (intervals) per application':
 			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'create': [], 'application': []}
 			start, end, application = np.array(r['create']), np.array(r['start']), np.array(r['application'])
@@ -266,9 +274,10 @@ for ylabel in yLabelsStatic:
 	if 'per application' not in ylabel: continue
 	print(color.BOLD+ylabel+color.ENDC)
 	plt.xlabel('Model')
+	plt.ylabel(ylabel.replace('%', '\%'))
+	if 'Wait' in ylabel: plt.gca().set_ylim(bottom=0)
 	values = [[Data[ylabel][model][i] for model in Models] for i in range(len(apps))]
 	errors = [[CI[ylabel][model][i] for model in Models] for i in range(len(apps))]
-	print(values, '\n', errors)
 	width = 0.25
 	x = np.arange(len(values[0]))
 	for i in range(len(apps)):
@@ -306,6 +315,12 @@ for ylabel in yLabelsStatic:
 			d = np.array([i['avgmigrationtime'] for i in stats.metrics]) if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = d/(d2+0.001), mean_confidence_interval(d/(d2+0.001))
+		if 'f' in env and ylabel == 'Average Wait Time (intervals)':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'create': [], 'application': []}
+			start, end, application = np.array(r['create']), np.array(r['start']), np.array(r['application'])
+			response_times, errors = [], []
+			response_time = np.fmax(0, end - start - 1)
+			Data[ylabel][model], CI[ylabel][model] = response_time, 0
 		if ylabel == 'Number of Task migrations':
 			d = np.array([i['nummigrations'] for i in stats.metrics]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
