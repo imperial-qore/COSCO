@@ -49,10 +49,10 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'LR-MMT', 'MAD-MC']
+Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'LR-MMT', 'MAD-MC', 'POND']
 rot = 15
 xLabel = 'Simulation Time (minutes)'
-Colors = ['red', 'blue', 'green', 'orange', 'pink', 'cyan']
+Colors = ['red', 'blue', 'green', 'orange', 'pink', 'cyan', 'yellow']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
 
 yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', 'Interval Energy (Kilowatt-hr)', 'Average Interval Energy (Kilowatt-hr)',\

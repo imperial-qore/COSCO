@@ -3,6 +3,7 @@ from .A2C.rl import *
 import numpy as np
 from copy import deepcopy
 from math import sqrt
+from random import randint
 
 class PONDScheduler(Scheduler):
 	def __init__(self, data_type):
@@ -70,7 +71,7 @@ class PONDScheduler(Scheduler):
 				if new_hid == hid: continue
 				new_alloc[i] = (new_alloc[i][0], new_hid)
 				new_weight = self.calc_weight(new_alloc)
-				if new_weight > cur_weight:
+				if new_weight > cur_weight and randint(1,100) < 5:
 					cur_weight, alloc = new_weight, new_alloc
 		decision = []
 		for cid, hid in alloc:
