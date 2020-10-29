@@ -28,7 +28,7 @@ class PONDScheduler(Scheduler):
 		for cid, hid in alloc:
 			# UCB weight calculation
 			app = self.env.containerlist[cid].application if hasattr(self.env.containerlist[cid], 'application') else self.default_app
-			weight += sqrt(self.env.interval) * self.r[app][hid] * sqrt(np.log(self.env.interval) / self.n[app][hid])
+			weight += 10 * self.r[app][hid] * sqrt(np.log(100) / self.n[app][hid])
 		return weight
 
 	def get_last_value(self):
