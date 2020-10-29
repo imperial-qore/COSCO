@@ -273,3 +273,4 @@ class Stats():
 		self.generateCompleteDataset(dirname, self.metrics, 'metrics')
 		self.generateCompleteDataset(dirname, self.activecontainerinfo, 'activecontainerinfo')
 		self.generateCompleteDataset(dirname, self.allcontainerinfo, 'allcontainerinfo')
+		self.generateCompleteDataset(dirname, self.schedulerinfo, 'schedulerinfo')
