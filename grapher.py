@@ -63,7 +63,8 @@ yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', '
 	'Average Completion Time (seconds)', 'Total Completion Time (seconds)', 'Average Response Time (seconds) per application',\
 	'Cost per container (US Dollars)', 'Fraction of total SLA Violations', 'Fraction of SLA Violations per application', \
 	'Interval Allocation Time (seconds)', 'Number of completed tasks per application', "Fairness (Jain's index)", 'Fairness', 'Fairness per application', \
-	'Average CPU Utilization (%)', 'Average number of containers per Interval', 'Average RAM Utilization (%)', 'Scheduling Time (seconds)']
+	'Average CPU Utilization (%)', 'Average number of containers per Interval', 'Average RAM Utilization (%)', 'Scheduling Time (seconds)',\
+	'Average Execution Time (seconds)']
 
 yLabelStatic2 = {
 	'Average Completion Time (seconds)': 'Number of completed tasks'
@@ -71,7 +72,8 @@ yLabelStatic2 = {
 
 yLabelsTime = ['Interval Energy (Kilowatts)', 'Number of completed tasks', 'Interval Response Time (seconds)', \
 	'Interval Migration Time (seconds)', 'Interval Completion Time (seconds)', 'Interval Cost (US Dollar)', \
-	'Fraction of SLA Violations', 'Number of Task migrations', 'Number of Task migrations', 'Average Wait Time (intervals)']
+	'Fraction of SLA Violations', 'Number of Task migrations', 'Number of Task migrations', 'Average Wait Time', 'Average Wait Time (intervals)', \
+	'Average Execution Time (seconds)']
 
 all_stats_list = []
 for model in Models:
@@ -145,6 +147,11 @@ for ylabel in yLabelsStatic:
 			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d[d2>0]), mean_confidence_interval(d[d2>0])
+		if ylabel == 'Average Execution Time (seconds)':
+			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
+			d1 = np.array([i['avgmigrationtime'] for i in stats.metrics]) if stats else np.array([0])
+			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
+			Data[ylabel][model], CI[ylabel][model] = np.mean(d[d2>0] - d1[d2>0]), mean_confidence_interval(d[d2>0] - d1[d2>0])
 		if 'f' in env and ylabel == 'Average Response Time (seconds) per application':
 			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
 			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
@@ -315,22 +322,21 @@ for ylabel in yLabelsStatic:
 			Data[ylabel][model], CI[ylabel][model] = d/(d2+0.001), mean_confidence_interval(d/(d2+0.001))
 		# SLA Violations, Cost (USD)
 		# Auxilliary metrics
+		if ylabel == 'Average Execution Time (seconds)':
+			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
+			d1 = np.array([i['avgmigrationtime'] for i in stats.metrics]) if stats else np.array([0])
+			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
+			Data[ylabel][model], CI[ylabel][model] = np.array(d[d2>0] - d1[d2>0]), 0
 		if ylabel == 'Average Migration Time (seconds)':
 			d = np.array([i['avgmigrationtime'] for i in stats.metrics]) if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = d/(d2+0.001), mean_confidence_interval(d/(d2+0.001))
-		if 'f' in env and ylabel == 'Average Wait Time (intervals)':
-			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'create': [], 'application': []}
-			start, end, application = np.array(r['create']), np.array(r['start']), np.array(r['application'])
-			response_times, errors = [], []
-			response_time = np.fmax(0, end - start - 1)
-			Data[ylabel][model], CI[ylabel][model] = response_time, 0
+		if ylabel == 'Average Wait Time (intervals)':
+			d = np.array([(np.average(i['waittime'])-1 if i != [] else 0) for i in stats.metrics]) if stats else np.array([0.])
+			d[np.isnan(d)] = 0
+			Data[ylabel][model], CI[ylabel][model] = np.array(d), 0
 		if ylabel == 'Number of Task migrations':
 			d = np.array([i['nummigrations'] for i in stats.metrics]) if stats else np.array([0])
-			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
-		if ylabel == 'Average Wait Time':
-			d = np.array([(np.average(i['waittime']) if i != [] else 0) for i in stats.metrics]) if stats else np.array([0.])
-			d[np.isnan(d)] = 0
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 		# Host metrics
 		if ylabel == 'Average CPU Utilization (%)':
