@@ -317,7 +317,7 @@ for ylabel in yLabelsStatic:
 			d = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = d, 0
 		if ylabel == 'Average Response Time (seconds)':
-			d = np.array([i['avgresponsetime'] for i in stats.metrics]) if stats else np.array([0])
+			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = d/(d2+0.001), mean_confidence_interval(d/(d2+0.001))
 		# SLA Violations, Cost (USD)
