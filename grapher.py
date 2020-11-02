@@ -101,7 +101,12 @@ if env == 'framework':
 		response_times.sort()
 		sla[app] = response_times[int(0.95*len(response_times))]
 else:
-	sla = dict(zip(apps, [0]*3))
+	sla = {}
+	r = all_stats['A3C'].allcontainerinfo[-1]
+	start, end = np.array(r['start']), np.array(r['destroy'])
+	response_times = np.fmax(0, end - start)
+	response_times.sort()
+	sla[apps[0]] = response_times[int(0.95*len(response_times))]
 print(sla)
 
 Data = dict()
@@ -190,6 +195,14 @@ for ylabel in yLabelsStatic:
 				violations += len(response_times[response_times > sla[app]])
 				total += len(response_times)
 			Data[ylabel][model], CI[ylabel][model] = violations / (total+0.01), 0
+		if 'f' not in env and ylabel == 'Fraction of total SLA Violations':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': []}
+			start, end = np.array(r['start']), np.array(r['destroy'])
+			violations, total = 0, 0
+			response_times = np.fmax(0, end[end!=-1] - start[end!=-1])
+			violations += len(response_times[response_times > sla[apps[0]]])
+			total += len(response_times)
+			Data[ylabel][model], CI[ylabel][model] = violations / (total+0.01) if '*' not in model else 0, 0
 		if 'f' in env and ylabel == 'Fraction of SLA Violations per application':
 			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
 			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
@@ -253,6 +266,7 @@ for ylabel in yLabelsStatic:
 # Bar Graphs
 x = range(5,100*5,5)
 print(Data)
+print(CI)
 
 for ylabel in yLabelsStatic:
 	if Models[0] not in Data[ylabel]: continue
@@ -361,7 +375,7 @@ for ylabel in yLabelsStatic:
 	if Models[0] not in Data[ylabel]: continue
 	print(color.GREEN+ylabel+color.ENDC)
 	plt.figure(figsize=size)
-	plt.xlabel('Simulation Time (Hours)')
+	plt.xlabel('Simulation Time (Interval)')
 	plt.ylabel(ylabel.replace('%', '\%'))
 	for model in Models:
 		plt.plot(reduce(Data[ylabel][model]), color=Colors[Models.index(model)], linewidth=1, label=model, alpha=0.7)
