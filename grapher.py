@@ -268,6 +268,8 @@ x = range(5,100*5,5)
 print(Data)
 print(CI)
 
+##### BAR PLOTS #####
+
 for ylabel in yLabelsStatic:
 	if Models[0] not in Data[ylabel]: continue
 	if 'per application' in ylabel: continue
@@ -311,6 +313,136 @@ for ylabel in yLabelsStatic:
 	plt.xticks(range(len(values[i])), Models, rotation=rot)
 	plt.savefig(SAVE_PATH+'Bar-'+ylabel.replace(' ', '_')+".pdf")
 	plt.clf()
+
+##### BOX PLOTS #####
+
+Data = dict()
+CI = dict()
+
+for ylabel in yLabelsStatic:
+	Data[ylabel], CI[ylabel] = {}, {}
+	for model in Models:
+		# print(ylabel, model)
+		stats = all_stats[model]
+		# Major metrics
+		if ylabel == 'Average Energy (Kilowatt-hr)':
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([])
+			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
+			Data[ylabel][model], CI[ylabel][model] = d[d2>0]/d2[d2>0], 0
+		if ylabel == 'Interval Energy (Kilowatt-hr)':
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([0])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		if ylabel == 'Average Interval Energy (Kilowatt-hr)':
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([0])
+			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
+			Data[ylabel][model], CI[ylabel][model] = d[d2>0]/d2[d2>0], mean_confidence_interval(d[d2>0]/d2[d2>0])
+		if ylabel == 'Number of completed tasks per interval':
+			d = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([0])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		if ylabel == 'Average Response Time (seconds)':
+			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
+			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
+			Data[ylabel][model], CI[ylabel][model] = d[d2>0], mean_confidence_interval(d[d2>0])
+		if ylabel == 'Average Execution Time (seconds)':
+			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
+			d1 = np.array([i['avgmigrationtime'] for i in stats.metrics]) if stats else np.array([0])
+			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
+			Data[ylabel][model], CI[ylabel][model] = d[d2>0] - d1[d2>0], mean_confidence_interval(d[d2>0] - d1[d2>0])
+		if 'f' in env and ylabel == 'Average Response Time (seconds) per application':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
+			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
+			response_times, errors = [], []
+			for app in apps:
+				response_time = np.fmax(0, end[end!=-1] - start[end!=-1])[application[end!=-1] == 'shreshthtuli/'+app] *300
+				response_times.append(response_time)
+				er = mean_confidence_interval(response_time)
+				errors.append(0 if 'array' in str(type(er)) else er)
+			Data[ylabel][model], CI[ylabel][model] = response_times, errors
+		# Auxilliary metrics
+		if ylabel == 'Average Migration Time (seconds)':
+			d = np.array([i['avgmigrationtime'] for i in stats.metrics]) if stats else np.array([0])
+			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
+			Data[ylabel][model], CI[ylabel][model] = d[d2>0], mean_confidence_interval(d[d2>0])
+		if ylabel == 'Average Wait Time (intervals)':
+			d = np.array([(np.average(i['waittime'])-1 if i != [] else 0) for i in stats.metrics]) if stats else np.array([0.])
+			Data[ylabel][model], CI[ylabel][model] = d[d>0], mean_confidence_interval(d[d>0])
+		if 'f' in env and ylabel == 'Average Wait Time (intervals)':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'create': [], 'application': []}
+			start, end, application = np.array(r['create']), np.array(r['start']), np.array(r['application'])
+			response_times, errors = [], []
+			response_time = np.fmax(0, end - start - 1)
+			response_times = response_time
+			er = mean_confidence_interval(response_time)
+			errors = 0 if 'array' in str(type(er)) else er
+			Data[ylabel][model], CI[ylabel][model] = response_times, errors
+		if 'f' in env and ylabel == 'Average Wait Time (intervals) per application':
+			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'create': [], 'application': []}
+			start, end, application = np.array(r['create']), np.array(r['start']), np.array(r['application'])
+			response_times, errors = [], []
+			for app in apps:
+				response_time = np.fmax(0, end - start - 1)[application == 'shreshthtuli/'+app]
+				response_times.append(response_time)
+				er = mean_confidence_interval(response_time)
+				errors.append(0 if 'array' in str(type(er)) else er)
+			Data[ylabel][model], CI[ylabel][model] = response_times, errors
+		# Host metrics
+		if ylabel == 'Average CPU Utilization (%)':
+			d = np.array([(np.average(i['cpu']) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		if ylabel == 'Average number of containers per Interval':
+			d = np.array([(np.average(i['numcontainers']) if i != [] else 0.) for i in stats.hostinfo]) if stats else np.array([0.])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		if ylabel == 'Average RAM Utilization (%)':
+			d = np.array([(np.average(100*np.array(i['ram'])/(np.array(i['ram'])+np.array(i['ramavailable']))) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		# Scheduler metrics
+		if ylabel == 'Scheduling Time (seconds)':
+			d = np.array([i['schedulingtime'] for i in stats.schedulerinfo]) if stats else np.array([0.])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		if 'f' in env and ylabel == 'Interval Allocation Time (seconds)':
+			d = np.array([i['migrationTime'] for i in stats.schedulerinfo]) if stats else np.array([0.])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+
+
+for ylabel in yLabelsStatic:
+	if Models[0] not in Data[ylabel]: continue
+	if 'per application' in ylabel: continue
+	print(color.BLUE+ylabel+color.ENDC)
+	plt.figure(figsize=size)
+	plt.xlabel('Model')
+	plt.ylabel(ylabel.replace('%', '\%'))
+	values = [Data[ylabel][model] for model in Models]
+	errors = [CI[ylabel][model] for model in Models]
+	# plt.ylim(0, max(values)+statistics.stdev(values))
+	p1 = plt.boxplot(values, positions=np.arange(len(values)), notch=False, showmeans=True, widths=0.65, meanprops=dict(marker='.', markeredgecolor='black', markerfacecolor='black'), showfliers=False)
+	plt.xticks(range(len(values)), Models, rotation=rot)
+	plt.savefig(SAVE_PATH+'Box-'+ylabel.replace(' ', '_')+".pdf")
+	plt.clf()
+
+for ylabel in yLabelsStatic:
+	if Models[0] not in Data[ylabel]: continue
+	if 'per application' not in ylabel: continue
+	print(color.BLUE+ylabel+color.ENDC)
+	plt.figure(figsize=size)
+	plt.xlabel('Model')
+	plt.ylabel(ylabel.replace('%', '\%'))
+	if 'Wait' in ylabel: plt.gca().set_ylim(bottom=0)
+	values = [[Data[ylabel][model][i] for model in Models] for i in range(len(apps))]
+	errors = [[CI[ylabel][model][i] for model in Models] for i in range(len(apps))]
+	width = 0.25
+	x = np.arange(len(values[0]))
+	for i in range(len(apps)):
+		p1 = plt.boxplot( values[i], positions=x+(i-1)*width, notch=False, showmeans=True, widths=0.25, 
+			meanprops=dict(marker='.', markeredgecolor='black', markerfacecolor='black'), showfliers=False)
+		for param in ['boxes', 'whiskers', 'caps', 'medians']:
+			plt.setp(p1[param], color=Colors[i])
+		plt.plot([], '-', c=Colors[i], label=apps[i])
+	plt.legend()
+	plt.xticks(range(len(values[i])), Models, rotation=rot)
+	plt.savefig(SAVE_PATH+'Box-'+ylabel.replace(' ', '_')+".pdf")
+	plt.clf()
+
+##### LINE PLOTS #####
 
 Data = dict()
 CI = dict()
