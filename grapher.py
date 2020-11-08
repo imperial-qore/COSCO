@@ -15,6 +15,7 @@ import numpy as np
 import scipy.stats
 from stats.Stats import *
 import seaborn as sns
+from pprint import pprint
 from utils.Utils import *
 import os
 import fnmatch
@@ -265,8 +266,8 @@ for ylabel in yLabelsStatic:
 
 # Bar Graphs
 x = range(5,100*5,5)
-print(Data)
-print(CI)
+pprint(Data)
+# print(CI)
 
 ##### BAR PLOTS #####
 
@@ -347,7 +348,7 @@ for ylabel in yLabelsStatic:
 			d = np.array([max(0, i['avgresponsetime']) for i in stats.metrics]) if stats else np.array([0])
 			d1 = np.array([i['avgmigrationtime'] for i in stats.metrics]) if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
-			Data[ylabel][model], CI[ylabel][model] = d[d2>0] - d1[d2>0], mean_confidence_interval(d[d2>0] - d1[d2>0])
+			Data[ylabel][model], CI[ylabel][model] = np.maximum(0, d[d2>0] - d1[d2>0]), mean_confidence_interval(d[d2>0] - d1[d2>0])
 		if 'f' in env and ylabel == 'Average Response Time (seconds) per application':
 			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
 			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
