@@ -55,7 +55,7 @@ SAVE_PATH = 'results/' + env + '/'
 Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC']
 rot = 15
 xLabel = 'Simulation Time (minutes)'
-Colors = ['red', 'blue', 'green', 'orange', 'yellow', 'pink', 'cyan']
+Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
 
 yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', 'Interval Energy (Kilowatt-hr)', 'Average Interval Energy (Kilowatt-hr)',\
@@ -511,7 +511,7 @@ for ylabel in yLabelsStatic:
 	plt.xlabel('Simulation Time (Interval)')
 	plt.ylabel(ylabel.replace('%', '\%'))
 	for model in Models:
-		plt.plot(reduce(Data[ylabel][model]), color=Colors[Models.index(model)], linewidth=1, label=model, alpha=0.7)
+		plt.plot(reduce(Data[ylabel][model]), color=Colors[Models.index(model)], linewidth=1.5, label=model, alpha=0.7)
 	plt.legend()
 	plt.savefig(SAVE_PATH+"Series-"+ylabel.replace(' ', '_')+".pdf")
 	plt.clf()
