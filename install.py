@@ -31,7 +31,7 @@ if 'Windows' in platform.system():
 	trial = subprocess.run("where bash.exe", shell=True, stderr=subprocess.PIPE)
 	stdout = trial.stderr.decode()
 	if 'Could not find' in stdout:
-		system("powershell.exe -ExecutionPolicy Bypass 'wsl-ubuntu-powershell-master/0_enable_wsl.ps1'")
+		system("powershell.exe -ExecutionPolicy Bypass 'framework/install_scripts/install_wsl.ps1'")
 
 # Installing InfluxDB
 if 'Windows' in platform.system():
