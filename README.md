@@ -30,13 +30,6 @@ The basic architecture of COSCO has two main packages: <br>
 Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for installation instructions and replaication of results.
 
 
-## To be done by the user:
-* Set environment type based on VMs/PMs of Datacenter object. Line 83 in main.py as either of *Virtual* or *Physical*.
-* Update *VLAN_config.json* based on environment.
-* Implement power models required in *VLAN_config.json* or set from existing models in 'framework/node/Powermodels'.
-* Update based on arch the instructions in *framework/server/scripts/instructions_arch.json* (Optional).
-* Update SLA requirement based on application requirements in *framework/workload/\*.py*.
-
 ## License
 
 BSD-3-Clause. 
