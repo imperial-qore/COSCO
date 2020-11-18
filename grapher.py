@@ -508,7 +508,7 @@ for ylabel in yLabelsStatic:
 	if Models[0] not in Data[ylabel]: continue
 	print(color.GREEN+ylabel+color.ENDC)
 	plt.figure(figsize=size)
-	plt.xlabel('Simulation Time (Interval)')
+	plt.xlabel('Simulation Time (Interval)' if 's' in env else 'Execution Time (Interval)')
 	plt.ylabel(ylabel.replace('%', '\%'))
 	for model in Models:
 		plt.plot(reduce(Data[ylabel][model]), color=Colors[Models.index(model)], linewidth=1.5, label=model, alpha=0.7)
