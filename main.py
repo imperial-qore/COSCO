@@ -40,6 +40,8 @@ from scheduler.GOBI import GOBIScheduler
 from scheduler.GOBI2 import GOBI2Scheduler
 from scheduler.DRL import DRLScheduler
 from scheduler.POND import PONDScheduler
+from scheduler.SOGOBI import SOGOBIScheduler
+from scheduler.SOGOBI2 import SOGOBI2Scheduler
 
 # Auxilliary imports
 from stats.Stats import *
@@ -93,7 +95,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = PONDScheduler('energy_latency_'+str(HOSTS)) # DRLScheduler('energy_latency_'+str(HOSTS))
+	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS)) # DRLScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

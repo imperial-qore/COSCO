@@ -25,6 +25,10 @@ plt.style.use(['science', 'ieee'])
 plt.rcParams["text.usetex"] = True
 size = (2.9, 2.5)
 env = argv[1]
+option = 0
+if len(argv) >= 3:
+	if 'SO' in argv[2]: option = 1
+	else: option = 2
 
 def fairness(l):
 	a = 1 / (np.mean(l)-(scipy.stats.hmean(l)+0.001)) # 1 / slowdown i.e. 1 / (am - hm)
@@ -52,7 +56,7 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC']
+Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC'] if option == 0 else ['SOGOBI*', 'SOGOBI', 'GOBI*', 'GOBI', 'A3C', 'POND']
 rot = 15
 xLabel = 'Simulation Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan']
@@ -314,6 +318,8 @@ for ylabel in yLabelsStatic:
 	plt.xticks(range(len(values[i])), Models, rotation=rot)
 	plt.savefig(SAVE_PATH+'Bar-'+ylabel.replace(' ', '_')+".pdf")
 	plt.clf()
+
+# exit()
 
 ##### BOX PLOTS #####
 
