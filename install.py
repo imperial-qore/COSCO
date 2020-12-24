@@ -5,15 +5,17 @@ if float(version[0:3]) < 3.7:
 	print(color.FAIL+'Python 3.7 or above required!'+color.ENDC)
 	exit()
 
-from os import mkdir, remove, startfile, path, system, environ
+from os import mkdir, remove, startfile, path, system, environ, getcwd
 
 system('pip install -r requirements.txt')
+system('pip install SciencePlots')
 
 import wget
 from zipfile import ZipFile
 import platform
 from shutil import copyfile
 import sys
+import os
 import subprocess
 from getpass import getpass
 
@@ -65,7 +67,7 @@ if 'Windows' in platform.system():
 			link = 'https://releases.hashicorp.com/vagrant/2.2.10/vagrant_2.2.10_i686.msi'
 		filename = wget.download(link)
 		print('\n'+color.HEADER+'Please follow the prompts for installing Vagrant'+color.ENDC)
-		startfile(filename)
+		subprocess.call([getcwd()+'/'+filename], shell=True)
 		remove(filename)
 	set_disk = subprocess.run("setx VAGRANT_EXPERIMENTAL \"disks\"", shell=True, stderr=subprocess.PIPE)
 elif 'Linux' in platform.system():
@@ -80,7 +82,7 @@ if 'Windows' in platform.system():
 		link = 'https://download.virtualbox.org/virtualbox/6.0.24/VirtualBox-6.0.24-139119-Win.exe'
 		filename = wget.download(link)
 		print('\n'+color.HEADER+'Please follow the prompts for installing VirtualBox'+color.ENDC)
-		startfile(filename)
+		subprocess.call([getcwd()+'/'+filename], shell=True)
 		remove(filename)
 elif 'Linux' in platform.system():
 	run_cmd_pwd('apt install virtualbox')
@@ -90,7 +92,7 @@ ssh_dir = 'C:'+environ['homepath']+'\\.ssh' if 'Windows' in platform.system() el
 if not path.exists(ssh_dir):
 	mkdir(ssh_dir)
 for filename in ['id_rsa', 'id_rsa.pub']:
-	copy('framework/install_scripts/ssh_keys/'+filename, ssh_dir)
+	copyfile('framework/install_scripts/ssh_keys/'+filename, ssh_dir)
 
 run_cmd_pwd("apt install ansible")
 run_cmd_pwd("apt install dos2unix")
