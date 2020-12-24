@@ -55,7 +55,7 @@ class PONDScheduler(Scheduler):
 			self.r[app][hid] = self.r[app][hid] / self.n[app][hid]
 
 	def run_POND(self):
-		print(self.r)
+		# print(self.r)
 		alloc = []; prev_alloc = {}
 		for c in self.env.containerlist:
 			if c: prev_alloc[c.id] = c.getHostID()

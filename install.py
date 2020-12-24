@@ -9,6 +9,7 @@ from os import mkdir, remove, startfile, path, system, environ, getcwd
 
 system('pip install -r requirements.txt')
 system('pip install SciencePlots')
+system('pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html')
 
 import wget
 from zipfile import ZipFile

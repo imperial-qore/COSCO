@@ -27,7 +27,7 @@ The basic architecture of COSCO has two main packages: <br>
 **Framework:** It’s a kind of tool to test the scheduling algorithms in a physical(real time) fog/cloud environment with real world applications.
 
 ## Wiki
-Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for installation instructions and replaication of results.
+Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for installation instructions and replication of results.
 
 
 ## License
