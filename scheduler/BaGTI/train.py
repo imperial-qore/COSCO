@@ -4,8 +4,11 @@ from src.models import *
 from src.ga import *
 from src.opt import *
 
-from sys import argv
+from sys import argv, maxsize
 from time import time
+
+import warnings
+warnings.filterwarnings("ignore")
 
 def backprop(dataset, model, optimizer):
 	total = 0
@@ -16,7 +19,7 @@ def backprop(dataset, model, optimizer):
 		y_true = feat[1]
 		# print(y_pred, y_true)
 		optimizer.zero_grad()
-		loss = torch.sum((y_pred - y_true) ** 2)
+		loss = torch.sum((y_pred - y_true) ** 2) if 'stochastic' not in model.name else KL_loss(y_pred, Coeff_Energy*y_true[0] + Coeff_Latency*y_true[1])
 		loss.backward()
 		optimizer.step()
 		total += loss
@@ -29,7 +32,7 @@ def accuracy(dataset, model):
 		feature = torch.tensor(feature,dtype=torch.float)
 		y_pred = model(feature)
 		y_true = feat[1]
-		loss = torch.sum((y_pred - y_true) ** 2)
+		loss = torch.sum((y_pred - y_true) ** 2) if 'stochastic' not in model.name else KL_loss(y_pred, Coeff_Energy*y_true[0] + Coeff_Latency*y_true[1])
 		total += loss
 	return total/len(dataset)
 
@@ -42,7 +45,7 @@ def save_model(model, optimizer, epoch, accuracy_list):
         'accuracy_list': accuracy_list}, file_path)
 
 def load_model(filename, model, data_type):
-	optimizer = torch.optim.Adam(model.parameters() , lr=0.0001, weight_decay=1e-5)
+	optimizer = torch.optim.Adam(model.parameters() , lr=0.0001, weight_decay=1e-5) if 'stochastic' not in data_type else torch.optim.AdamW(model.parameters() , lr=0.0001)
 	file_path1 = MODEL_SAVE_PATH + "/" + filename + "_Trained.ckpt"
 	file_path2 = 'scheduler/BaGTI/' + file_path1
 	file_path = file_path1 if os.path.exists(file_path1) else file_path2
@@ -59,12 +62,12 @@ def load_model(filename, model, data_type):
 	return model, optimizer, epoch, accuracy_list
 
 if __name__ == '__main__':
-	data_type = argv[1] # can be 'energy', 'energy_latency', 'energy_latency2' + '_' + str(HOSTS)
+	data_type = argv[1] # can be 'energy', 'energy_latency', 'energy_latency2', 'stochastic_energy_latency', 'stochastic_energy_latency2' + '_' + str(HOSTS)
 	exec_type = argv[2] # can be 'train', ga', 'opt'
 
 	model = eval(data_type+"()")
 	model, optimizer, start_epoch, accuracy_list = load_model(data_type, model, data_type)
-	dtl = data_type.split('_')
+	dtl = data_type.replace('stochastic_','').split('_')
 	dataset, dataset_size, _ = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
 
 	if exec_type == "train":

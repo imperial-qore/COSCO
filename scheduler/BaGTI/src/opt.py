@@ -3,7 +3,7 @@ import torch
 import numpy as np
 from copy import deepcopy
 from src.constants import *
-from src.optim_adahessian import Adahessian
+from src.adahessian import Adahessian
 import matplotlib.pyplot as plt
 
 def convertToOneHot(dat, cpu_old, HOSTS):

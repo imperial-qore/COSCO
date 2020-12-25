@@ -43,7 +43,7 @@ from scheduler.POND import PONDScheduler
 from scheduler.SOGOBI import SOGOBIScheduler
 from scheduler.SOGOBI2 import SOGOBI2Scheduler
 
-# Auxilliary imports
+# Auxiliary imports
 from stats.Stats import *
 from utils.Utils import *
 from pdb import set_trace as bp
