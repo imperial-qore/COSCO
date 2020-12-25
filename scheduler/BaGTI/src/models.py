@@ -126,5 +126,5 @@ class stochastic_energy_latency_50(nn.Module):
         x = x.reshape(1, -1)
         x, s = self.find(x)
         if not('train' in argv[0] and 'train' in argv[2]):
-            return x - UCB_K * s
+            return x + UCB_K * s
         return x, s
