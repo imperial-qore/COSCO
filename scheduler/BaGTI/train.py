@@ -10,6 +10,11 @@ from time import time
 import warnings
 warnings.filterwarnings("ignore")
 
+def custom_loss(y_pred, y_true, model_name):
+	if 'stochastic' in model_name:
+		return KL_loss(y_pred, Coeff_Energy*y_true[0] + Coeff_Latency*y_true[1])
+	return torch.sum((y_pred - y_true) ** 2)
+
 def backprop(dataset, model, optimizer):
 	total = 0
 	for feat in dataset:
@@ -19,7 +24,7 @@ def backprop(dataset, model, optimizer):
 		y_true = feat[1]
 		# print(y_pred, y_true)
 		optimizer.zero_grad()
-		loss = torch.sum((y_pred - y_true) ** 2) if 'stochastic' not in model.name else KL_loss(y_pred, Coeff_Energy*y_true[0] + Coeff_Latency*y_true[1])
+		loss = custom_loss(y_pred, y_true, model.name)
 		loss.backward()
 		optimizer.step()
 		total += loss
@@ -32,7 +37,7 @@ def accuracy(dataset, model):
 		feature = torch.tensor(feature,dtype=torch.float)
 		y_pred = model(feature)
 		y_true = feat[1]
-		loss = torch.sum((y_pred - y_true) ** 2) if 'stochastic' not in model.name else KL_loss(y_pred, Coeff_Energy*y_true[0] + Coeff_Latency*y_true[1])
+		loss = custom_loss(y_pred, y_true, model.name)
 		total += loss
 	return total/len(dataset)
 
@@ -67,7 +72,7 @@ if __name__ == '__main__':
 
 	model = eval(data_type+"()")
 	model, optimizer, start_epoch, accuracy_list = load_model(data_type, model, data_type)
-	dtl = data_type.replace('stochastic_','').split('_')
+	dtl = data_type.split('_')
 	dataset, dataset_size, _ = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
 
 	if exec_type == "train":

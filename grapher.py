@@ -26,9 +26,12 @@ plt.rcParams["text.usetex"] = True
 size = (2.9, 2.5)
 env = argv[1]
 option = 0
+sla_baseline = 'A3C'
 if len(argv) >= 3:
 	if 'SO' in argv[2]: option = 1
-	else: option = 2
+	elif 'H' in argv[2]: 
+		option = 2
+		sla_baseline = 'GOBI'
 
 def fairness(l):
 	a = 1 / (np.mean(l)-(scipy.stats.hmean(l)+0.001)) # 1 / slowdown i.e. 1 / (am - hm)
@@ -56,7 +59,11 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC'] if option == 0 else ['SOGOBI*', 'SOGOBI', 'GOBI*', 'GOBI', 'A3C', 'POND']
+Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC'] 
+if option == 1:
+	Models = ['SOGOBI*', 'SOGOBI', 'GOBI*', 'GOBI', 'A3C', 'POND']
+elif option == 2:
+	Models = ['HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'A3C', 'POND']
 rot = 15
 xLabel = 'Simulation Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan']
@@ -99,7 +106,7 @@ cost = (100 * 300 // 60) * (4 * 0.0472 + 2 * 0.189 + 2 * 0.166 + 2 * 0.333) # Ho
 
 if env == 'framework':
 	sla = {}
-	r = all_stats['A3C'].allcontainerinfo[-1]
+	r = all_stats[sla_baseline].allcontainerinfo[-1]
 	start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
 	for app in apps:
 		response_times = np.fmax(0, end - start)[application == 'shreshthtuli/'+app]
@@ -107,7 +114,7 @@ if env == 'framework':
 		sla[app] = response_times[int(0.95*len(response_times))]
 else:
 	sla = {}
-	r = all_stats['A3C'].allcontainerinfo[-1]
+	r = all_stats[sla_baseline].allcontainerinfo[-1]
 	start, end = np.array(r['start']), np.array(r['destroy'])
 	response_times = np.fmax(0, end - start)
 	response_times.sort()

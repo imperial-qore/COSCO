@@ -12,7 +12,7 @@ class HGOBIScheduler(Scheduler):
 		self.model, _, _, _ = load_model(data_type, self.model, data_type)
 		self.data_type = data_type
 		self.hosts = int(data_type.split('_')[-1])
-		dtl = data_type.replace('stochastic_','').split('_')
+		dtl = data_type.split('_')
 		_, _, self.max_container_ips = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
 
 	def run_HGOBI(self):

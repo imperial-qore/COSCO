@@ -43,6 +43,7 @@ from scheduler.POND import PONDScheduler
 from scheduler.SOGOBI import SOGOBIScheduler
 from scheduler.SOGOBI2 import SOGOBI2Scheduler
 from scheduler.HGOBI import HGOBIScheduler
+from scheduler.HGOBI2 import HGOBI2Scheduler
 
 # Auxiliary imports
 from stats.Stats import *

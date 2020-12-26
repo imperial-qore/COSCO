@@ -11,7 +11,7 @@ from sys import argv
 
 plt.style.use(['science', 'ieee'])
 plt.rcParams["text.usetex"] = True
-plt.rcParams['figure.figsize'] = 40, 30
+plt.rcParams['figure.figsize'] = 2, 1.2
 
 if 'train' in argv[0] and not os.path.exists(MODEL_SAVE_PATH):
 	os.mkdir(MODEL_SAVE_PATH)
@@ -100,6 +100,12 @@ def load_energy_latency2_data(HOSTS):
 		dataset.append(((np.concatenate((cpuH, cpuC, alloc, pred_vals), axis=1)), torch.Tensor([(data[i][-2]- data.min(0)[-2])/(data.max(0)[-2] - data.min(0)[-2]), max(0, data[i][-1])/data.max(0)[-1]])))
 		# Normalization by (x - min)/(max - min)
 	return dataset, len(dataset), (max_ips_container, max_energy, max_response)
+
+def load_stochastic_energy_latency_data(HOSTS):
+	return load_energy_latency_data(HOSTS)
+
+def load_stochastic_energy_latency2_data(HOSTS):
+	return load_energy_latency2_data(HOSTS)
 
 def plot_accuracies(accuracy_list, data_type):
 	trainAcc = [i[0] for i in accuracy_list]
