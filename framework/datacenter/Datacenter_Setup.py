@@ -6,6 +6,8 @@ from subprocess import call, Popen, PIPE
 from getpass import getpass
 from utils.Utils import *
 
+BASE_IP = '192.168.122.'
+
 def setup(cfg):
     # For ansible setup
     host = []
@@ -70,10 +72,10 @@ def setupVagrantEnvironment(cfg, mode):
         custom_list = "servers=[\n"
         host_ip = []
         for i, datapoint in enumerate(config['vagrant']['servers']):
-            custom_list += "\t{\n\t\t:hostname => 'vm"+str(i+1)+"',\n\t\t:ip => '192.168.0."+str(i+2)+"',\n\t\t:box => '"
+            custom_list += "\t{\n\t\t:hostname => 'vm"+str(i+1)+"',\n\t\t:ip => '"+BASE_IP+str(i+2)+"',\n\t\t:box => '"
             custom_list += config['vagrant']['box']
             custom_list += "',\n\t\t:ram => "+str(datapoint['ram'])+",\n\t\t:cpu => "+str(datapoint['cpu'])+",\n\t\t:disk => '"+str(datapoint['disk'])+"GB'\n\t}"
-            host_ip.append("192.168.0."+str(i+2))
+            host_ip.append(BASE_IP+str(i+2))
             if i != len(config['vagrant']['servers']) - 1:
                 custom_list += ","
             custom_list += "\n"
@@ -85,7 +87,7 @@ def setupVagrantEnvironment(cfg, mode):
         call(["vagrant", "up", "--parallel"])
         os.chdir("../../") 
         return host_ip
-    HOST_IPS = ['192.168.0.'+str(i+2) for i in range(len(config['vagrant']['servers']))]
+    HOST_IPS = [BASE_IP+str(i+2) for i in range(len(config['vagrant']['servers']))]
     uname = "vagrant"
     for ip in HOST_IPS:
         res = call(["ssh", "-o", "StrictHostKeyChecking=no", "-i", "framework/install_scripts/ssh_keys/id_rsa", uname+"@"+ip, "~/agent/scripts/delete.sh"], shell=True, stdout=PIPE, stderr=PIPE)  
