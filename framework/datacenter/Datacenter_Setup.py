@@ -5,7 +5,7 @@ import re
 from subprocess import call, Popen, PIPE
 from getpass import getpass
 from utils.Utils import *
-from workflow.agent.codes import BASE_IP
+from framework.agent.codes import BASE_IP
 
 def setup(cfg):
     # For ansible setup
