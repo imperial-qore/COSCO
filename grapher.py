@@ -63,7 +63,7 @@ Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC']
 if option == 1:
 	Models = ['SOGOBI*', 'SOGOBI', 'GOBI*', 'GOBI', 'A3C', 'POND']
 elif option == 2:
-	Models = ['HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'A3C', 'POND']
+	Models = ['HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C']
 rot = 15
 xLabel = 'Simulation Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan']
