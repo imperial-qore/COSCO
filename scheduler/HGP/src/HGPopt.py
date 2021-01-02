@@ -26,7 +26,7 @@ def HGPopt(init, model, data_type):
     HOSTS = int(data_type.split('_')[-1])
     init = init.reshape(HOSTS, HOSTS+2)
     cpu_old = deepcopy(init[:,0:-HOSTS]); alloc_old = deepcopy(init[:,-HOSTS:])
-    init = optimize.minimize(f, x0=init.reshape(-1), tol=100, method='nelder-mead', options={'maxiter':1}).x
+    init = optimize.minimize(f, x0=init.reshape(-1), tol=100, method='BFGS', options={'maxiter':1}).x
     init = init.reshape(HOSTS, HOSTS+2)
     init = convertToOneHot(init, cpu_old, HOSTS)
     return init, f(init)
