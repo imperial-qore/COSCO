@@ -9,10 +9,10 @@ from sys import platform
 from os import mkdir, remove, path, system, environ, getcwd
 if 'win' in platform:
 	from os import startfile
-	
-system('pip install -r requirements.txt')
-system('pip install SciencePlots')
-system('pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html')
+
+system('python3 -m pip install -r requirements.txt')
+system('python3 -m pip install SciencePlots')
+system('python3 -m pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html')
 
 import wget
 from zipfile import ZipFile
