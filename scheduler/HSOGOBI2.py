@@ -5,24 +5,27 @@ from .Scheduler import *
 from .BaGTI.train import *
 from .BaGTI.src.utils import *
 
-class HGOBIScheduler(Scheduler):
+class HGOBI2Scheduler(Scheduler):
 	def __init__(self, data_type):
 		super().__init__()
 		data_type = 'stochastic_' + data_type
+		dtl = data_type.split('_')
+		data_type = '_'.join(dtl[:-1])+'2_'+dtl[-1]
 		self.model = eval(data_type+"()")
 		self.model, _, _, _ = load_model(data_type, self.model, data_type)
 		self.data_type = data_type
 		self.hosts = int(data_type.split('_')[-1])
-		dtl = data_type.split('_')
-		_, _, self.max_container_ips = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
+		_, _, (self.max_container_ips, self.max_energy, self.max_response) = eval("load_"+'_'.join(dtl[:-1])+"2_data("+dtl[-1]+")")
 
-	def run_HGOBI(self):
+	def run_HGOBI2(self):
 		cpu = [host.getCPU()/100 for host in self.env.hostlist]
 		cpu = np.array([cpu]).transpose()
 		if 'latency' in self.model.name:
 			cpuC = [(c.getApparentIPS()/self.max_container_ips if c else 0) for c in self.env.containerlist]
 			cpuC = np.array([cpuC]).transpose()
-			cpu = np.concatenate((cpu, cpuC), axis=1)
+			e, r = (0, 0) if self.env.stats == None else self.env.stats.runSimulationGOBI()
+			pred = np.broadcast_to(np.array([e/self.max_energy, r/self.max_response]), (self.hosts, 2))
+			cpu = np.concatenate((cpu, cpuC, pred), axis=1)
 		alloc = []; prev_alloc = {}
 		for c in self.env.containerlist:
 			oneHot = [0] * len(self.env.hostlist)
@@ -32,7 +35,7 @@ class HGOBIScheduler(Scheduler):
 			alloc.append(oneHot)
 		init = np.concatenate((cpu, alloc), axis=1)
 		init = torch.tensor(init, dtype=torch.float, requires_grad=True)
-		result, iteration, fitness = opt(init, self.model, [], self.data_type)
+		result, iteration, fitness = so_opt(init, self.model, [], self.data_type)
 		decision = []
 		for cid in prev_alloc:
 			one_hot = result[cid, -self.hosts:].tolist()
@@ -45,5 +48,5 @@ class HGOBIScheduler(Scheduler):
 
 	def placement(self, containerIDs):
 		first_alloc = np.all([not (c and c.getHostID() != -1) for c in self.env.containerlist])
-		decision = self.run_HGOBI()
+		decision = self.run_HGOBI2()
 		return decision

@@ -45,6 +45,8 @@ from scheduler.SOGOBI import SOGOBIScheduler
 from scheduler.SOGOBI2 import SOGOBI2Scheduler
 from scheduler.HGOBI import HGOBIScheduler
 from scheduler.HGOBI2 import HGOBI2Scheduler
+from scheduler.HSOGOBI import HSOGOBIScheduler
+from scheduler.HSOGOBI2 import HGOBI2Scheduler
 
 # Auxiliary imports
 from stats.Stats import *

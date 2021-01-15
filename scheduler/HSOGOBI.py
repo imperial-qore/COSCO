@@ -5,7 +5,7 @@ from .Scheduler import *
 from .BaGTI.train import *
 from .BaGTI.src.utils import *
 
-class HGOBIScheduler(Scheduler):
+class HSOGOBIScheduler(Scheduler):
 	def __init__(self, data_type):
 		super().__init__()
 		data_type = 'stochastic_' + data_type
@@ -16,7 +16,7 @@ class HGOBIScheduler(Scheduler):
 		dtl = data_type.split('_')
 		_, _, self.max_container_ips = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
 
-	def run_HGOBI(self):
+	def run_HSOGOBI(self):
 		cpu = [host.getCPU()/100 for host in self.env.hostlist]
 		cpu = np.array([cpu]).transpose()
 		if 'latency' in self.model.name:
@@ -32,7 +32,7 @@ class HGOBIScheduler(Scheduler):
 			alloc.append(oneHot)
 		init = np.concatenate((cpu, alloc), axis=1)
 		init = torch.tensor(init, dtype=torch.float, requires_grad=True)
-		result, iteration, fitness = opt(init, self.model, [], self.data_type)
+		result, iteration, fitness = so_opt(init, self.model, [], self.data_type)
 		decision = []
 		for cid in prev_alloc:
 			one_hot = result[cid, -self.hosts:].tolist()
@@ -45,5 +45,5 @@ class HGOBIScheduler(Scheduler):
 
 	def placement(self, containerIDs):
 		first_alloc = np.all([not (c and c.getHostID() != -1) for c in self.env.containerlist])
-		decision = self.run_HGOBI()
+		decision = self.run_HSOGOBI()
 		return decision
