@@ -184,6 +184,7 @@ class RequestRouter():
             cid = subprocess.run("docker inspect -f '{{.Id}}' "+container_name, shell=True, stdout=subprocess.PIPE)
             cid = cid.stdout.decode('utf-8').strip()
             running = self.containerClient.dclient1.inspect_container(cid)['State']['Running']
+            logging.debug('Inside checkpoint function, checkpoint is running = '+str(running))
             if running:
                 subprocess.call(["sudo", "docker", "checkpoint", "create", container_name, checkpoint_name])
         except Exception as e:
