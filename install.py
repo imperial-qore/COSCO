@@ -99,5 +99,6 @@ for filename in ['id_rsa', 'id_rsa.pub']:
 
 run_cmd_pwd("apt install ansible", password)
 run_cmd_pwd("apt install dos2unix", password)
+run_cmd_pwd("sudo chmod 400 framework/install_scripts/ssh_keys/id_rsa", password)
 
 print(color.GREEN+"All packages installed."+color.ENDC)
