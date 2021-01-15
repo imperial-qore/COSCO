@@ -6,7 +6,7 @@ if float(version[0:3]) < 3.7:
 	exit()
 
 import platform
-from os import mkdir, remove, path, system, environ, getcwd
+from os import mkdir, makedirs, remove, path, system, environ, getcwd
 if 'Windows' in platform.system():
 	from os import startfile
 
@@ -93,7 +93,7 @@ elif 'Linux' in platform.system():
 # Copy SSH keys
 ssh_dir = 'C:'+environ['homepath']+'\\.ssh' if 'Windows' in platform.system() else '~/.ssh'
 if not path.exists(ssh_dir):
-	mkdir(ssh_dir)
+	makedirs(ssh_dir)
 for filename in ['id_rsa', 'id_rsa.pub']:
 	copyfile('framework/install_scripts/ssh_keys/'+filename, ssh_dir)
 
