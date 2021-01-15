@@ -91,7 +91,7 @@ elif 'Linux' in platform.system():
 	run_cmd_pwd('apt install virtualbox', password)
 
 # Copy SSH keys
-ssh_dir = 'C:'+environ['homepath']+'\\.ssh' if 'Windows' in platform.system() else '~/.ssh'
+ssh_dir = 'C:'+environ['homepath']+'\\.ssh' if 'Windows' in platform.system() else environ['homepath']+'/.ssh'
 if not path.exists(ssh_dir):
 	makedirs(ssh_dir)
 for filename in ['id_rsa', 'id_rsa.pub']:
