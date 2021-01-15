@@ -1,8 +1,8 @@
 from sys import version
 from utils.ColorUtils import *
 
-if float(version[0:3]) < 3.7:
-	print(color.FAIL+'Python 3.7 or above required!'+color.ENDC)
+if float(version[0:3]) < 3.6:
+	print(color.FAIL+'Python 3.6 or above required!'+color.ENDC)
 	exit()
 
 import platform
@@ -11,7 +11,7 @@ if 'Windows' in platform.system():
 	from os import startfile
 
 system('python3 -m pip install -r requirements.txt')
-system('python3 -m pip install SciencePlots')
+system('python3 -m pip install -U scikit-learn')
 system('python3 -m pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html')
 
 import wget
