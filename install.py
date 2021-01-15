@@ -5,8 +5,11 @@ if float(version[0:3]) < 3.7:
 	print(color.FAIL+'Python 3.7 or above required!'+color.ENDC)
 	exit()
 
-from os import mkdir, remove, startfile, path, system, environ, getcwd
-
+from sys import platform
+from os import mkdir, remove, path, system, environ, getcwd
+if 'win' in platform:
+	from os import startfile
+	
 system('pip install -r requirements.txt')
 system('pip install SciencePlots')
 system('pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html')
