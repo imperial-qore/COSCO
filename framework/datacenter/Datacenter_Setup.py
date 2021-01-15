@@ -51,8 +51,8 @@ def setupVLANEnvironment(cfg, mode):
         run_cmd("ansible-playbook framework/config/VLAN_ansible.yml")
     uname = "ansible"
     for ip in HOST_IPS:
-        res = os.system("ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa "+uname+"@"+ip+" ~/agent/scripts/delete.sh")  
-        res = os.system("ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa "+uname+"@"+ip+" sudo service docker restart")
+        res = os.system("ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa "+uname+"@"+ip+" ~/agent/scripts/delete.sh > /dev/null 2>&1")  
+        res = os.system("ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa "+uname+"@"+ip+" sudo service docker restart > /dev/null 2>&1")
     return HOST_IPS
 
 def destroyVLANEnvironment(cfg, mode):
