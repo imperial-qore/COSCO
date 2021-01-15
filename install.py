@@ -5,9 +5,9 @@ if float(version[0:3]) < 3.7:
 	print(color.FAIL+'Python 3.7 or above required!'+color.ENDC)
 	exit()
 
-from sys import platform
+import platform
 from os import mkdir, remove, path, system, environ, getcwd
-if 'win' in platform:
+if 'Windows' in platform.system():
 	from os import startfile
 
 system('python3 -m pip install -r requirements.txt')
@@ -16,7 +16,6 @@ system('python3 -m pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https:
 
 import wget
 from zipfile import ZipFile
-import platform
 from shutil import copyfile
 import sys
 import os
@@ -58,7 +57,7 @@ if 'Windows' in platform.system():
 		print('InfluxDB service runs as a separate front-end window. Please minimize this window.')
 		startfile(influxdb_install_path+'/influxdb-1.8.3-1/influxd.exe')
 elif 'Linux' in platform.system():
-	run_cmd_pwd('apt install influxdb')
+	run_cmd_pwd('apt install influxdb', password)
 
 # Installing Vagrant
 if 'Windows' in platform.system():
@@ -75,7 +74,7 @@ if 'Windows' in platform.system():
 		remove(filename)
 	set_disk = subprocess.run("setx VAGRANT_EXPERIMENTAL \"disks\"", shell=True, stderr=subprocess.PIPE)
 elif 'Linux' in platform.system():
-	run_cmd_pwd('apt install vagrant')
+	run_cmd_pwd('apt install vagrant', password)
 	set_disk = subprocess.run("export VAGRANT_EXPERIMENTAL=disks", shell=True, stderr=subprocess.PIPE)
 
 # Install VirtualBox
@@ -89,7 +88,7 @@ if 'Windows' in platform.system():
 		subprocess.call([getcwd()+'/'+filename], shell=True)
 		remove(filename)
 elif 'Linux' in platform.system():
-	run_cmd_pwd('apt install virtualbox')
+	run_cmd_pwd('apt install virtualbox', password)
 
 # Copy SSH keys
 ssh_dir = 'C:'+environ['homepath']+'\\.ssh' if 'Windows' in platform.system() else '~/.ssh'
@@ -98,7 +97,7 @@ if not path.exists(ssh_dir):
 for filename in ['id_rsa', 'id_rsa.pub']:
 	copyfile('framework/install_scripts/ssh_keys/'+filename, ssh_dir)
 
-run_cmd_pwd("apt install ansible")
-run_cmd_pwd("apt install dos2unix")
+run_cmd_pwd("apt install ansible", password)
+run_cmd_pwd("apt install dos2unix", password)
 
 print(color.GREEN+"All packages installed."+color.ENDC)
