@@ -18,6 +18,7 @@ def save_model(filename, gp_heteroscedastic):
 
 def load_model(filename):
     dtl = filename.split('_')
+    al = 1 if '10' in dtl[-1] else 0
     dataset, dataset_size, max_container_ips = eval("load_"+'_'.join(dtl[:-1])+"_data("+dtl[-1]+")")
     X = np.array([np.array(i[0]).reshape(-1) for i in dataset])
     y = np.array([Coeff_Energy*i[1][0] + Coeff_Latency*i[1][1] for i in dataset])
@@ -25,7 +26,7 @@ def load_model(filename):
     kernel_hetero = C(1.0, (1e-10, 1000)) * RBF(1, (0.01, 100.0)) \
         + HeteroscedasticKernel.construct(prototypes, 1e-3, (1e-10, 50.0),
                                           gamma=5.0, gamma_bounds="fixed")
-    gp_heteroscedastic = GaussianProcessRegressor(kernel=kernel_hetero, alpha=0)
+    gp_heteroscedastic = GaussianProcessRegressor(kernel=kernel_hetero, alpha=al)
     file_path1 = "checkpoints/" + filename + ".pt"
     file_path2 = 'scheduler/HGP/' + file_path1
     file_path = file_path1 if os.path.exists(file_path1) else file_path2
@@ -38,7 +39,7 @@ def load_model(filename):
     return gp_heteroscedastic, X, y, max_container_ips
 
 if __name__ == '__main__':
-    data_type = argv[1] # can be 'energy', 'energy_latency', 'energy_latency2', 'stochastic_energy_latency', 'stochastic_energy_latency2' + '_' + str(HOSTS)
+    data_type = argv[1] # can be 'energy_latency' + '_' + str(HOSTS)
     exec_type = argv[2] # can be 'train', 'opt'
 
     gp_heteroscedastic, X, y, max_container_ips = load_model(data_type)
