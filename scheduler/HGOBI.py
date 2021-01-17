@@ -4,6 +4,7 @@ sys.path.append('scheduler/BaGTI/')
 from .Scheduler import *
 from .BaGTI.train import *
 from .BaGTI.src.utils import *
+from .BaGTI.src.models import *
 
 class HGOBIScheduler(Scheduler):
 	def __init__(self, data_type):
