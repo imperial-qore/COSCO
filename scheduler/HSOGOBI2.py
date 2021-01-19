@@ -5,7 +5,7 @@ from .Scheduler import *
 from .BaGTI.train import *
 from .BaGTI.src.utils import *
 
-class HGOBI2Scheduler(Scheduler):
+class HSOGOBI2Scheduler(Scheduler):
 	def __init__(self, data_type):
 		super().__init__()
 		data_type = 'stochastic_' + data_type
@@ -17,7 +17,7 @@ class HGOBI2Scheduler(Scheduler):
 		self.hosts = int(data_type.split('_')[-1])
 		_, _, (self.max_container_ips, self.max_energy, self.max_response) = eval("load_"+'_'.join(dtl[:-1])+"2_data("+dtl[-1]+")")
 
-	def run_HGOBI2(self):
+	def run_HSOGOBI2(self):
 		cpu = [host.getCPU()/100 for host in self.env.hostlist]
 		cpu = np.array([cpu]).transpose()
 		if 'latency' in self.model.name:
@@ -48,5 +48,5 @@ class HGOBI2Scheduler(Scheduler):
 
 	def placement(self, containerIDs):
 		first_alloc = np.all([not (c and c.getHostID() != -1) for c in self.env.containerlist])
-		decision = self.run_HGOBI2()
+		decision = self.run_HSOGOBI2()
 		return decision
