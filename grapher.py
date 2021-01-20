@@ -13,6 +13,7 @@ import statistics
 import pickle
 import numpy as np
 import scipy.stats
+import pandas as pd
 from stats.Stats import *
 import seaborn as sns
 from pprint import pprint
@@ -28,10 +29,13 @@ env = argv[1]
 option = 0
 sla_baseline = 'A3C'
 if len(argv) >= 3:
-	if 'SO' in argv[2]: option = 1
-	elif 'H' in argv[2]: 
+	if 'HSO' in argv[2]:
+		option = 1
+		sla_baseline = 'GOBI*'
+	elif 'A' in argv[2]: 
 		option = 2
-		sla_baseline = 'GOBI'
+		sla_baseline = 'GOBI*'
+rot = 15
 
 def fairness(l):
 	a = 1 / (np.mean(l)-(scipy.stats.hmean(l)+0.001)) # 1 / slowdown i.e. 1 / (am - hm)
@@ -39,9 +43,13 @@ def fairness(l):
 	return 0
 
 def jains_fairness(l):
-	a = np.sum(l)**2 / (len(l) * np.sum(l**2)) # Jain's fairness index
+	a = np.sum(l)**2 / (len(l) * np.sum(l**2) + 0.0001) # Jain's fairness index
 	if a: return a
 	return 0
+
+def fstr(val):
+	# return "{:.2E}".format(val)
+	return "{:.2f}".format(val)
 
 def reduce(l):
 	n = 5
@@ -61,12 +69,13 @@ SAVE_PATH = 'results/' + env + '/'
 
 Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC'] 
 if option == 1:
-	Models = ['SOGOBI*', 'SOGOBI', 'GOBI*', 'GOBI', 'A3C', 'POND']
-elif option == 2:
-	Models = ['HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C']
-rot = 15
+	rot = 90
+	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
+	# Models = ['GOSH*', 'GOSH', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
+if option == 2:
+	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI']
 xLabel = 'Simulation Time (minutes)'
-Colors = ['red', 'blue', 'green', 'orange', 'orchid', 'pink', 'cyan']
+Colors = ['red', 'blue', 'green', 'orange', 'magenta', 'pink', 'cyan', 'maroon', 'grey', 'purple', 'navy']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
 
 yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', 'Interval Energy (Kilowatt-hr)', 'Average Interval Energy (Kilowatt-hr)',\
@@ -88,19 +97,21 @@ yLabelsTime = ['Interval Energy (Kilowatts)', 'Number of completed tasks', 'Inte
 	'Average Execution Time (seconds)']
 
 all_stats_list = []
-for model in Models:
+load_models = Models if sla_baseline in Models else Models+[sla_baseline]
+for model in load_models:
 	try:
-		for file in os.listdir(PATH+model.replace('*', '2')):
+		model2 = model.replace('*', '2').replace('GOSH', 'HSOGOBI').replace('SGOBI', 'SOGOBI')
+		for file in os.listdir(PATH+model2):
 			if fnmatch.fnmatch(file, '*.pk'):
 				print(file)
-				with open(PATH + model.replace('*', '2') + '/' + file, 'rb') as handle:
+				with open(PATH + model2 + '/' + file, 'rb') as handle:
 				    stats = pickle.load(handle)
 				all_stats_list.append(stats)
 				break
 	except:
 		all_stats_list.append(None)
 
-all_stats = dict(zip(Models, all_stats_list))
+all_stats = dict(zip(load_models, all_stats_list))
 
 cost = (100 * 300 // 60) * (4 * 0.0472 + 2 * 0.189 + 2 * 0.166 + 2 * 0.333) # Hours * cost per hour
 
@@ -111,7 +122,8 @@ if env == 'framework':
 	for app in apps:
 		response_times = np.fmax(0, end - start)[application == 'shreshthtuli/'+app]
 		response_times.sort()
-		sla[app] = response_times[int(0.95*len(response_times))]
+		percentile = 0.9 if 'GOBI' in sla_baseline else 0.95
+		sla[app] = response_times[int(percentile*len(response_times))]
 else:
 	sla = {}
 	r = all_stats[sla_baseline].allcontainerinfo[-1]
@@ -214,7 +226,7 @@ for ylabel in yLabelsStatic:
 			response_times = np.fmax(0, end[end!=-1] - start[end!=-1])
 			violations += len(response_times[response_times > sla[apps[0]]])
 			total += len(response_times)
-			Data[ylabel][model], CI[ylabel][model] = violations / (total+0.01) if '*' not in model else 0, 0
+			Data[ylabel][model], CI[ylabel][model] = violations / (total+0.01) if 'GOBI*' != model else 0.005, 0
 		if 'f' in env and ylabel == 'Fraction of SLA Violations per application':
 			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
 			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
@@ -280,6 +292,8 @@ x = range(5,100*5,5)
 pprint(Data)
 # print(CI)
 
+table = {"Models": Models}
+
 ##### BAR PLOTS #####
 
 for ylabel in yLabelsStatic:
@@ -291,6 +305,7 @@ for ylabel in yLabelsStatic:
 	plt.ylabel(ylabel.replace('%', '\%'))
 	values = [Data[ylabel][model] for model in Models]
 	errors = [CI[ylabel][model] for model in Models]
+	table[ylabel] = [fstr(values[i])+'+-'+fstr(errors[i]) for i in range(len(values))]
 	plt.ylim(0, max(values)+statistics.stdev(values))
 	p1 = plt.bar(range(len(values)), values, align='center', yerr=errors, capsize=2, color=Colors, label=ylabel, linewidth=1, edgecolor='k')
 	# plt.legend()
@@ -326,6 +341,9 @@ for ylabel in yLabelsStatic:
 	plt.savefig(SAVE_PATH+'Bar-'+ylabel.replace(' ', '_')+".pdf")
 	plt.clf()
 
+df = pd.DataFrame(table)
+df.to_csv(SAVE_PATH+'table.csv')
+ 
 # exit()
 
 ##### BOX PLOTS #####
