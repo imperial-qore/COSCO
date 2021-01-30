@@ -543,6 +543,6 @@ for ylabel in yLabelsStatic:
 	plt.ylabel(ylabel.replace('%', '\%'))
 	for model in Models:
 		plt.plot(reduce(Data[ylabel][model]), color=Colors[Models.index(model)], linewidth=1.5, label=model, alpha=0.7)
-	plt.legend()
+	# plt.legend(ncol=11, bbox_to_anchor=(1.05, 1))
 	plt.savefig(SAVE_PATH+"Series-"+ylabel.replace(' ', '_')+".pdf")
 	plt.clf()
