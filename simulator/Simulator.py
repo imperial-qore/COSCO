@@ -20,7 +20,7 @@ class Simulator():
 		self.stats = None
 		self.addHostlistInit(hostinit)
 
-	def addHostInit(self, IPS, RAM, Disk, Bw, Powermodel):
+	def addHostInit(self, IPS, RAM, Disk, Bw, Latency, Powermodel):
 		assert len(self.hostlist) < self.hostlimit
 		host = Host(len(self.hostlist), IPS, RAM, Disk, Bw, Latency, Powermodel, self)
 		self.hostlist.append(host)
