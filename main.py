@@ -40,6 +40,7 @@ from scheduler.GA import GAScheduler
 from scheduler.GOBI import GOBIScheduler
 from scheduler.GOBI2 import GOBI2Scheduler
 from scheduler.DRL import DRLScheduler
+from scheduler.DQL import DQLScheduler
 from scheduler.POND import PONDScheduler
 from scheduler.SOGOBI import SOGOBIScheduler
 from scheduler.SOGOBI2 import SOGOBI2Scheduler

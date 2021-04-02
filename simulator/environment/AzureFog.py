@@ -11,6 +11,7 @@ from metrics.powermodels.PMXeon_X5570 import *
 class AzureFog():
 	def __init__(self, num_hosts):
 		self.num_hosts = num_hosts
+		self.edge_hosts = round(num_hosts * 0.6)
 		self.types = {
 			'B2s':
 				{
@@ -63,5 +64,6 @@ class AzureFog():
 			Disk_ = Disk(self.types[typeID]['DiskSize'], self.types[typeID]['DiskRead']*5, self.types[typeID]['DiskWrite']*10)
 			Bw = Bandwidth(self.types[typeID]['BwUp'], self.types[typeID]['BwDown'])
 			Power = eval(self.types[typeID]['Power']+'()')
-			hosts.append((IPS, Ram, Disk_, Bw, Power))
+			Latency = 0.003 if i < self.edge_hosts else 0.076
+			hosts.append((IPS, Ram, Disk_, Bw, Latency, Power))
 		return hosts

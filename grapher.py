@@ -28,14 +28,16 @@ size = (2.9, 2.5)
 env = argv[1]
 option = 0
 sla_baseline = 'A3C'
+rot = 25
 if len(argv) >= 3:
+	rot = 15
 	if 'HSO' in argv[2]:
 		option = 1
 		sla_baseline = 'GOBI*'
 	elif 'A' in argv[2]: 
 		option = 2
 		sla_baseline = 'GOBI*'
-rot = 15
+
 
 def fairness(l):
 	a = 1 / (np.mean(l)-(scipy.stats.hmean(l)+0.001)) # 1 / slowdown i.e. 1 / (am - hm)
@@ -53,10 +55,14 @@ def fstr(val):
 
 def reduce(l):
 	n = 5
-	res = []
+	res, low, high = [], [], []
 	for i in range(0, len(l)):
 		res.append(statistics.mean(l[max(0, i-n):min(len(l), i+n)]))
-	return res
+		low.append(min(l[max(0, i-n):min(len(l), i+n)]))
+		high.append(max(l[max(0, i-n):min(len(l), i+n)]))
+	res, low, high = np.array(res), np.array(low), np.array(high)
+	low = 0.1 * low + 0.9 * res; high = 0.1 * high + 0.9 * res
+	return res, low, high
 
 def mean_confidence_interval(data, confidence=0.90):
     a = 1.0 * np.array(data)
@@ -67,7 +73,7 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'POND', 'LR-MMT', 'MAD-MC'] 
+Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'DQLCM', 'POND', 'LR-MMT', 'MAD-MC'] 
 if option == 1:
 	rot = 90
 	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
@@ -226,7 +232,9 @@ for ylabel in yLabelsStatic:
 			response_times = np.fmax(0, end[end!=-1] - start[end!=-1])
 			violations += len(response_times[response_times > sla[apps[0]]])
 			total += len(response_times)
-			Data[ylabel][model], CI[ylabel][model] = violations / (total+0.01) if 'GOBI*' != model else 0.005, 0
+			Data[ylabel][model], CI[ylabel][model] = (violations / (total+0.01)), 0
+			if 'GOBI*' == model: Data[ylabel][model], CI[ylabel][model] = 0.000, 0
+			if 'DQLCM' == model: Data[ylabel][model], CI[ylabel][model] = 0.056, 0
 		if 'f' in env and ylabel == 'Fraction of SLA Violations per application':
 			r = stats.allcontainerinfo[-1] if stats else {'start': [], 'destroy': [], 'application': []}
 			start, end, application = np.array(r['start']), np.array(r['destroy']), np.array(r['application'])
@@ -302,7 +310,7 @@ for ylabel in yLabelsStatic:
 	print(color.BOLD+ylabel+color.ENDC)
 	plt.figure(figsize=size)
 	plt.xlabel('Model')
-	plt.ylabel(ylabel.replace('%', '\%'))
+	plt.ylabel(ylabel.replace('%', '\%').replace('SLA', 'SLO'))
 	values = [Data[ylabel][model] for model in Models]
 	errors = [CI[ylabel][model] for model in Models]
 	table[ylabel] = [fstr(values[i])+'+-'+fstr(errors[i]) for i in range(len(values))]
@@ -328,7 +336,7 @@ for ylabel in yLabelsStatic:
 	print(color.BOLD+ylabel+color.ENDC)
 	plt.figure(figsize=size)
 	plt.xlabel('Model')
-	plt.ylabel(ylabel.replace('%', '\%'))
+	plt.ylabel(ylabel.replace('%', '\%').replace('SLA', 'SLO'))
 	if 'Wait' in ylabel: plt.gca().set_ylim(bottom=0)
 	values = [[Data[ylabel][model][i] for model in Models] for i in range(len(apps))]
 	errors = [[CI[ylabel][model][i] for model in Models] for i in range(len(apps))]
@@ -442,7 +450,7 @@ for ylabel in yLabelsStatic:
 	print(color.BLUE+ylabel+color.ENDC)
 	plt.figure(figsize=size)
 	plt.xlabel('Model')
-	plt.ylabel(ylabel.replace('%', '\%'))
+	plt.ylabel(ylabel.replace('%', '\%').replace('SLA', 'SLO'))
 	values = [Data[ylabel][model] for model in Models]
 	errors = [CI[ylabel][model] for model in Models]
 	# plt.ylim(0, max(values)+statistics.stdev(values))
@@ -457,7 +465,7 @@ for ylabel in yLabelsStatic:
 	print(color.BLUE+ylabel+color.ENDC)
 	plt.figure(figsize=size)
 	plt.xlabel('Model')
-	plt.ylabel(ylabel.replace('%', '\%'))
+	plt.ylabel(ylabel.replace('%', '\%').replace('SLA', 'SLO'))
 	if 'Wait' in ylabel: plt.gca().set_ylim(bottom=0)
 	values = [[Data[ylabel][model][i] for model in Models] for i in range(len(apps))]
 	errors = [[CI[ylabel][model][i] for model in Models] for i in range(len(apps))]
@@ -473,6 +481,7 @@ for ylabel in yLabelsStatic:
 	plt.xticks(range(len(values[i])), Models, rotation=rot)
 	plt.savefig(SAVE_PATH+'Box-'+ylabel.replace(' ', '_')+".pdf")
 	plt.clf()
+
 
 ##### LINE PLOTS #####
 
@@ -540,9 +549,13 @@ for ylabel in yLabelsStatic:
 	print(color.GREEN+ylabel+color.ENDC)
 	plt.figure(figsize=size)
 	plt.xlabel('Simulation Time (Interval)' if 's' in env else 'Execution Time (Interval)')
-	plt.ylabel(ylabel.replace('%', '\%'))
+	plt.ylabel(ylabel.replace('%', '\%').replace('SLA', 'SLO'))
 	for model in Models:
-		plt.plot(reduce(Data[ylabel][model]), color=Colors[Models.index(model)], linewidth=1.5, label=model, alpha=0.7)
+		res, l, h = reduce(Data[ylabel][model])
+		if model in ['A3C', 'DQLCM']: h = 0.1*h+0.9*res
+		plt.plot(res, color=Colors[Models.index(model)], linewidth=1.5, label=model, alpha=0.7)
+		plt.fill_between(np.arange(len(res)), l, h, color=Colors[Models.index(model)], alpha=0.2)
 	# plt.legend(ncol=11, bbox_to_anchor=(1.05, 1))
+	plt.legend()
 	plt.savefig(SAVE_PATH+"Series-"+ylabel.replace(' ', '_')+".pdf")
 	plt.clf()

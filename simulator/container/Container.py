@@ -52,7 +52,12 @@ class Container():
 
 	def allocate(self, hostID, allocBw):
 		# Migrate if different host
-		lastMigrationTime = self.getContainerSize() / allocBw if self.hostid != hostID else 0
+		# Migration time is sum of network latency and
+		# time to trransfer container based on network bandwidth
+		lastMigrationTime = 0
+		if self.hostid != hostID:
+			lastMigrationTime += self.getContainerSize() / allocBw
+			lastMigrationTime += abs(self.env.hostlist[self.hostid].latency - self.env.hostlist[hostID].latency)
 		self.hostid = hostID
 		return lastMigrationTime
 

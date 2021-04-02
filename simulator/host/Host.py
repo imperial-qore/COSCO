@@ -7,12 +7,13 @@ class Host():
 	# RAM = Ram in MB capacity
 	# Disk = Disk characteristics capacity
 	# Bw = Bandwidth characteristics capacity
-	def __init__(self, ID, IPS, RAM, Disk, Bw, Powermodel, Environment):
+	def __init__(self, ID, IPS, RAM, Disk, Bw, Latency, Powermodel, Environment):
 		self.id = ID
 		self.ipsCap = IPS
 		self.ramCap = RAM
 		self.diskCap = Disk
 		self.bwCap = Bw
+		self.latency = Latency
 		self.powermodel = Powermodel
 		self.powermodel.allocHost(self)
 		self.powermodel.host = self

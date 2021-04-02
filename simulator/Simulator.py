@@ -22,13 +22,13 @@ class Simulator():
 
 	def addHostInit(self, IPS, RAM, Disk, Bw, Powermodel):
 		assert len(self.hostlist) < self.hostlimit
-		host = Host(len(self.hostlist), IPS, RAM, Disk, Bw, Powermodel, self)
+		host = Host(len(self.hostlist), IPS, RAM, Disk, Bw, Latency, Powermodel, self)
 		self.hostlist.append(host)
 
 	def addHostlistInit(self, hostList):
 		assert len(hostList) == self.hostlimit
-		for IPS, RAM, Disk, Bw, Powermodel in hostList:
-			self.addHostInit(IPS, RAM, Disk, Bw, Powermodel)
+		for IPS, RAM, Disk, Bw, Latency, Powermodel in hostList:
+			self.addHostInit(IPS, RAM, Disk, Bw, Latency, Powermodel)
 
 	def addContainerInit(self, CreationID, CreationInterval, IPSModel, RAMModel, DiskModel):
 		container = Container(len(self.containerlist), CreationID, CreationInterval, IPSModel, RAMModel, DiskModel, self, HostID = -1)
