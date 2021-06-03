@@ -26,9 +26,39 @@ The basic architecture of COSCO has two main packages: <br>
 **Simulator:** It's a discrete event simulator and runs in a standalone system. <br>
 **Framework:** It’s a kind of tool to test the scheduling algorithms in a physical(real time) fog/cloud environment with real world applications.
 
-## Wiki
-Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for installation instructions and replication of results.
+## Novel Scheduling Algorithms
+We present two novel algorithms in this work: GOBI and GOBI*. GOBI uses a neural network as a surrogate model and gradient based optimization using backpropagation of gradients to input. With advances like cosine annealing and momentum allow us to converge to an optima quickly. Moreover, GOBI* leverages a coupled simulation engine like a digital-twin to further improve the surrogate accuracy and subsequently the scheduling decisions. Experiments conducted using real-world data on fog applications using the GOBI and GOBI* methods, show a significant improvement in terms of energy consumption, response time, Service Level Objective and scheduling time by up to 15, 40, 4, and 82 percent respectively when compared to the state-of-the-art algorithms.
 
+## Quick Start Guide
+To run the COSCO framework, install required packages using
+```bash
+pip3 install -r requirements.txt
+```
+To run the code with the required scheduler, modify line 104 of `main.py` to one of the several options including LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI.
+```python
+scheduler = GOBIScheduler('energy_latency_'+str(HOSTS))
+```
+
+To run the simulator, use the following command
+```bash
+python3 main.py
+```
+
+## Wiki
+Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed installation instructions, implementing a custom scheduler and replication of results.
+
+## Arxiv preprint
+https://arxiv.org/abs/2104.14392.
+
+## Cite this work
+```
+@article{tuli2021cosco,
+  title={COSCO: Container Orchestration using Co-Simulation and Gradient Based Optimization for Fog Computing Environments},
+  author={Tuli, Shreshth and Poojara, Shivananda and Srirama, Satish and Casale, Giuliano and Jennings, Nicholas R},
+  journal={IEEE Transactions on Parallel and Distributed Systems},
+  year={2021}
+}
+```
 
 ## License
 
