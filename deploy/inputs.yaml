@@ -1,0 +1,14 @@
+---
+resourceGroup: COSCO
+vms: 
+  - ['Standard_B2s', 'uksouth']
+  - ['Standard_B2s', 'uksouth']
+  - ['Standard_B2s', 'uksouth']
+  - ['Standard_B2s', 'uksouth']
+  - ['Standard_B4ms', 'uksouth']
+  - ['Standard_B4ms', 'uksouth']
+  - ['Standard_B4ms', 'eastus']
+  - ['Standard_B4ms', 'eastus']
+  - ['Standard_B8ms', 'eastus']
+  - ['Standard_B8ms', 'eastus']
+...

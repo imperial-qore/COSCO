@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Create Resource Group
+      shell: "az group create --name {{ resourceGroup }} --location uksouth"
+
+    - name: Create VMs
+      shell: "az vm create --resource-group {{ resourceGroup }} --name vm{{ item.0 + 1}} --size {{ item.1.0 }} --location {{ item.1.1 }} --image UbuntuLTS --ssh-key-values id_rsa.pub --admin-username ansible"
+      with_indexed_items: 
+        - "{{ vms }}"
+
+    - name: Sleep
+      shell: "sleep 60"
+
+    - name: Open port 8081
+      shell: "az vm open-port --resource-group {{ resourceGroup }} --name vm{{ item.0 + 1}} --port 8081"
+      with_indexed_items: 
+        - "{{ vms }}"
+
+    - name: Install new kernel
+      shell: "az vm run-command invoke -g {{ resourceGroup }} -n {{ item.0 }} --command-id RunShellScript --scripts 'sudo apt install -y -f linux-image-4.15.0-1009-azure linux-tools-4.15.0-1009-azure linux-cloud-tools-4.15.0-1009-azure linux-headers-4.15.0-1009-azure linux-modules-4.15.0-1009-azure linux-modules-extra-4.15.0-1009-azure'"
+      with_items: 
+        - "{{ vms }}"

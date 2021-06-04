@@ -1,0 +1,40 @@
+---
+tosca_definitions_version: tosca_simple_yaml_1_3
+
+node_types:
+  radon.nodes.deploy:
+    derived_from: tosca.nodes.SoftwareComponent
+    properties:
+      vms:
+        type: list
+        description: Azure VM types
+      resourceGroup:
+        type: string
+        description: name of resource group
+    interfaces:
+      Standard:
+        type: tosca.interfaces.node.lifecycle.Standard
+        inputs:
+          vms: {default: { get_property: [SELF, vms] }, type: list }
+          resourceGroup: {default: { get_property: [SELF, resourceGroup] }, type: string }
+        operations:
+          create: 
+            implementation: 
+              primary: playbooks/deploy.yaml
+              dependencies:
+                - id_rsa.pub
+
+topology_template:
+  inputs:
+    vms:
+      type: list
+    resourceGroup:
+      type: string
+
+  node_templates:
+    deploy_0:
+      type: radon.nodes.deploy
+      properties:
+        vms: { get_input: vms }
+        resourceGroup: { get_input: resourceGroup }
+...
