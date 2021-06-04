@@ -45,7 +45,7 @@ python3 main.py
 ```
 
 ## Wiki
-Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed installation instructions, implementing a custom scheduler and replication of results.
+Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed installation instructions, implementing a custom scheduler and replication of results. All execution traces and training data is available at [Zenodo](https://zenodo.org/record/4897944) under CC License.
 
 ## Arxiv preprint
 https://arxiv.org/abs/2104.14392.
@@ -63,7 +63,7 @@ https://arxiv.org/abs/2104.14392.
 ## License
 
 BSD-3-Clause. 
-Copyright (c) 2020, Shreshth Tuli.
+Copyright (c) 2021, Shreshth Tuli.
 All rights reserved.
 
 See License file for more details.
