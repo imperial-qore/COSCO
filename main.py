@@ -26,6 +26,7 @@ from simulator.workload.BitbrainWorkload2 import *
 
 # Scheduler imports
 from scheduler.Random_Random_Random import RandomScheduler
+from scheduler.SimpleScheduler import SimpleScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -79,7 +80,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = RandomScheduler()
+	scheduler = SimpleScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
