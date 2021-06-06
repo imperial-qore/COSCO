@@ -36,7 +36,7 @@ We present two novel algorithms in this work: GOBI and GOBI*. GOBI uses a neural
 ## Quick Start Guide
 To run the COSCO framework, install required packages using
 ```bash
-pip3 install -r requirements.txt
+python3 install.py
 ```
 To run the code with the required scheduler, modify line 104 of `main.py` to one of the several options including LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI.
 ```python
