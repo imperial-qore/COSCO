@@ -94,6 +94,7 @@ def initalizeEnvironment(environment, logger):
 	# Initialize workload
 	''' Can be SWSD, BWGD, BWGD2 // DFW '''
 	workload = BWGD2(NEW_CONTAINERS, 1.5) if environment == '' else \
+			   BWGD2W(NEW_CONTAINERS, 1.5) if environment == 'W' else \
 			   DFW(NEW_CONTAINERS, 1.5, db) if environment in ['VLAN', 'Vagrant'] else \
 			   EdgeBench(NEW_CONTAINERS, 1.5, db) if environment == 'VLAN_W' else None
 			   
