@@ -58,7 +58,7 @@ usage = "usage: python main.py -e <environment> -m <mode> # empty environment ru
 
 parser = optparse.OptionParser(usage=usage)
 parser.add_option("-e", "--environment", action="store", dest="env", default="", 
-					help="Environment is AWS, Openstack, Azure, VLAN, Vagrant")
+					help="Environment is '', 'W', 'VLAN', 'VLAN_W' ('Vagrant' in beta phase)")
 parser.add_option("-m", "--mode", action="store", dest="mode", default="0", 
 					help="Mode is 0 (Create and destroy), 1 (Create), 2 (No op), 3 (Destroy)")
 opts, args = parser.parse_args()
@@ -87,28 +87,26 @@ def initalizeEnvironment(environment, logger):
 
 	# Initialize simple fog datacenter
 	''' Can be SimpleFog, BitbrainFog, AzureFog // Datacenter '''
-	if environment != '':
-		datacenter = Datacenter(HOSTS_IP, environment, 'Virtual')
-	else:
-		datacenter = AzureFog(HOSTS)
+	datacenter = RPiEdge(HOSTS) if environment in ['', 'W'] else \
+				 Datacenter(HOSTS_IP, environment, 'Virtual') if environment in ['VLAN', 'Vagrant'] else None
+				 
 
 	# Initialize workload
 	''' Can be SWSD, BWGD, BWGD2 // DFW '''
-	if environment != '':
-		workload = DFW(NEW_CONTAINERS, 1.5, db)
-	else: 
-		workload = BWGD2(NEW_CONTAINERS, 1.5)
-	
+	workload = BWGD2(NEW_CONTAINERS, 1.5) if environment == '' else \
+			   DFW(NEW_CONTAINERS, 1.5, db) if environment in ['VLAN', 'Vagrant'] else \
+			   EdgeBench(NEW_CONTAINERS, 1.5, db) if environment == 'VLAN_W' else None
+			   
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
-	if environment != '':
-		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
-	else:
-		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
+	env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist) if environment == '' else \
+		  WSimulator(TOTAL_POWER, ROUTER_BW, scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist) if environment == 'W' else \
+		  Framework(scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger) if environment in ['VLAN', 'Vagrant'] else \
+		  Workflow(scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger) if environment == 'VLAN_W' else None
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
