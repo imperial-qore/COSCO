@@ -89,6 +89,11 @@ class Workflow(Framework):
 			if self.getPlacementPossible(cid, hid):
 				migrations.append((cid, hid))
 				container.allocateAndExecute(hid)
+				ram_usage, _, _ = container.getRAM()
+				if self.activeworkflows[container.workflowID]['startAt'] == -1:
+					self.activeworkflows[container.workflowID]['startAt'] = self.interval
+				# Update RAM usages for getPlacementPossible()
+				self.getHostByID(hid).ram.size += ram_usage
 			else: 
 				self.containerlist[cid] = None
 		self.intervalAllocTimings.append(time() - start)
@@ -161,6 +166,10 @@ class Workflow(Framework):
 			if hid != self.containerlist[cid].hostid and self.getPlacementPossible(cid, hid):
 				containerIDsAllocated.append(cid)
 				migrations.append((cid, hid))
+				ram_usage, _, _ = container.getRAM()
+				if container.hostid != -1:
+					self.getHostByID(container.hostid).ram.size -= ram_usage
+				self.getHostByID(hid).ram.size += ram_usage
 		Parallel(n_jobs=num_cores, backend='threading')(delayed(self.parallelizedFunc)(i) for i in migrations)
 		for (cid, hid) in decision:
 			if self.containerlist[cid].hostid == -1: self.containerlist[cid] = None
