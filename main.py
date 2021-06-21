@@ -29,6 +29,10 @@ from simulator.workload.BitbrainWorkload2 import *
 from wsimulator.WSimulator import *
 from wsimulator.workload.BitbrainWorkloadW import *
 
+# Workflow imports
+from workflow.Workflow import *
+from workflow.workload.EdgeBench import *
+
 # Scheduler imports
 from scheduler.IQR_MMT_Random import IQRMMTRScheduler
 from scheduler.MAD_MMT_Random import MADMMTRScheduler
