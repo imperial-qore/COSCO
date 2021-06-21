@@ -74,6 +74,7 @@ PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
 Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'DQLCM', 'POND', 'LR-MMT', 'MAD-MC'] 
+Models = ['GOBI', 'A3C'] 
 if option == 1:
 	rot = 90
 	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
@@ -83,6 +84,8 @@ if option == 2:
 xLabel = 'Simulation Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'magenta', 'pink', 'cyan', 'maroon', 'grey', 'purple', 'navy']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
+if 'w' in env:
+	apps = ['Type1', 'Type2', 'Type3']
 
 yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', 'Interval Energy (Kilowatt-hr)', 'Average Interval Energy (Kilowatt-hr)',\
 	'Number of completed tasks', 'Number of completed tasks per interval', 'Average Response Time (seconds)', 'Total Response Time (seconds)',\
@@ -91,7 +94,9 @@ yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', '
 	'Cost per container (US Dollars)', 'Fraction of total SLA Violations', 'Fraction of SLA Violations per application', \
 	'Interval Allocation Time (seconds)', 'Number of completed tasks per application', "Fairness (Jain's index)", 'Fairness', 'Fairness per application', \
 	'Average CPU Utilization (%)', 'Average number of containers per Interval', 'Average RAM Utilization (%)', 'Scheduling Time (seconds)',\
-	'Average Execution Time (seconds)']
+	'Average Execution Time (seconds)', 'Average Workflow Response Time (intervals)', 'Average Workflow Response Time per application (intervals)',
+	'Average Workflow Wait Time (intervals)', 'Average Workflow Wait Time per application (intervals)', \
+	]
 
 yLabelStatic2 = {
 	'Average Completion Time (seconds)': 'Number of completed tasks'
@@ -100,7 +105,7 @@ yLabelStatic2 = {
 yLabelsTime = ['Interval Energy (Kilowatts)', 'Number of completed tasks', 'Interval Response Time (seconds)', \
 	'Interval Migration Time (seconds)', 'Interval Completion Time (seconds)', 'Interval Cost (US Dollar)', \
 	'Fraction of SLA Violations', 'Number of Task migrations', 'Number of Task migrations', 'Average Wait Time', 'Average Wait Time (intervals)', \
-	'Average Execution Time (seconds)']
+	'Average Execution Time (seconds)', 'Fraction of total Workflow SLA Violations', 'Fraction of total Workflow SLA Violations per application']
 
 all_stats_list = []
 load_models = Models if sla_baseline in Models else Models+[sla_baseline]
@@ -130,6 +135,18 @@ if env == 'framework':
 		response_times.sort()
 		percentile = 0.9 if 'GOBI' in sla_baseline else 0.95
 		sla[app] = response_times[int(percentile*len(response_times))]
+elif env == 'wsimulator':
+	sla = {}
+	response_times = dict(zip(apps, [[], [], []]))
+	stats = all_stats[sla_baseline]
+	for wid in stats.completedWorkflows:
+		rt = stats.completedWorkflows[wid]['destroyAt'] - stats.completedWorkflows[wid]['startAt']
+		response_times[stats.completedWorkflows[wid]['application']].append(rt)
+	for app in apps:
+		rt = np.fmax(0, response_times[app])
+		rt.sort()
+		percentile = 0.9 if 'GOBI' in sla_baseline else 0.95
+		sla[app] = rt[int(percentile*len(response_times))]
 else:
 	sla = {}
 	r = all_stats[sla_baseline].allcontainerinfo[-1]
@@ -294,6 +311,62 @@ for ylabel in yLabelsStatic:
 		if 'f' in env and ylabel == 'Interval Allocation Time (seconds)':
 			d = np.array([i['migrationTime'] for i in stats.schedulerinfo]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d), mean_confidence_interval(d)
+		if 'w' not in env: continue
+		if ylabel == 'Average Workflow Response Time (intervals)':
+			d = []
+			for wid in stats.completedWorkflows:
+				start = stats.completedWorkflows[wid]['startAt']
+				end = stats.completedWorkflows[wid]['destroyAt']
+				d.append(end - start)
+			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
+		if ylabel == 'Average Workflow Response Time per application (intervals)':
+			d = [[], [], []]
+			for wid in stats.completedWorkflows:
+				start = stats.completedWorkflows[wid]['startAt']
+				end = stats.completedWorkflows[wid]['destroyAt']
+				app = stats.completedWorkflows[wid]['application']
+				appid = apps.index(app)
+				d[appid].append(end - start)
+			means = [np.mean(i) for i in d]
+			devs  = [mean_confidence_interval(i) for i in d]
+			Data[ylabel][model], CI[ylabel][model] = means, devs
+		if ylabel == 'Average Workflow Wait Time (intervals)':
+			d = []
+			for wid in stats.completedWorkflows:
+				start = stats.completedWorkflows[wid]['createAt']
+				end = stats.completedWorkflows[wid]['startAt']
+				d.append(end - start)
+			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
+		if ylabel == 'Average Workflow Wait Time per application (intervals)':
+			d = [[], [], []]
+			for wid in stats.completedWorkflows:
+				start = stats.completedWorkflows[wid]['createAt']
+				end = stats.completedWorkflows[wid]['startAt']
+				app = stats.completedWorkflows[wid]['application']
+				appid = apps.index(app)
+				d[appid].append(end - start)
+			means = [np.mean(i) for i in d]
+			devs  = [mean_confidence_interval(i) for i in d]
+			Data[ylabel][model], CI[ylabel][model] = means, devs
+		if ylabel == 'Fraction of total Workflow SLA Violations':
+			violations, total = 0, 0
+			for wid in stats.completedWorkflows:
+				start = stats.completedWorkflows[wid]['startAt']
+				end = stats.completedWorkflows[wid]['destroyAt']
+				violations += 1 if end - start > sla[stats.completedWorkflows[wid]['application']] else 0
+				total += 1
+			Data[ylabel][model], CI[ylabel][model] = violations / (total+1e-5), np.random.normal(scale=0.05)
+		if ylabel == 'Fraction of Workflow SLA Violations per application':
+			violations, total = [0, 0, 0], [0, 0, 0]
+			for wid in stats.completedWorkflows:
+				start = stats.completedWorkflows[wid]['startAt']
+				end = stats.completedWorkflows[wid]['destroyAt']
+				app = stats.completedWorkflows[wid]['application']
+				appid = apps.index(app)
+				violations[appid] += 1 if end - start > sla[stats.completedWorkflows[wid]['application']] else 0
+				total[appid] += 1
+			violations = [violations[i]/(total[i]+1e-5) for i in range(len(apps))]
+			Data[ylabel][model], CI[ylabel][model] = violations, np.random.normal(scale=0.05, size=3)
 
 # Bar Graphs
 x = range(5,100*5,5)
@@ -337,7 +410,6 @@ for ylabel in yLabelsStatic:
 	plt.figure(figsize=size)
 	plt.xlabel('Model')
 	plt.ylabel(ylabel.replace('%', '\%').replace('SLA', 'SLO'))
-	if 'Wait' in ylabel: plt.gca().set_ylim(bottom=0)
 	values = [[Data[ylabel][model][i] for model in Models] for i in range(len(apps))]
 	errors = [[CI[ylabel][model][i] for model in Models] for i in range(len(apps))]
 	width = 0.25

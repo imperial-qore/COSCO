@@ -12,6 +12,7 @@ class color:
     FAIL = '\033[91m'
     ENDC = '\033[0m'
     BOLD = '\033[1m'
+    YELLOW = '\033[33m'
     UNDERLINE = '\033[4m'
 
 def printDecisionAndMigrations(decision, migrations):

@@ -25,6 +25,10 @@ from simulator.environment.BitbrainFog import *
 from simulator.workload.BitbrainWorkload_GaussianDistribution import *
 from simulator.workload.BitbrainWorkload2 import *
 
+# Workflow Simulator imports
+from wsimulator.WSimulator import *
+from wsimulator.workload.BitbrainWorkloadW import *
+
 # Scheduler imports
 from scheduler.IQR_MMT_Random import IQRMMTRScheduler
 from scheduler.MAD_MMT_Random import MADMMTRScheduler
@@ -51,6 +55,7 @@ from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 
 # Auxiliary imports
 from stats.Stats import *
+from stats.WStats import *
 from utils.Utils import *
 from pdb import set_trace as bp
 
@@ -64,13 +69,14 @@ parser.add_option("-m", "--mode", action="store", dest="mode", default="0",
 opts, args = parser.parse_args()
 
 # Global constants
-NUM_SIM_STEPS = 100
-HOSTS = 10 * 5 if opts.env == '' else 10
+NUM_SIM_STEPS = 200
+HOSTS = 10 * 5 if opts.env in ['', 'W'] else 10
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
 NEW_CONTAINERS = 0 if HOSTS == 10 else 5
+NEW_WORKFLOWS = 0
 DB_NAME = ''
 DB_HOST = ''
 DB_PORT = 0
@@ -81,22 +87,21 @@ if len(sys.argv) > 1:
 	with open(logFile, 'w'): os.utime(logFile, None)
 
 def initalizeEnvironment(environment, logger):
-	if environment != '':
+	if environment not in ['', 'W']:
 		# Initialize the db
 		db = Database(DB_NAME, DB_HOST, DB_PORT)
 
 	# Initialize simple fog datacenter
 	''' Can be SimpleFog, BitbrainFog, AzureFog // Datacenter '''
-	datacenter = RPiEdge(HOSTS) if environment in ['', 'W'] else \
-				 Datacenter(HOSTS_IP, environment, 'Virtual') if environment in ['VLAN', 'Vagrant'] else None
-				 
+	datacenter = AzureFog(HOSTS) if environment in ['', 'W'] else \
+				 Datacenter(HOSTS_IP, environment, 'Virtual')
 
 	# Initialize workload
 	''' Can be SWSD, BWGD, BWGD2 // DFW '''
 	workload = BWGD2(NEW_CONTAINERS, 1.5) if environment == '' else \
-			   BWGD2W(NEW_CONTAINERS, 1.5) if environment == 'W' else \
+			   BWGD2W(NEW_WORKFLOWS, 1.5) if environment == 'W' else \
 			   DFW(NEW_CONTAINERS, 1.5, db) if environment in ['VLAN', 'Vagrant'] else \
-			   EdgeBench(NEW_CONTAINERS, 1.5, db) if environment == 'VLAN_W' else None
+			   EdgeBench(NEW_WORKFLOWS, 1.5, db) if environment == 'VLAN_W' else None
 			   
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
@@ -104,10 +109,10 @@ def initalizeEnvironment(environment, logger):
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
-	env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist) if environment == '' else \
-		  WSimulator(TOTAL_POWER, ROUTER_BW, scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist) if environment == 'W' else \
-		  Framework(scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger) if environment in ['VLAN', 'Vagrant'] else \
-		  Workflow(scheduler, recovery, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger) if environment == 'VLAN_W' else None
+	env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist) if environment == '' else \
+		  WSimulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist) if environment == 'W' else \
+		  Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger) if environment in ['VLAN', 'Vagrant'] else \
+		  Workflow(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger) if environment == 'VLAN_W' else None
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -123,13 +128,14 @@ def initalizeEnvironment(environment, logger):
 	printDecisionAndMigrations(decision, migrations)
 
 	# Initialize stats
-	stats = Stats(env, workload, datacenter, scheduler)
+	stats = Stats(env, workload, datacenter, scheduler) if 'W' not in environment else \
+			WStats(env, workload, datacenter, scheduler)
 	stats.saveStats(deployed, migrations, [], deployed, decision, schedulingTime)
 	return datacenter, workload, scheduler, env, stats
 
 def stepSimulation(workload, scheduler, env, stats):
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
-	if opts.env != '': print(newcontainerinfos)
+	if opts.env not in ['', 'W']: print(newcontainerinfos)
 	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
 	start = time()
 	selected = scheduler.selection() # Select container IDs for migration
@@ -148,7 +154,7 @@ def stepSimulation(workload, scheduler, env, stats):
 	stats.saveStats(deployed, migrations, destroyed, selected, decision, schedulingTime)
 
 def saveStats(stats, datacenter, workload, env, end=True):
-	dirname = "logs/" + datacenter.__class__.__name__
+	dirname = "logs/" + datacenter.__class__.__name__ + ('(W)' if env not in ['', 'W'] else '')
 	dirname += "_" + workload.__class__.__name__
 	dirname += "_" + str(NUM_SIM_STEPS) 
 	dirname += "_" + str(HOSTS)
@@ -156,7 +162,7 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	dirname += "_" + str(TOTAL_POWER)
 	dirname += "_" + str(ROUTER_BW)
 	dirname += "_" + str(INTERVAL_TIME)
-	dirname += "_" + str(NEW_CONTAINERS)
+	dirname += "_" + (str(NEW_CONTAINERS) if env not in ['', 'W'] else str(NEW_WORKFLOWS))
 	if not os.path.exists("logs"): os.mkdir("logs")
 	if os.path.exists(dirname): shutil.rmtree(dirname, ignore_errors=True)
 	os.mkdir(dirname)
@@ -182,7 +188,7 @@ def saveStats(stats, datacenter, workload, env, end=True):
 if __name__ == '__main__':
 	env, mode = opts.env, int(opts.mode)
 
-	if env != '':
+	if env not in ['', 'W']:
 		# Convert all agent files to unix format
 		unixify(['framework/agent/', 'framework/agent/scripts/'])
 
@@ -218,9 +224,9 @@ if __name__ == '__main__':
 	for step in range(NUM_SIM_STEPS):
 		print(color.BOLD+"Simulation Interval:", step, color.ENDC)
 		stepSimulation(workload, scheduler, env, stats)
-		if env != '' and step % 10 == 0: saveStats(stats, datacenter, workload, env, end = False)
+		if opts.env not in ['', 'W'] and step % 10 == 0: saveStats(stats, datacenter, workload, env, end = False)
 
-	if opts.env != '':
+	if opts.env not in ['', 'W']:
 		# Destroy environment if required
 		eval('destroy'+opts.env+'Environment(configFile, mode)')
 
