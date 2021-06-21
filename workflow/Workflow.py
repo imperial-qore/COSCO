@@ -1,6 +1,7 @@
 from framework.node.Node import *
 from framework.task.Task import *
 from framework.server.controller import *
+from framework.Framework import *
 from time import time, sleep
 from pdb import set_trace as bp
 import multiprocessing
@@ -8,7 +9,7 @@ from joblib import Parallel, delayed
 
 num_cores = multiprocessing.cpu_count()
 
-class Workflow():
+class Workflow(Framework):
 	# Total power in watt
 	# Total Router Bw
 	# Interval Time in seconds
