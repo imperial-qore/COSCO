@@ -1,0 +1,60 @@
+{
+	"database" : {
+		"ip": "127.0.0.1",
+		"port":8086},
+	"vlan_w" : {
+		"uname" : "ansible",
+		"servers" : [
+			{
+				"ip" : "40.120.48.202",
+				"cpu" : 2,
+				"powermodel": "PMB2s"
+			},
+			{
+				"ip" : "52.151.65.50",
+				"cpu" : 2,
+				"powermodel": "PMB2s"
+			},
+			{
+				"ip" : "52.151.71.102",
+				"cpu" : 2,
+				"powermodel": "PMB2s"
+			},
+			{
+				"ip" : "52.151.70.150",
+				"cpu" : 2,
+				"powermodel": "PMB2s"
+			},
+			{
+				"ip" : "51.143.158.189",
+				"cpu" : 4,
+				"powermodel": "PMB4ms"
+			},
+			{
+				"ip" : "51.141.235.163",
+				"cpu" : 4,
+				"powermodel": "PMB4ms"
+			},
+			{
+				"ip" : "40.88.7.64",
+				"cpu" : 4,
+				"powermodel": "PMB4ms"
+			},
+			{
+				"ip" : "40.88.144.160",
+				"cpu" : 4,
+				"powermodel": "PMB4ms"
+			},
+			{
+				"ip" : "52.142.12.155",
+				"cpu" : 8,
+				"powermodel": "PMB8ms"
+			},
+			{
+				"ip" : "40.88.32.92",
+				"cpu" : 8,
+				"powermodel": "PMB8ms"
+			}
+		]
+	}
+}

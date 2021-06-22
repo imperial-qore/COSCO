@@ -1,11 +1,13 @@
 from framework.node.Node import *
-from framework.task.Task import *
 from framework.server.controller import *
 from framework.Framework import *
 from time import time, sleep
 from pdb import set_trace as bp
 import multiprocessing
 from joblib import Parallel, delayed
+from utils.ColorUtils import *
+from workflow.task.Task import *
+from pprint import pprint
 
 num_cores = multiprocessing.cpu_count()
 
@@ -31,7 +33,7 @@ class Workflow(Framework):
 		maxdeploy = min(len(containerInfoList), self.containerlimit-self.getNumActiveContainers())
 		deployedContainers = []
 		for CreationID, WorkflowID, dependentOn, CreationInterval, SLA, Application, App in containerInfoList:
-			if dependentOn is None or dependentOn in self.destroyedccids:
+			if dependentOn is None or set(dependentOn) <= self.destroyedccids:
 				dep = self.addContainerInit(CreationID, WorkflowID, dependentOn, CreationInterval, SLA, Application, App)
 				deployedContainers.append(dep)
 				if len(deployedContainers) >= maxdeploy: break
@@ -56,7 +58,7 @@ class Workflow(Framework):
 		if maxdeploy == 0: return []
 		deployedContainers = []
 		for CreationID, WorkflowID, dependentOn, CreationInterval, SLA, Application, App in containerInfoList:
-			if dependentOn is None or dependentOn in self.destroyedccids:
+			if dependentOn is None or set(dependentOn) <= self.destroyedccids:
 				dep = self.addContainer(CreationID, WorkflowID, dependentOn, CreationInterval, SLA, Application, App)
 				deployedContainers.append(dep)
 				if len(deployedContainers) >= maxdeploy: break
@@ -70,7 +72,7 @@ class Workflow(Framework):
 		return deployed, destroyed
 
 	def addWorkflows(self, containerInfoList):
-		for CreationID, WorkflowID, _, interval, _, _, _, application in containerInfoList:
+		for CreationID, WorkflowID, _, interval, _, application, _ in containerInfoList:
 			if WorkflowID not in self.activeworkflows:
 				self.activeworkflows[WorkflowID] = {'ccids': [CreationID], \
 					'createAt': interval, \

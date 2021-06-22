@@ -7,8 +7,8 @@ import random
 class EdgeBench(Workload):
     def __init__(self, num_workloads, std_dev, database):
         super().__init__()
-        self.num_workloads = num_workloads
-        self.std_dev = std_dev
+        self.mean = num_workloads
+        self.sigma = std_dev
         self.db = database
         self.workflows = ['Type1', 'Type2', 'Type3']
         self.applications = ['shreshthtuli/yolo', 'shreshthtuli/pocketsphinx', 'shreshthtuli/aeneas']
@@ -36,39 +36,39 @@ class EdgeBench(Workload):
         for i, (WorkflowID, interval, SLA, workflow) in enumerate(workflowlist):
             if workflow == 'Type1': 
                 # P -> A -> A -> P
-                CreationID1, info = self.generateRandomContainer(WorkflowID, None, interval, SLA, workflow, self.appdict['P'])
+                CreationID1, info = self.generateContainer(WorkflowID, None, interval, SLA, workflow, self.appdict['P'])
                 workloadlist.append((CreationID1, *info))
-                CreationID2, info = self.generateRandomContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['A'])
+                CreationID2, info = self.generateContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['A'])
                 workloadlist.append((CreationID2, *info))
-                CreationID3, info = self.generateRandomContainer(WorkflowID, [CreationID2], interval, SLA, workflow, self.appdict['A'])
+                CreationID3, info = self.generateContainer(WorkflowID, [CreationID2], interval, SLA, workflow, self.appdict['A'])
                 workloadlist.append((CreationID3, *info))
-                CreationID4, info = self.generateRandomContainer(WorkflowID, [CreationID3], interval, SLA, workflow, self.appdict['P'])
+                CreationID4, info = self.generateContainer(WorkflowID, [CreationID3], interval, SLA, workflow, self.appdict['P'])
                 workloadlist.append((CreationID4, *info))
             if workflow == 'Type2': 
                 #      P
                 # A ->   -> P
                 #      Y 
-                CreationID1, info = self.generateRandomContainer(WorkflowID, None, interval, SLA, workflow, self.appdict['A'])
+                CreationID1, info = self.generateContainer(WorkflowID, None, interval, SLA, workflow, self.appdict['A'])
                 workloadlist.append((CreationID1, *info))
-                CreationID2, info = self.generateRandomContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['P'])
+                CreationID2, info = self.generateContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['P'])
                 workloadlist.append((CreationID2, *info))
-                CreationID3, info = self.generateRandomContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['Y'])
+                CreationID3, info = self.generateContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['Y'])
                 workloadlist.append((CreationID3, *info))
-                CreationID4, info = self.generateRandomContainer(WorkflowID, [CreationID2, CreationID3], interval, SLA, workflow, self.appdict['P'])
+                CreationID4, info = self.generateContainer(WorkflowID, [CreationID2, CreationID3], interval, SLA, workflow, self.appdict['P'])
                 workloadlist.append((CreationID4, *info))
             if workflow == 'Type3': 
                 #      A -> Y
                 # A ->   
                 #      P -> P
-                CreationID1, info = self.generateRandomContainer(WorkflowID, None, interval, SLA, workflow, self.appdict['A'])
+                CreationID1, info = self.generateContainer(WorkflowID, None, interval, SLA, workflow, self.appdict['A'])
                 workloadlist.append((CreationID1, *info))
-                CreationID2, info = self.generateRandomContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['A'])
+                CreationID2, info = self.generateContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['A'])
                 workloadlist.append((CreationID2, *info))
-                CreationID3, info = self.generateRandomContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['P'])
+                CreationID3, info = self.generateContainer(WorkflowID, [CreationID1], interval, SLA, workflow, self.appdict['P'])
                 workloadlist.append((CreationID3, *info))
-                CreationID4, info = self.generateRandomContainer(WorkflowID, [CreationID2], interval, SLA, workflow, self.appdict['Y'])
+                CreationID4, info = self.generateContainer(WorkflowID, [CreationID2], interval, SLA, workflow, self.appdict['Y'])
                 workloadlist.append((CreationID4, *info))
-                CreationID5, info = self.generateRandomContainer(WorkflowID, [CreationID3], interval, SLA, workflow, self.appdict['P'])
+                CreationID5, info = self.generateContainer(WorkflowID, [CreationID3], interval, SLA, workflow, self.appdict['P'])
                 workloadlist.append((CreationID5, *info))
         self.createdContainers += workloadlist
         self.deployedContainers += [False] * len(workloadlist)
