@@ -106,7 +106,7 @@ class Task():
 		self.json_body["fields"]["Host_id"] = hostID
 		_, checkpointTime = self.env.controller.checkpoint(self.creationID, self.id, cur_host_ip)
 		_, migrationTime = self.env.controller.migrate(self.creationID, self.id, cur_host_ip, tar_host_ip)
-		_, restoreTime = self.env.controller.restore(self.creationID, self.id, self.application, tar_host_ip)
+		_, restoreTime = self.env.controller.restore(self.creationID, self.id, self.app, tar_host_ip)
 		lastMigrationTime = checkpointTime + migrationTime + restoreTime
 		self.totalMigrationTime += lastMigrationTime
 		execTime = self.env.intervaltime - lastMigrationTime
