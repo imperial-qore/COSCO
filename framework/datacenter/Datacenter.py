@@ -26,7 +26,7 @@ class Datacenter():
     def __init__(self, hosts, env, env_type):
         self.num_hosts = len(hosts)
         self.hosts = hosts
-        self.env = env.replace('_w', '')
+        self.env = env.replace('_W', '')
         self.env_type = env_type
         self.types = {'Power' : [1]}
 
