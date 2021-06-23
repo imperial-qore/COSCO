@@ -49,7 +49,7 @@ class Task():
 									{
 										"Host_id": self.hostid,
 										"name": str(self.creationID)+"_"+str(self.id),
-										"image": self.application,
+										"image": self.app,
 										"Active": self.active,
 										"totalExecTime": self.totalExecTime,
 										"startAt": self.startAt,
