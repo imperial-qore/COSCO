@@ -217,7 +217,7 @@ if __name__ == '__main__':
 			print("Setting up VirtualBox environment using Vagrant")
 			HOSTS_IP = setupVagrantEnvironment(configFile, mode)
 			print(HOSTS_IP)
-		elif env == 'VLAN':
+		elif env in ['VLAN', 'VLAN_W']:
 			print("Setting up VLAN environment using Ansible")
 			HOSTS_IP = setupVLANEnvironment(configFile, mode)
 			print(HOSTS_IP)
