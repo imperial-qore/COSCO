@@ -56,6 +56,7 @@ from scheduler.HGOBI import HGOBIScheduler
 from scheduler.HGOBI2 import HGOBI2Scheduler
 from scheduler.HSOGOBI import HSOGOBIScheduler
 from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
+from scheduler.GOBIGraph import GOBIGraphScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -73,14 +74,14 @@ parser.add_option("-m", "--mode", action="store", dest="mode", default="0",
 opts, args = parser.parse_args()
 
 # Global constants
-NUM_SIM_STEPS = 200
+NUM_SIM_STEPS = 10
 HOSTS = 10 * 5 if opts.env in ['', 'W'] else 10
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
 NEW_CONTAINERS = 0 if HOSTS == 10 else 5
-NEW_WORKFLOWS = 0
+NEW_WORKFLOWS = 0 if HOSTS == 10 else 2
 DB_NAME = ''
 DB_HOST = ''
 DB_PORT = 0
@@ -109,7 +110,7 @@ def initalizeEnvironment(environment, logger):
 			   
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = GOBIGraphScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -117,6 +118,10 @@ def initalizeEnvironment(environment, logger):
 		  WSimulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist) if environment == 'W' else \
 		  Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger) if environment in ['VLAN', 'Vagrant'] else \
 		  Workflow(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger) if environment == 'VLAN_W' else None
+
+	# Initialize stats
+	stats = Stats(env, workload, datacenter, scheduler) if 'W' not in environment else \
+			WStats(env, workload, datacenter, scheduler)
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -131,9 +136,6 @@ def initalizeEnvironment(environment, logger):
 	print("Schedule:", env.getActiveContainerList())
 	printDecisionAndMigrations(decision, migrations)
 
-	# Initialize stats
-	stats = Stats(env, workload, datacenter, scheduler) if 'W' not in environment else \
-			WStats(env, workload, datacenter, scheduler)
 	stats.saveStats(deployed, migrations, [], deployed, decision, schedulingTime)
 	return datacenter, workload, scheduler, env, stats
 

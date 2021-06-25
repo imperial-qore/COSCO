@@ -6,6 +6,7 @@ import numpy as np
 import torch
 import random
 import statistics
+import dgl
 
 from sys import argv
 
@@ -106,6 +107,32 @@ def load_stochastic_energy_latency_data(HOSTS):
 
 def load_stochastic_energy_latency2_data(HOSTS):
 	return load_energy_latency2_data(HOSTS)
+
+def load_energy_latencyW_data(HOSTS):
+	dataset_path = 'datasets/energy_latencyW_'+str(HOSTS)+'_scheduling.csv'
+	data = pd.read_csv(dataset_path) if os.path.exists(dataset_path) else pd.read_csv('scheduler/BaGTI/'+dataset_path)
+	data = data.values
+	max_ips_container = max(data.max(0)[HOSTS:2*HOSTS])
+	dataset = []
+	print("Dataset size", data.shape[0])
+	for i in range(data.shape[0]):
+		cpuH, cpuC, alloc = [], [], []
+		for j in range(HOSTS):
+			cpuH.append(data[i][j]/100)
+			cpuC.append(data[i][j+HOSTS]/max_ips_container)
+			oneHot = [0] * HOSTS
+			if int(data[i][j+(2*HOSTS)]) >= 0: oneHot[int(data[i][j+(2*HOSTS)])] = 1
+			alloc.append(oneHot)
+		cpuH = np.array([cpuH]).transpose(); cpuC = np.array([cpuC]).transpose()
+		alloc = np.array(alloc)
+		node_apps = torch.tensor(np.array(eval(data[i][3*HOSTS])))
+		graph = dgl.DGLGraph(eval(data[i][3*HOSTS+1])); graph.add_nodes(HOSTS*4 - graph.num_nodes())
+		graph = dgl.add_self_loop(graph)
+		dataset.append((torch.tensor(np.concatenate((cpuH, cpuC, alloc), axis=1)), node_apps, graph, torch.Tensor([(data[i][-2]- data.min(0)[-2])/(data.max(0)[-2] - data.min(0)[-2]), max(0, data[i][-1])/data.max(0)[-1]])))
+		if dataset[-1][1][1] > 1:
+			print(dataset[-1])
+		# Normalization by (x - min)/(max - min)
+	return dataset, len(dataset), max_ips_container
 
 def plot_accuracies(accuracy_list, data_type):
 	trainAcc = [i[0] for i in accuracy_list]

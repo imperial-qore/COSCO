@@ -27,6 +27,9 @@ class WStats():
 		self.allcontainerinfo = []
 		self.metrics = []
 		self.schedulerinfo = []
+		self.graphs = []
+		self.sim = 'simulator' in self.env.__class__.__name__.lower()
+		self.appdict = dict(zip(['shreshthtuli/aeneas', 'shreshthtuli/pocketsphinx', 'shreshthtuli/yolo'], [0, 1, 2]))
 
 	def saveHostInfo(self):
 		hostinfo = dict()
@@ -108,6 +111,34 @@ class WStats():
 		metrics['energytotalinterval_pred'], metrics['avgresponsetime_pred'] = self.runSimulationGOBI()
 		self.metrics.append(metrics)
 
+	def formGraph(self):
+		nodes, edges = [], []
+		for container in self.env.containerlist:
+			if container: nodes.append(container.creationID)
+		for container in self.env.containerlist:
+			if not container or not container.dependentOn: continue
+			for depOn in container.dependentOn:
+				if depOn in nodes:	edges.append((container.creationID, depOn))
+		for _ in range(4):
+			nodes_to_add = []
+			for node in nodes:
+				for undeployed in self.workload.getUndeployedContainers():
+					creationID, dependentOn = undeployed[0], undeployed[2]
+					if not dependentOn: continue
+					for depOn in dependentOn:
+						if depOn in nodes and (creationID, depOn) not in edges: 
+							edges.append((creationID, depOn))
+							nodes_to_add.append(creationID)
+			nodes += nodes_to_add
+		infos = [self.workload.createdContainers[i] for i in nodes]
+		apps = [(0 if self.sim else self.appdict(info[-1])) for info in infos]
+		final_edges = [(nodes.index(i[0]), nodes.index(i[1])) for i in edges]
+		return apps, edges
+
+	def saveGraph(self):
+		apps, final_edges = self.formGraph()
+		self.graphs.append((apps, final_edges))
+
 	def saveSchedulerInfo(self, selectedcontainers, decision, schedulingtime):
 		schedulerinfo = dict()
 		schedulerinfo['interval'] = self.env.interval
@@ -127,6 +158,7 @@ class WStats():
 		self.saveMetrics(destroyed, migrations)
 		self.saveSchedulerInfo(selectedcontainers, decision, schedulingtime)
 		self.saveWorkflowInfo()
+		self.saveGraph()
 
 	def runSimpleSimulation(self, decision):
 		host_alloc = []; container_alloc = [-1] * len(self.env.hostlist)
@@ -278,6 +310,28 @@ class WStats():
 		df = pd.concat([df, pd.DataFrame(objfunc2_with_interval)], axis=1)
 		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
 
+	def generateWorkflowDatasetWithInterval(self, dirname, metric, objfunc, metric2=None, objfunc2=None):
+		title = metric + '_' + (metric2 + '_' if metric2 else "") + (objfunc + '_' if objfunc else "") + (objfunc2 + '_' if objfunc2 else "") + 'with_interval' 
+		totalIntervals = len(self.hostinfo)
+		metric_with_interval = []; metric2_with_interval = [] # metric1 is of host and metric2 is of containers
+		host_alloc_with_interval = []; objfunc2_with_interval = []
+		objfunc_with_interval = []
+		for interval in range(totalIntervals-1):
+			metric_with_interval.append([self.hostinfo[interval][metric][hostID] for hostID in range(len(self.hostinfo[0][metric]))])
+			host_alloc_with_interval.append([self.activecontainerinfo[interval]['hostalloc'][cID] for cID in range(len(self.activecontainerinfo[0]['hostalloc']))])
+			objfunc_with_interval.append(self.metrics[interval+1][objfunc])
+			if metric2:
+				metric2_with_interval.append(self.activecontainerinfo[interval][metric2])
+			if objfunc2:
+				objfunc2_with_interval.append(self.metrics[interval+1][objfunc2])
+		df = pd.DataFrame(metric_with_interval)
+		if metric2: df = pd.concat([df, pd.DataFrame(metric2_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(host_alloc_with_interval)], axis=1)
+		df = pd.concat([df, pd.DataFrame(self.graphs)], axis=1)
+		df = pd.concat([df, pd.DataFrame(objfunc_with_interval)], axis=1)
+		if objfunc2: df = pd.concat([df, pd.DataFrame(objfunc2_with_interval)], axis=1)
+		df.to_csv(dirname + '/' + title + '.csv' , header=False, index=False)
+
 	def generateGraphs(self, dirname):
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'cpu')
 		self.generateGraphsWithInterval(dirname, self.hostinfo, 'host', 'numcontainers')
@@ -291,9 +345,10 @@ class WStats():
 
 	def generateDatasets(self, dirname):
 		# self.generateDatasetWithInterval(dirname, 'cpu', objfunc='energytotalinterval')
-		self.generateDatasetWithInterval(dirname, 'cpu', metric2='apparentips', objfunc='energytotalinterval', objfunc2='avgresponsetime')
-		self.generateDatasetWithInterval2(dirname, 'cpu', 'apparentips', 'energytotalinterval_pred', 'avgresponsetime_pred', objfunc='energytotalinterval', objfunc2='avgresponsetime')
-		
+		# self.generateDatasetWithInterval(dirname, 'cpu', metric2='apparentips', objfunc='energytotalinterval', objfunc2='avgresponsetime')
+		# self.generateDatasetWithInterval2(dirname, 'cpu', 'apparentips', 'energytotalinterval_pred', 'avgresponsetime_pred', objfunc='energytotalinterval', objfunc2='avgresponsetime')
+		self.generateWorkflowDatasetWithInterval(dirname, 'cpu', metric2='apparentips', objfunc='energytotalinterval', objfunc2='avgresponsetime')
+
 	def generateCompleteDatasets(self, dirname):
 		self.generateCompleteDataset(dirname, self.hostinfo, 'hostinfo')
 		self.generateCompleteDataset(dirname, self.workloadinfo, 'workloadinfo')

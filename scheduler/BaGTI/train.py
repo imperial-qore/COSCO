@@ -3,6 +3,7 @@ from src.utils import *
 from src.models import *
 from src.ga import *
 from src.opt import *
+from src.optW import *
 
 from sys import argv, maxsize
 from time import time
@@ -19,9 +20,13 @@ def backprop(dataset, model, optimizer):
 	total = 0
 	for feat in dataset:
 		feature = feat[0]
-		feature = torch.tensor(feature,dtype=torch.float)
-		y_pred = model(feature)
-		y_true = feat[1]
+		if not 'W' in model.name:
+			feature = torch.tensor(feature,dtype=torch.float)
+			y_pred = model(feature)
+		else:
+			apps, graph = feat[1], feat[2]
+			y_pred = model(feature, apps, graph)
+		y_true = feat[-1]
 		# print(y_pred, y_true)
 		optimizer.zero_grad()
 		loss = custom_loss(y_pred, y_true, model.name)
@@ -34,9 +39,13 @@ def accuracy(dataset, model):
 	total = 0
 	for feat in dataset:
 		feature = feat[0]
-		feature = torch.tensor(feature,dtype=torch.float)
-		y_pred = model(feature)
-		y_true = feat[1]
+		if not 'W' in model.name:
+			feature = torch.tensor(feature,dtype=torch.float)
+			y_pred = model(feature)
+		else:
+			apps, graph = feat[1], feat[2]
+			y_pred = model(feature, apps, graph)
+		y_true = feat[-1]
 		loss = custom_loss(y_pred, y_true, model.name)
 		total += loss
 	return total/len(dataset)
@@ -67,7 +76,8 @@ def load_model(filename, model, data_type):
 	return model, optimizer, epoch, accuracy_list
 
 if __name__ == '__main__':
-	data_type = argv[1] # can be 'energy', 'energy_latency', 'energy_latency2', 'stochastic_energy_latency', 'stochastic_energy_latency2' + '_' + str(HOSTS)
+	data_type = argv[1] # can be 'energy', 'energy_latency', 'energy_latency2', energy_latencyW', 
+	# 'stochastic_energy_latency', 'stochastic_energy_latency2' + '_' + str(HOSTS)
 	exec_type = argv[2] # can be 'train', ga', 'opt'
 
 	model = eval(data_type+"()")
