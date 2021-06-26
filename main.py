@@ -184,6 +184,7 @@ def saveStats(stats, datacenter, workload, env, end=True):
 	stats.generateGraphs(dirname)
 	stats.generateCompleteDatasets(dirname)
 	stats.env, stats.workload, stats.datacenter, stats.scheduler = None, None, None, None
+	stats.graphs, stats.simulated_scheduler = None, None
 	if 'Datacenter' in datacenter.__class__.__name__:
 		stats.simulated_scheduler = None
 		logger.getLogger().handlers.clear(); env.logger.getLogger().handlers.clear()

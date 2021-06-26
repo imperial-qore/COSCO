@@ -74,7 +74,7 @@ PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
 Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'DQLCM', 'POND', 'LR-MMT', 'MAD-MC'] 
-Models = ['GOBI', 'A3C'] 
+Models = ['GOBI', 'A3C', 'GOBIGraph', 'MCDS'] 
 if option == 1:
 	rot = 90
 	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
