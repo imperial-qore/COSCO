@@ -57,6 +57,7 @@ from scheduler.HGOBI2 import HGOBI2Scheduler
 from scheduler.HSOGOBI import HSOGOBIScheduler
 from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 from scheduler.GOBIGraph import GOBIGraphScheduler
+from scheduler.MCDS import MCDSScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -74,7 +75,7 @@ parser.add_option("-m", "--mode", action="store", dest="mode", default="0",
 opts, args = parser.parse_args()
 
 # Global constants
-NUM_SIM_STEPS = 10
+NUM_SIM_STEPS = 200
 HOSTS = 10 * 5 if opts.env in ['', 'W'] else 10
 CONTAINERS = HOSTS
 TOTAL_POWER = 1000
@@ -110,7 +111,7 @@ def initalizeEnvironment(environment, logger):
 			   
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = GOBIGraphScheduler('energy_latency_'+str(HOSTS))
+	scheduler = MCDSScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

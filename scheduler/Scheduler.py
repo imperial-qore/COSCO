@@ -21,7 +21,7 @@ class Scheduler():
     def filter_placement(self, decision):
         filtered_decision = []
         for cid, hid in decision:
-            if self.env.getContainerByID(cid).getHostID() != hid:
+            if self.env.getContainerByID(cid) and self.env.getContainerByID(cid).getHostID() != hid:
                 filtered_decision.append((cid, hid))
         return filtered_decision
 
