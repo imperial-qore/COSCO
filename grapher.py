@@ -54,7 +54,7 @@ def fstr(val):
 	return "{:.2f}".format(val)
 
 def reduce(l):
-	n = 5
+	n = 20
 	res, low, high = [], [], []
 	for i in range(0, len(l)):
 		res.append(statistics.mean(l[max(0, i-n):min(len(l), i+n)]))
@@ -95,7 +95,7 @@ yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', '
 	'Interval Allocation Time (seconds)', 'Number of completed tasks per application', "Fairness (Jain's index)", 'Fairness', 'Fairness per application', \
 	'Average CPU Utilization (%)', 'Average number of containers per Interval', 'Average RAM Utilization (%)', 'Scheduling Time (seconds)',\
 	'Average Execution Time (seconds)', 'Average Workflow Response Time (intervals)', 'Average Workflow Response Time per application (intervals)',
-	'Average Workflow Wait Time (intervals)', 'Average Workflow Wait Time per application (intervals)', \
+	'Average Workflow Wait Time (intervals)', 'Average Workflow Wait Time per application (intervals)', 'Fraction of total Workflow SLA Violations', 'Fraction of Workflow SLA Violations per application' \
 	]
 
 yLabelStatic2 = {
