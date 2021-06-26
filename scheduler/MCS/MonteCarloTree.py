@@ -1,5 +1,6 @@
 from .MonteCarloNode import *
 from ete3 import Tree
+import gc
 
 class MonteCarloTree():
 	def __init__(self, expansionSize):
@@ -43,5 +44,6 @@ class MonteCarloTree():
 			if cid not in [decision[0] for decision in decisions]:
 				decisions.append((cid, random.choice(range(len(self.root.senv.hostlist)))))
 		print(decisions)
+		gc.collect()
 		return decisions
 

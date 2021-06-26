@@ -25,7 +25,11 @@ class GOBIGraphScheduler(Scheduler):
 		cpu = np.concatenate((cpu, cpuC), axis=1)
 		apps, edges = self.env.stats.formGraph()
 		apps = torch.tensor(np.array(apps))
-		graph = dgl.DGLGraph(edges); graph.add_nodes(self.hosts*4 - graph.num_nodes())
+		graph = dgl.DGLGraph(edges); 
+		if graph.num_nodes() < self.hosts*4:
+			graph.add_nodes(self.hosts*4 - graph.num_nodes())
+		elif graph.num_nodes() > self.hosts*4:
+			graph.remove_nodes(torch.tensor(list(range(self.hosts*4, graph.num_nodes()))))
 		graph = dgl.add_self_loop(graph)
 		alloc = []; prev_alloc = {}
 		for c in self.env.containerlist:

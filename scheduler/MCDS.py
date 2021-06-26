@@ -22,7 +22,11 @@ class MCDSScheduler(Scheduler):
 	def run_MCSearch(self, containerIDs):
 		apps, edges = self.env.stats.formGraph()
 		apps = torch.tensor(np.array(apps))
-		graph = dgl.DGLGraph(edges); graph.add_nodes(self.hosts*4 - graph.num_nodes())
+		graph = dgl.DGLGraph(edges); 
+		if graph.num_nodes() < self.hosts*4:
+			graph.add_nodes(self.hosts*4 - graph.num_nodes())
+		elif graph.num_nodes() > self.hosts*4:
+			graph.remove_nodes(torch.tensor(list(range(self.hosts*4, graph.num_nodes()))))
 		graph = dgl.add_self_loop(graph)
 		senv = SimpleEnv(self.env, apps, graph, self.model, self.max_container_ips)
 		self.mct.setEnv(senv)
