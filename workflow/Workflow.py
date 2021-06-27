@@ -110,12 +110,8 @@ class Workflow(Framework):
 				if ccid not in self.destroyedccids:
 					allDestroyed = False
 			if allDestroyed:
-				correct, total = self.checkWorkflowOutput(WorkflowID)
-				shutil.rmtree('tmp/'+str(WorkflowID)+'/')
 				self.destroyedworkflows[WorkflowID] = deepcopy(self.activeworkflows[WorkflowID])
-				self.destroyedworkflows[WorkflowID]['sla'] = self.activeworkflows[WorkflowID]['sla']
 				self.destroyedworkflows[WorkflowID]['destroyAt'] = self.interval
-				self.destroyedworkflows[WorkflowID]['result'] = (correct, total)
 				print(color.GREEN); print("Workflow ID: ", WorkflowID)
 				pprint(self.destroyedworkflows[WorkflowID]); print(color.ENDC)
 				toDelete.append(WorkflowID)
