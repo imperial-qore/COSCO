@@ -18,6 +18,6 @@
         - "{{ vms }}"
 
     - name: Install new kernel
-      shell: "az vm run-command invoke -g {{ resourceGroup }} -n {{ item.0 }} --command-id RunShellScript --scripts 'sudo apt install -y -f linux-image-4.15.0-1009-azure linux-tools-4.15.0-1009-azure linux-cloud-tools-4.15.0-1009-azure linux-headers-4.15.0-1009-azure linux-modules-4.15.0-1009-azure linux-modules-extra-4.15.0-1009-azure'"
-      with_items: 
+      shell: "az vm run-command invoke -g {{ resourceGroup }} -n vm{{ item.0 + 1}} --command-id RunShellScript --scripts 'sudo apt install -y -f linux-image-4.15.0-1009-azure linux-tools-4.15.0-1009-azure linux-cloud-tools-4.15.0-1009-azure linux-headers-4.15.0-1009-azure linux-modules-4.15.0-1009-azure linux-modules-extra-4.15.0-1009-azure'"
+      with_indexed_items: 
         - "{{ vms }}"

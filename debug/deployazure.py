@@ -2,7 +2,8 @@ import subprocess
 from time import sleep
 import json
 
-vmlist = ['Standard_B2s']*8 + ['Standard_B2ms']*8
+vmlist = ['Standard_B2s']*4 + ['Standard_B4ms']*4 + ['Standard_B8ms']*2
+locs = ['uksouth']*6 + ['eastus']*4
 
 HEADER = '\033[1m'
 FAIL = '\033[91m'
@@ -23,7 +24,8 @@ def run(cmd, shell=True):
 print(f'{HEADER}Create Azure VM{ENDC}')
 for i, size in enumerate(vmlist):
   name = f'vm{i+1}'
-  run(f'az vm create --resource-group vm1_group --name {name} --size {size} --image UbuntuLTS --ssh-key-values id_rsa.pub --admin-username ansible')
+  l = locs[i]
+  run(f'az vm create --resource-group vm1_group --name {name} --size {size} --location {l} --image UbuntuLTS --ssh-key-values id_rsa.pub --admin-username ansible')
 
 # #################
 
