@@ -130,10 +130,11 @@ class WStats():
 							edges.append((creationID, depOn))
 							nodes_to_add.append(creationID)
 			nodes += nodes_to_add
+		nodes = list(np.unique(nodes))
 		infos = [self.workload.createdContainers[i] for i in nodes]
-		apps = [(0 if self.sim else self.appdict(info[-1])) for info in infos]
+		apps = [(0 if self.sim else self.appdict[info[-1]]) for info in infos]
 		final_edges = [(nodes.index(i[0]), nodes.index(i[1])) for i in edges]
-		return apps, edges
+		return apps, final_edges
 
 	def saveGraph(self):
 		apps, final_edges = self.formGraph()

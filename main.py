@@ -111,7 +111,7 @@ def initalizeEnvironment(environment, logger):
 			   
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = MCDSScheduler('energy_latency_'+str(HOSTS))
+	scheduler = RandomScheduler()
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()

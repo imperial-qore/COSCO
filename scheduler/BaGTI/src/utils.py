@@ -129,7 +129,7 @@ def load_energy_latencyW_data(HOSTS):
 		graph = dgl.DGLGraph(eval(data[i][3*HOSTS+1])); graph.add_nodes(HOSTS*4 - graph.num_nodes())
 		graph = dgl.add_self_loop(graph)
 		dataset.append((torch.tensor(np.concatenate((cpuH, cpuC, alloc), axis=1)), node_apps, graph, torch.Tensor([(data[i][-2]- data.min(0)[-2])/(data.max(0)[-2] - data.min(0)[-2]), max(0, data[i][-1])/data.max(0)[-1]])))
-		if dataset[-1][1][1] > 1:
+		if dataset[-1][-1][1] > 1:
 			print(dataset[-1])
 		# Normalization by (x - min)/(max - min)
 	return dataset, len(dataset), max_ips_container

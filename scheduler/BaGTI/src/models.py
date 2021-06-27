@@ -139,6 +139,35 @@ class energy_latencyW_50(nn.Module):
             x = Coeff_Energy*x[0] + Coeff_Latency*x[1]
         return x
 
+class energy_latencyW_10(nn.Module):
+    def __init__(self):
+        super(energy_latencyW_10, self).__init__()
+        self.name = "energy_latencyW_10"
+        self.nlim = 10*4
+        self.emb = 5
+        self.find = nn.Sequential(
+            nn.Linear(10 * 12 + self.nlim, 128),
+            nn.Softplus(),
+            nn.Linear(128, 128),
+            nn.Softplus(),
+            nn.Linear(128, 64), 
+            nn.Tanhshrink(),
+            nn.Linear(64, 2),
+            nn.Sigmoid())
+        self.embedding = nn.Embedding(3, self.emb)
+        self.grapher = GraphConv(self.emb, 1)
+
+    def forward(self, x, apps, graph):
+        apps = self.embedding(apps.int())
+        zero = torch.zeros(self.nlim-apps.shape[0], apps.shape[1])
+        apps = torch.cat((apps, zero))
+        apps = self.grapher(graph, apps)
+        x = torch.cat((x.flatten(), apps.flatten())).float()
+        x = self.find(x)
+        if not('train' in argv[0] and 'train' in argv[2]):
+            x = Coeff_Energy*x[0] + Coeff_Latency*x[1]
+        return x
+
 class stochastic_energy_latency_50(nn.Module):
     def __init__(self):
         super(stochastic_energy_latency_50, self).__init__()
