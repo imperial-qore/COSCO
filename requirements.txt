@@ -16,5 +16,6 @@ wget==3.2
 joblib==0.17.0
 cython
 SciencePlots
+dgl
 seaborn
 ete3

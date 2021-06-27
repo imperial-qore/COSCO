@@ -6,54 +6,54 @@
 		"uname" : "ansible",
 		"servers" : [
 			{
-				"ip" : "51.140.110.30",
+				"ip" : "20.90.254.237",
 				"cpu" : 2,
 				"powermodel": "PMB2s"
 			},
 			{
-				"ip" : "51.140.30.137",
+				"ip" : "20.90.248.233",
 				"cpu" : 2,
 				"powermodel": "PMB2s"
 			},
 			{
-				"ip" : "51.140.117.214",
+				"ip" : "20.90.252.130",
 				"cpu" : 2,
 				"powermodel": "PMB2s"
 			},
 			{
-				"ip" : "51.140.116.56",
+				"ip" : "20.90.255.13",
 				"cpu" : 2,
 				"powermodel": "PMB2s"
 			},
 			{
-				"ip" : "51.140.118.6",
-				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"ip" : "20.90.255.93",
+				"cpu" : 4,
+				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "51.140.119.184",
-				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"ip" : "20.90.249.87",
+				"cpu" : 4,
+				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "51.140.119.55",
-				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"ip" : "40.114.11.193",
+				"cpu" : 4,
+				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "51.140.119.109",
-				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"ip" : "40.114.0.196",
+				"cpu" : 4,
+				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "51.140.185.163",
-				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"ip" : "104.45.150.141",
+				"cpu" : 8,
+				"powermodel": "PMB8ms"
 			},
 			{
-				"ip" : "51.140.156.236",
-				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"ip" : "52.170.134.132",
+				"cpu" : 8,
+				"powermodel": "PMB8ms"
 			}
 		]
 	}
