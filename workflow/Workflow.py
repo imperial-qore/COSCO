@@ -8,6 +8,7 @@ from joblib import Parallel, delayed
 from utils.ColorUtils import *
 from workflow.task.Task import *
 from pprint import pprint
+from copy import deepcopy
 
 num_cores = multiprocessing.cpu_count()
 
