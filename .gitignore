@@ -137,3 +137,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 todo.txt
+framework/config/VLAN_W_config2.json
