@@ -82,7 +82,7 @@ TOTAL_POWER = 1000
 ROUTER_BW = 10000
 INTERVAL_TIME = 300 # seconds
 NEW_CONTAINERS = 0 if HOSTS == 10 else 5
-NEW_WORKFLOWS = 0.1 if HOSTS == 10 else 2
+NEW_WORKFLOWS = 0 if HOSTS == 10 else 2
 DB_NAME = ''
 DB_HOST = ''
 DB_PORT = 0
@@ -111,7 +111,7 @@ def initalizeEnvironment(environment, logger):
 			   
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = RandomScheduler()
+	scheduler = MCDSScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
@@ -236,7 +236,7 @@ if __name__ == '__main__':
 
 	if opts.env not in ['', 'W']:
 		# Destroy environment if required
-		eval('destroy'+opts.env+'Environment(configFile, mode)')
+		eval('destroy'+opts.env.replace('_W','')+'Environment(configFile, mode)')
 
 		# Quit InfluxDB
 		if 'Windows' in platform.system():
