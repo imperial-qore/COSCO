@@ -158,7 +158,7 @@ class energy_latencyW_10(nn.Module):
         self.grapher = GraphConv(self.emb, 1)
 
     def forward(self, x, apps, graph):
-        apps = self.embedding(apps.int())
+        apps = self.embedding(apps.long())
         zero = torch.zeros(self.nlim-apps.shape[0], apps.shape[1])
         apps = torch.cat((apps, zero))
         apps = self.grapher(graph, apps)
