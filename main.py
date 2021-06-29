@@ -59,6 +59,8 @@ from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 from scheduler.GAW import GAWScheduler
 from scheduler.GOBIGraph import GOBIGraphScheduler
 from scheduler.MCDS import MCDSScheduler
+from scheduler.Closure import ClosureScheduler
+from scheduler.IMPSO import IMPSOScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -112,7 +114,7 @@ def initalizeEnvironment(environment, logger):
 			   
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = GAWScheduler('energy_latency_'+str(HOSTS))
+	scheduler = IMPSOScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
