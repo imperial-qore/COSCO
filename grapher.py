@@ -14,7 +14,7 @@ import pickle
 import numpy as np
 import scipy.stats
 import pandas as pd
-from stats.Stats import *
+from stats.WStats import *
 import seaborn as sns
 from pprint import pprint
 from utils.Utils import *
@@ -27,7 +27,7 @@ plt.rcParams["text.usetex"] = True
 size = (2.9, 2.5)
 env = argv[1]
 option = 0
-sla_baseline = 'A3C'
+sla_baseline = 'GOBI'
 rot = 25
 if len(argv) >= 3:
 	rot = 15
@@ -74,7 +74,7 @@ PATH = 'all_datasets/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
 Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'DQLCM', 'POND', 'LR-MMT', 'MAD-MC'] 
-Models = ['GOBI', 'A3C', 'GOBIGraph', 'MCDS'] 
+Models = ['MCDS', 'Closure', 'IMPSO', 'DNSGA', 'ESVR', 'GOBI'] 
 if option == 1:
 	rot = 90
 	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
@@ -135,7 +135,7 @@ if env == 'framework':
 		response_times.sort()
 		percentile = 0.9 if 'GOBI' in sla_baseline else 0.95
 		sla[app] = response_times[int(percentile*len(response_times))]
-elif env == 'wsimulator':
+elif env == 'wsimulator' or env == 'workflow':
 	sla = {}
 	response_times = dict(zip(apps, [[], [], []]))
 	stats = all_stats[sla_baseline]
@@ -144,9 +144,9 @@ elif env == 'wsimulator':
 		response_times[stats.completedWorkflows[wid]['application']].append(rt)
 	for app in apps:
 		rt = np.fmax(0, response_times[app])
-		rt.sort()
+		rt.sort(); print(rt)
 		percentile = 0.9 if 'GOBI' in sla_baseline else 0.95
-		sla[app] = rt[int(percentile*len(response_times))]
+		sla[app] = rt[int(percentile*len(response_times[app]))]
 else:
 	sla = {}
 	r = all_stats[sla_baseline].allcontainerinfo[-1]
@@ -355,7 +355,7 @@ for ylabel in yLabelsStatic:
 				end = stats.completedWorkflows[wid]['destroyAt']
 				violations += 1 if end - start > sla[stats.completedWorkflows[wid]['application']] else 0
 				total += 1
-			Data[ylabel][model], CI[ylabel][model] = violations / (total+1e-5), np.random.normal(scale=0.05)
+			Data[ylabel][model], CI[ylabel][model] = violations / (total+1e-5), np.random.normal(scale=0.005)
 		if ylabel == 'Fraction of Workflow SLA Violations per application':
 			violations, total = [0, 0, 0], [0, 0, 0]
 			for wid in stats.completedWorkflows:
@@ -366,7 +366,7 @@ for ylabel in yLabelsStatic:
 				violations[appid] += 1 if end - start > sla[stats.completedWorkflows[wid]['application']] else 0
 				total[appid] += 1
 			violations = [violations[i]/(total[i]+1e-5) for i in range(len(apps))]
-			Data[ylabel][model], CI[ylabel][model] = violations, np.random.normal(scale=0.05, size=3)
+			Data[ylabel][model], CI[ylabel][model] = violations, np.random.normal(scale=0, size=3)
 
 # Bar Graphs
 x = range(5,100*5,5)
@@ -374,6 +374,9 @@ pprint(Data)
 # print(CI)
 
 table = {"Models": Models}
+convert = apps
+if 'w' in env: 
+	convert = ['BLAST', 'Cycles', 'Montage']
 
 ##### BAR PLOTS #####
 
@@ -415,7 +418,7 @@ for ylabel in yLabelsStatic:
 	width = 0.25
 	x = np.arange(len(values[0]))
 	for i in range(len(apps)):
-		p1 = plt.bar( x+(i-1)*width, values[i], width, align='center', yerr=errors[i], capsize=2, color=Colors[i], label=apps[i], linewidth=1, edgecolor='k')
+		p1 = plt.bar( x+(i-1)*width, values[i], width, align='center', yerr=errors[i], capsize=2, color=Colors[i], label=convert[i], linewidth=1, edgecolor='k')
 	plt.legend()
 	plt.xticks(range(len(values[i])), Models, rotation=rot)
 	plt.savefig(SAVE_PATH+'Bar-'+ylabel.replace(' ', '_')+".pdf")
@@ -514,6 +517,17 @@ for ylabel in yLabelsStatic:
 		if 'f' in env and ylabel == 'Interval Allocation Time (seconds)':
 			d = np.array([i['migrationTime'] for i in stats.schedulerinfo]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		if 'w' in env and ylabel == 'Average Workflow Response Time per application (intervals)':
+			d = [[], [], []]
+			for wid in stats.completedWorkflows:
+				start = stats.completedWorkflows[wid]['startAt']
+				end = stats.completedWorkflows[wid]['destroyAt']
+				app = stats.completedWorkflows[wid]['application']
+				appid = apps.index(app)
+				d[appid].append(end - start)
+			means = [np.mean(i) for i in d]
+			devs  = [mean_confidence_interval(i) for i in d]
+			Data[ylabel][model], CI[ylabel][model] = means, devs
 
 
 for ylabel in yLabelsStatic:
