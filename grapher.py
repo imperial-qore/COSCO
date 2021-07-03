@@ -525,9 +525,7 @@ for ylabel in yLabelsStatic:
 				app = stats.completedWorkflows[wid]['application']
 				appid = apps.index(app)
 				d[appid].append(end - start)
-			means = [np.mean(i) for i in d]
-			devs  = [mean_confidence_interval(i) for i in d]
-			Data[ylabel][model], CI[ylabel][model] = means, devs
+			Data[ylabel][model], CI[ylabel][model] = d, [mean_confidence_interval(i) for i in d]
 
 
 for ylabel in yLabelsStatic:
