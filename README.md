@@ -59,10 +59,13 @@ https://arxiv.org/abs/2104.14392.
 ## Cite this work
 ```
 @article{tuli2021cosco,
-  title={COSCO: Container Orchestration using Co-Simulation and Gradient Based Optimization for Fog Computing Environments},
-  author={Tuli, Shreshth and Poojara, Shivananda and Srirama, Satish and Casale, Giuliano and Jennings, Nicholas R},
-  journal={IEEE Transactions on Parallel and Distributed Systems},
-  year={2021}
+  author={Tuli, Shreshth and Poojara, Shivananda R. and Srirama, Satish N. and Casale, Giuliano and Jennings, Nicholas R.},
+  journal={IEEE Transactions on Parallel and Distributed Systems}, 
+  title={COSCO: Container Orchestration Using Co-Simulation and Gradient Based Optimization for Fog Computing Environments}, 
+  year={2022},
+  volume={33},
+  number={1},
+  pages={101-116},
 }
 ```
 
