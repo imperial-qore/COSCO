@@ -33,7 +33,7 @@ We present two novel algorithms in this work: GOBI and GOBI*. GOBI uses a neural
 
 [![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/RZOWTj0rfBQ/0.jpg)](https://www.youtube.com/watch?v=RZOWTj0rfBQ)
 
-An exhastive course on using the COSCO framework is available as a [youtube playlist](https://www.youtube.com/playlist?list=PLN_nzHzuaOBQijEwy2Fy8c09-dWYVe4XO).
+A detailed course on using the COSCO framework for deep learning based scheduling (gradient surrogate optimization and co-simulation) in fog environments is available as a [youtube playlist](https://www.youtube.com/playlist?list=PLN_nzHzuaOBQijEwy2Fy8c09-dWYVe4XO).
  
 ## Quick Start Guide
 To run the COSCO framework, install required packages using
