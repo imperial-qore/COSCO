@@ -112,7 +112,6 @@ def load_energy_latencyGNN_data(HOSTS):
 	for i in range(data.shape[0]):
 		cpuH, cpuC, alloc = [], [], []
 		u, v = [], []
-		g = dgl.graph((u, v))
 		for j in range(HOSTS):
 			cpuH.append(data[i][j]/100)
 			cpuC.append(data[i][j+HOSTS]/max_ips_container)
