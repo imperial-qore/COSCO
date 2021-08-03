@@ -19,10 +19,13 @@ def backprop(dataset, model, optimizer):
 	total = 0
 	for feat in dataset:
 		feature = feat[0]
-		feature = torch.tensor(feature,dtype=torch.float)
-		y_pred = model(feature)
-		y_true = feat[1]
-		# print(y_pred, y_true)
+		if not 'GNN' in model.name:
+			feature = torch.tensor(feature,dtype=torch.float)
+			y_pred = model(feature)
+		else:
+			graph, data, d = feat[0], feat[1], torch.tensor(feat[2],dtype=torch.float)
+			y_pred = model(graph, data, d)
+		y_true = feat[-1]
 		optimizer.zero_grad()
 		loss = custom_loss(y_pred, y_true, model.name)
 		loss.backward()
@@ -34,9 +37,13 @@ def accuracy(dataset, model):
 	total = 0
 	for feat in dataset:
 		feature = feat[0]
-		feature = torch.tensor(feature,dtype=torch.float)
-		y_pred = model(feature)
-		y_true = feat[1]
+		if not 'GNN' in model.name:
+			feature = torch.tensor(feature,dtype=torch.float)
+			y_pred = model(feature)
+		else:
+			graph, data, d = feat[0], feat[1], torch.tensor(feat[2],dtype=torch.float)
+			y_pred = model(graph, data, d)
+		y_true = feat[-1]
 		loss = custom_loss(y_pred, y_true, model.name)
 		total += loss
 	return total/len(dataset)
@@ -50,7 +57,7 @@ def save_model(model, optimizer, epoch, accuracy_list):
         'accuracy_list': accuracy_list}, file_path)
 
 def load_model(filename, model, data_type):
-	optimizer = torch.optim.Adam(model.parameters() , lr=0.0001, weight_decay=1e-5) if 'stochastic' not in data_type else torch.optim.AdamW(model.parameters() , lr=0.0001)
+	optimizer = torch.optim.Adam(model.parameters() , lr=0.001, weight_decay=1e-5) if 'stochastic' not in data_type else torch.optim.AdamW(model.parameters() , lr=0.0001)
 	file_path1 = MODEL_SAVE_PATH + "/" + filename + "_Trained.ckpt"
 	file_path2 = 'scheduler/BaGTI/' + file_path1
 	file_path = file_path1 if os.path.exists(file_path1) else file_path2
@@ -67,7 +74,8 @@ def load_model(filename, model, data_type):
 	return model, optimizer, epoch, accuracy_list
 
 if __name__ == '__main__':
-	data_type = argv[1] # can be 'energy', 'energy_latency', 'energy_latency2', 'stochastic_energy_latency', 'stochastic_energy_latency2' + '_' + str(HOSTS)
+	data_type = argv[1] # can be 'energy', 'energy_latency', 'energy_latency2', 'energy_latencyGNN'
+	# 'stochastic_energy_latency', 'stochastic_energy_latency2' + '_' + str(HOSTS)
 	exec_type = argv[2] # can be 'train', ga', 'opt'
 
 	model = eval(data_type+"()")
