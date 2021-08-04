@@ -27,7 +27,7 @@ plt.rcParams["text.usetex"] = True
 size = (2.9, 2.5)
 env = argv[1]
 option = 0
-sla_baseline = 'GOBI'
+sla_baseline = 'CRUZE'
 rot = 25
 if len(argv) >= 3:
 	rot = 15
@@ -73,7 +73,7 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/thermal/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GGCN', 'GOBI'] 
+Models = ['GGCN', 'HDIC', 'MITEC', 'CRUZE', 'DeepRL'] 
 xLabel = 'Simulation Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'magenta', 'pink', 'cyan', 'maroon', 'grey', 'purple', 'navy']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
