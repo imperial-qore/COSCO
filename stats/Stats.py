@@ -39,6 +39,7 @@ class Stats():
 		hostinfo['ramavailable'] = [host.getRAMAvailable() for host in self.env.hostlist]
 		hostinfo['disk'] = [host.getCurrentDisk() for host in self.env.hostlist]
 		hostinfo['diskavailable'] = [host.getDiskAvailable() for host in self.env.hostlist]
+		hostinfo['temp'] = [host.getTemp() for host in self.env.hostlist]
 		self.hostinfo.append(hostinfo)
 
 	def saveWorkloadInfo(self, deployed, migrations):

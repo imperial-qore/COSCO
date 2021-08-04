@@ -27,7 +27,7 @@ plt.rcParams["text.usetex"] = True
 size = (2.9, 2.5)
 env = argv[1]
 option = 0
-sla_baseline = 'A3C'
+sla_baseline = 'GOBI'
 rot = 25
 if len(argv) >= 3:
 	rot = 15
@@ -70,16 +70,10 @@ def mean_confidence_interval(data, confidence=0.90):
     h = scipy.stats.sem(a) * scipy.stats.t.ppf((1 + confidence) / 2., n-1)
     return h
 
-PATH = 'all_datasets/' + env + '/'
+PATH = 'all_datasets/thermal/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GOBI*', 'GOBI', 'A3C', 'GA', 'DQLCM', 'POND', 'LR-MMT', 'MAD-MC'] 
-if option == 1:
-	rot = 90
-	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
-	# Models = ['GOSH*', 'GOSH', 'GOBI*', 'GOBI', 'HGP', 'A3C', 'POND']
-if option == 2:
-	Models = ['GOSH*', 'GOSH', 'SGOBI*', 'SGOBI', 'HGOBI*', 'HGOBI']
+Models = ['GGCN', 'GOBI'] 
 xLabel = 'Simulation Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'magenta', 'pink', 'cyan', 'maroon', 'grey', 'purple', 'navy']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
@@ -91,7 +85,7 @@ yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', '
 	'Cost per container (US Dollars)', 'Fraction of total SLA Violations', 'Fraction of SLA Violations per application', \
 	'Interval Allocation Time (seconds)', 'Number of completed tasks per application', "Fairness (Jain's index)", 'Fairness', 'Fairness per application', \
 	'Average CPU Utilization (%)', 'Average number of containers per Interval', 'Average RAM Utilization (%)', 'Scheduling Time (seconds)',\
-	'Average Execution Time (seconds)']
+	'Average Execution Time (seconds)', 'Temperature (C)']
 
 yLabelStatic2 = {
 	'Average Completion Time (seconds)': 'Number of completed tasks'
@@ -287,6 +281,10 @@ for ylabel in yLabelsStatic:
 		if ylabel == 'Average RAM Utilization (%)':
 			d = np.array([(np.average(100*np.array(i['ram'])/(np.array(i['ram'])+np.array(i['ramavailable']))) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d), mean_confidence_interval(d)
+		if ylabel == 'Temperature (C)':
+			d = np.array([(np.average(i['temp']) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
+			devd = mean_confidence_interval(np.array([(np.average(i['temp']) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.]))
+			Data[ylabel][model], CI[ylabel][model] = np.average(d), np.average(devd)
 		# Scheduler metrics
 		if ylabel == 'Scheduling Time (seconds)':
 			d = np.array([i['schedulingtime'] for i in stats.schedulerinfo]) if stats else np.array([0.])
@@ -435,6 +433,9 @@ for ylabel in yLabelsStatic:
 		if ylabel == 'Average RAM Utilization (%)':
 			d = np.array([(np.average(100*np.array(i['ram'])/(np.array(i['ram'])+np.array(i['ramavailable']))) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		if ylabel == 'Temperature (C)':
+			d = np.array([(np.average(i['temp']) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 		# Scheduler metrics
 		if ylabel == 'Scheduling Time (seconds)':
 			d = np.array([i['schedulingtime'] for i in stats.schedulerinfo]) if stats else np.array([0.])
@@ -534,6 +535,9 @@ for ylabel in yLabelsStatic:
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 		if ylabel == 'Average RAM Utilization (%)':
 			d = np.array([(np.average(100*np.array(i['ram'])/(np.array(i['ram'])+np.array(i['ramavailable']))) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
+			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
+		if ylabel == 'Temperature (C)':
+			d = np.array([(np.average(i['temp']) if i != [] else 0) for i in stats.hostinfo]) if stats else np.array([0.])
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 		# Scheduler metrics
 		if ylabel == 'Scheduling Time (seconds)':

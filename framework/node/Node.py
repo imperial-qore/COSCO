@@ -65,6 +65,9 @@ class Node():
 	def getPower(self):
 		return self.powermodel.power()
 
+	def getTemp(self):
+		return self.powermodel.temperature()
+		
 	def getPowerFromIPS(self, ips):
 		return self.powermodel.powerFromCPU(min(100, 100 * (ips / self.ipsCap)))
 
