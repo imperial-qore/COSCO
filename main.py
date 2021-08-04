@@ -49,6 +49,7 @@ from scheduler.HGOBI2 import HGOBI2Scheduler
 from scheduler.HSOGOBI import HSOGOBIScheduler
 from scheduler.HSOGOBI2 import HSOGOBI2Scheduler
 from scheduler.GGCN import GGCNScheduler
+from scheduler.CRUZE import CRUZEScheduler
 
 # Auxiliary imports
 from stats.Stats import *
@@ -102,7 +103,7 @@ def initalizeEnvironment(environment, logger):
 	
 	# Initialize scheduler
 	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
+	scheduler = CRUZEScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
 
 	# Initialize Environment
 	hostlist = datacenter.generateHosts()
