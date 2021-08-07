@@ -73,7 +73,7 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/thermal/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GGCN', 'HDIC', 'MITEC', 'CRUZE', 'DeepRL'] 
+Models = ['GGCN', 'HDIC', 'SDAE-MMQ', 'ANN', 'MITEC', 'CRUZE', 'PADQN'] 
 xLabel = 'Simulation Time (minutes)'
 Colors = ['red', 'blue', 'green', 'orange', 'magenta', 'pink', 'cyan', 'maroon', 'grey', 'purple', 'navy']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
