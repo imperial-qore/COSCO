@@ -28,7 +28,7 @@ size = (2.9, 2.5)
 env = argv[1]
 option = 0
 sla_baseline = 'CRUZE'
-rot = 25
+rot = 35
 if len(argv) >= 3:
 	rot = 15
 	if 'HSO' in argv[2]:
@@ -73,9 +73,9 @@ def mean_confidence_interval(data, confidence=0.90):
 PATH = 'all_datasets/thermal/' + env + '/'
 SAVE_PATH = 'results/' + env + '/'
 
-Models = ['GGCN', 'HDIC', 'SDAE-MMQ', 'ANN', 'MITEC', 'CRUZE', 'PADQN'] 
+Models = ['HUNTER', 'HDIC', 'SDAE-MMQ', 'ANN', 'MITEC', 'CRUZE', 'PADQN'] 
 xLabel = 'Simulation Time (minutes)'
-Colors = ['red', 'blue', 'green', 'orange', 'magenta', 'pink', 'cyan', 'maroon', 'grey', 'purple', 'navy']
+Colors = ['tab:red', 'tab:blue', 'tab:green', 'tab:orange', 'tab:purple', 'tab:brown', 'tab:cyan', 'tab:olive', 'grey', 'pink', 'navy']
 apps = ['yolo', 'pocketsphinx', 'aeneas']
 
 yLabelsStatic = ['Total Energy (Kilowatt-hr)', 'Average Energy (Kilowatt-hr)', 'Interval Energy (Kilowatt-hr)', 'Average Interval Energy (Kilowatt-hr)',\
