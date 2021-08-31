@@ -10,16 +10,16 @@
 # Supplementary to the Workflow scheduling submission
 
 ## Novel Scheduling Algorithms
-We present two novel algorithms in this work: GOSH and GOSH*. GOSH uses heteroscedastic deep surrogate model with uncertainty based exploration and higher-order optimization to quickly converge to near optimal scheduling decisions. GOSH* is the co-simulator based extension of GOSH.
+We present a novel algorithm in this work: MCDS. MCDS uses a deep surrogate model with monte carlo learning to develop a long-term QoS estimate. MCDS uses gradient based optimization to converge to near-optimal scheduling decisions.
 
 ## Quick Start Guide
 To run the COSCO framework, install required packages using
 ```bash
 python3 install.py
 ```
-To run the code with the required scheduler, modify line 104 of `main.py` to one of the several options including GOSH.
+To run the code with the required scheduler, modify line 117 of `main.py` to one of the several options including GOSH.
 ```python
-scheduler = GOSHScheduler('energy_latency_'+str(HOSTS))
+scheduler = MCDSScheduler('energy_latency_'+str(HOSTS))
 ```
 
 To run the simulator, use the following command
