@@ -50,6 +50,10 @@ To run the simulator, use the following command
 python3 main.py
 ```
 
+## CodeOcean
+You can directly run tests on the results using a CodeOcean Repository without needing to install anything on your local machine. Click "Open in CodeOcean" below:
+[![Open in Code Ocean](https://codeocean.com/codeocean-assets/badge/open-in-code-ocean.svg)](https://codeocean.com/capsule/8234136/tree)
+
 ## Wiki
 Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed installation instructions, implementing a custom scheduler and replication of results. All execution traces and training data is available at [Zenodo](https://zenodo.org/record/4897944) under CC License.
 
