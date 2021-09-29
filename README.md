@@ -63,7 +63,7 @@ https://arxiv.org/abs/2104.14392.
 
 ## Cite this work
 Our work is published in IEEE TPDS journal https://ieeexplore.ieee.org/document/9448450/.
-```
+```bibtex
 @article{tuli2021cosco,
   author={Tuli, Shreshth and Poojara, Shivananda R. and Srirama, Satish N. and Casale, Giuliano and Jennings, Nicholas R.},
   journal={IEEE Transactions on Parallel and Distributed Systems}, 
