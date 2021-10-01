@@ -1,0 +1,12 @@
+# List the start up tasks. Learn more https://www.gitpod.io/docs/config-start-tasks/
+tasks:
+  - init: |
+      pip install matplotlib scikit-learn
+      pip install certifi==2020.6.20 cycler==0.10.0 future==0.18.2 kiwisolver==1.2.0 matplotlib==3.3.2 numpy==1.19.2 pandas==1.1.2 Pillow==7.2.0 pyparsing==2.4.7 influxdb==5.3.0 python-dateutil==2.8.1 pytz==2020.1 scipy==1.5.2 six==1.15.0 wget==3.2 joblib==0.17.0 cython SciencePlots seaborn
+      pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
+    command: echo 'start script'
+
+# List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
+ports:
+  - port: 8081
+    onOpen: open-preview
