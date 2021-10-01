@@ -27,7 +27,7 @@
     <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in gitpod">
   </a>
 </div>
----
+
 
 COSCO is an AI based coupled-simulation and container orchestration framework for integrated Edge, Fog and Cloud Computing Environments.  It's a simple python based software solution, where academics or industrialists  can develop, simulate, test and deploy their scheduling policies. 
 
