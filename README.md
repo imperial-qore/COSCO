@@ -51,7 +51,7 @@ python3 main.py
 ```
 
 ## Gitpod
-You can directly run tests on the results using a Gitpod Workspace without needing to install anything on your local machine. Click "Open in Gitpod" below:
+You can directly run tests on the results using a Gitpod Workspace without needing to install anything on your local machine. Click "Open in Gitpod" below and test the code by running `python3 main.py`.
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/imperial-qore/COSCO/)
 
