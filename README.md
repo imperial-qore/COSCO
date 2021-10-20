@@ -97,7 +97,7 @@ Our work is published in IEEE TPDS journal https://ieeexplore.ieee.org/document/
 
 ## Other extensions
 
-The COSCO framework has been used for a wide range of research topics including sustainable computing ([1](https://arxiv.org/abs/2110.05529)), distributed AI ([1](https://arxiv.org/abs/2110.04841)) and EdgeAI ([1](https://arxiv.org/abs/2110.02912)).
+The COSCO framework has been used for a wide range of research topics including sustainable computing ([JSS '21](https://arxiv.org/abs/2110.05529)) and EdgeAI ([SIGMETRICS '21](https://arxiv.org/abs/2110.04841), [CoRR '21](https://arxiv.org/abs/2110.02912)).
 
 ## License
 
