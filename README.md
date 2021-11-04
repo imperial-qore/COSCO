@@ -87,7 +87,7 @@ Our work is published in IEEE TPDS journal https://ieeexplore.ieee.org/document/
 @article{tuli2021cosco,
   author={Tuli, Shreshth and Poojara, Shivananda R. and Srirama, Satish N. and Casale, Giuliano and Jennings, Nicholas R.},
   journal={IEEE Transactions on Parallel and Distributed Systems}, 
-  title={COSCO: Container Orchestration Using Co-Simulation and Gradient Based Optimization for Fog Computing Environments}, 
+  title={{COSCO: Container Orchestration Using Co-Simulation and Gradient Based Optimization for Fog Computing Environments}}, 
   year={2022},
   volume={33},
   number={1},
