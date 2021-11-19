@@ -17,3 +17,4 @@ joblib==0.17.0
 cython
 SciencePlots
 seaborn
+tqdm
