@@ -46,6 +46,8 @@ The basic architecture of COSCO has two main packages: <br>
 **Simulator:** It's a discrete event simulator and runs in a standalone system. <br>
 **Framework:** It’s a kind of tool to test the scheduling algorithms in a physical(real time) fog/cloud environment with real world applications.
 
+Supported workloads: (Simulator) [BitBrains](http://gwa.ewi.tudelft.nl/datasets/gwa-t-12-bitbrains) and [Azure2017/2019](https://github.com/Azure/AzurePublicDataset); (Framework) [DeFog](https://github.com/qub-blesson/DeFog) and [AIoTBench](https://www.benchcouncil.org/aibench/aiotbench/index.html).
+
 ## Novel Scheduling Algorithms
 We present two novel algorithms in this work: GOBI and GOBI*. GOBI uses a neural network as a surrogate model and gradient based optimization using backpropagation of gradients to input. With advances like cosine annealing and momentum allow us to converge to an optima quickly. Moreover, GOBI* leverages a coupled simulation engine like a digital-twin to further improve the surrogate accuracy and subsequently the scheduling decisions. Experiments conducted using real-world data on fog applications using the GOBI and GOBI* methods, show a significant improvement in terms of energy consumption, response time, Service Level Objective and scheduling time by up to 15, 40, 4, and 82 percent respectively when compared to the state-of-the-art algorithms.
 
@@ -60,7 +62,7 @@ To run the COSCO framework, install required packages using
 ```bash
 python3 install.py
 ```
-To run the code with the required scheduler, modify line 104 of `main.py` to one of the several options including LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI.
+To run the code with the required scheduler, modify line 106 of `main.py` to one of the several options including LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI.
 ```python
 scheduler = GOBIScheduler('energy_latency_'+str(HOSTS))
 ```
