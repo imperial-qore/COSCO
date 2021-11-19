@@ -1,7 +1,7 @@
 from .Workload import *
-from simulator.container.IPSModels.IPSMBitbrain import *
-from simulator.container.RAMModels.RMBitbrain import *
-from simulator.container.DiskModels.DMBitbrain import *
+from simulator.container.IPSModels.IPSMConstant import *
+from simulator.container.RAMModels.RMConstant import *
+from simulator.container.DiskModels.DMConstant import *
 
 class SWSD(Workload):
 	def __init__(self, num_workloads):
@@ -16,7 +16,7 @@ class SWSD(Workload):
 			IPSModel = IPSMConstant(1000*ipsMultiplier, 1500*ipsMultiplier, 4*ipsMultiplier, interval + 3*ipsMultiplier)
 			ramMultiplier = np.random.randint(1,5)
 			RAMModel = RMConstant(100*ramMultiplier, 50*ramMultiplier, 20*ramMultiplier)
-			diskMultiplier = np.random.randint(1,3)
+			diskMultiplier = np.random.randint(0,1)
 			DiskModel = DMConstant(300*diskMultiplier, 100*diskMultiplier, 120*diskMultiplier)
 			workloadlist.append((CreationID, interval, IPSModel, RAMModel, DiskModel))
 			self.creation_id += 1
