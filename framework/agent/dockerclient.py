@@ -8,6 +8,8 @@ import configparser
 import docker 
 import codes
 import json
+import os
+import subprocess
 
 # Reference: https://docker-py.readthedocs.io/en/stable/api.html
 
@@ -22,7 +24,11 @@ class DockerClient():
         name = config["name"]
         image = config["image"]
         try:
-            containerid = self.dclient.containers.run(image=image, tty=True, detach=True, name=name)
+            if 'shreshthtuli' in image:
+                containerid = self.dclient.containers.run(image=image, tty=True, detach=True, name=name)
+            else:
+                cmd = f"docker run -itd --name {name} shreshthtuli/aiotbench 'python3' 'main.py' '{image}'"
+                cid = subprocess.Popen(cmd, shell=True,stdout=subprocess.PIPE).communicate()[0].decode('utf-8').strip()
         except requests.exceptions.ConnectionError as err:
             rc = codes.FAILED
         return rc, json.dumps({"rc": rc})

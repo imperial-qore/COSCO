@@ -17,6 +17,7 @@ from framework.database.Database import *
 from framework.datacenter.Datacenter_Setup import *
 from framework.datacenter.Datacenter import *
 from framework.workload.DeFogWorkload import *
+from framework.workload.AIoTBenchWorkload import *
 
 # Simulator imports
 from simulator.Simulator import *
@@ -94,7 +95,7 @@ def initalizeEnvironment(environment, logger):
 		datacenter = AzureFog(HOSTS)
 
 	# Initialize workload
-	''' Can be SWSD, BWGD2, Azure2017Workload, Azure2019Workload // DFW '''
+	''' Can be SWSD, BWGD2, Azure2017Workload, Azure2019Workload // DFW, AIoTW '''
 	if environment != '':
 		workload = DFW(NEW_CONTAINERS, 1.5, db)
 	else: 
