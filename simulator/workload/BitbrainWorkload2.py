@@ -25,7 +25,10 @@ class BWGD2(Workload):
 			makedirs(dataset_path)
 			print('Downloading Bitbrain Dataset')
 			url = 'http://gwa.ewi.tudelft.nl/fileadmin/pds/trace-archives/grid-workloads-archive/datasets/gwa-t-12/rnd.zip'
-			filename = wget.download(url); zf = ZipFile(filename, 'r'); zf.extractall(dataset_path); zf.close()
+			url_alternate = 'https://www.dropbox.com/s/xk047xqcq9ue5hc/rnd.zip?dl=1'
+			try: filename = wget.download(url)
+			except: filename = wget.download(url_alternate)
+			zf = ZipFile(filename, 'r'); zf.extractall(dataset_path); zf.close()
 			for f in listdir(dataset_path+'rnd/2013-9/'): shutil.move(dataset_path+'rnd/2013-9/'+f, dataset_path+'rnd/')
 			shutil.rmtree(dataset_path+'rnd/2013-7'); shutil.rmtree(dataset_path+'rnd/2013-8')
 			shutil.rmtree(dataset_path+'rnd/2013-9'); remove(filename)
