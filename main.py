@@ -22,8 +22,9 @@ from framework.workload.DeFogWorkload import *
 from simulator.Simulator import *
 from simulator.environment.AzureFog import *
 from simulator.environment.BitbrainFog import *
-from simulator.workload.BitbrainWorkload_GaussianDistribution import *
 from simulator.workload.BitbrainWorkload2 import *
+from simulator.workload.Azure2017Workload import *
+from simulator.workload.Azure2019Workload import *
 
 # Scheduler imports
 from scheduler.IQR_MMT_Random import IQRMMTRScheduler
@@ -93,7 +94,7 @@ def initalizeEnvironment(environment, logger):
 		datacenter = AzureFog(HOSTS)
 
 	# Initialize workload
-	''' Can be SWSD, BWGD, BWGD2 // DFW '''
+	''' Can be SWSD, BWGD2, Azure2017Workload, Azure2019Workload // DFW '''
 	if environment != '':
 		workload = DFW(NEW_CONTAINERS, 1.5, db)
 	else: 
