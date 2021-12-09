@@ -28,8 +28,7 @@
   </a>
 </div>
 
-
-COSCO is an AI based coupled-simulation and container orchestration framework for integrated Edge, Fog and Cloud Computing Environments.  It's a simple python based software solution, where academics or industrialists  can develop, simulate, test and deploy their scheduling policies. 
+COSCO is an AI based coupled-simulation and container orchestration framework for integrated Edge, Fog and Cloud Computing Environments. It's a simple python based software solution, where academics or industrialists can develop, simulate, test and deploy their scheduling policies. Further, this repo presents a novel gradient-based optimization strategy using deep neural networks as surrogate functions and co-simulations to facilitate decision making.
 
 <img src="https://github.com/imperial-qore/COSCO/blob/master/wiki/COSCO.jpg" width="900" align="middle">
 
@@ -80,11 +79,21 @@ You can directly run tests on the results using a Gitpod Workspace without needi
 ## Wiki
 Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed installation instructions, implementing a custom scheduler and replication of results. All execution traces and training data is available at [Zenodo](https://zenodo.org/record/4897944) under CC License.
 
-## Arxiv preprint
-https://arxiv.org/abs/2104.14392.
+## Links
+| Items | Contents | 
+| --- | --- |
+| **Paper** | https://ieeexplore.ieee.org/document/9448450 (with the "Code Reviewed Badge") |
+| **Pre-print** | https://arxiv.org/pdf/2104.14392.pdf |
+| **Documentation** | https://github.com/imperial-qore/COSCO/wiki |
+| **Video** | https://youtu.be/RZOWTj0rfBQ |
+| **Tutorial** | https://www.youtube.com/playlist?list=PLN_nzHzuaOBQijEwy2Fy8c09-dWYVe4XO | 
+| **Repository** | https://github.com/imperial-qore/COSCO |
+| **Extensions** | Energy aware sustainable computing ([JSS'21](https://www.sciencedirect.com/science/article/abs/pii/S0164121221002211), [code](https://github.com/imperial-qore/COSCO/tree/ggcn)), EdgeAI ([SIGMETRICS'21](https://arxiv.org/abs/2110.04841)) and fault-tolerance ([Infocom'22](https://arxiv.org/abs/2112.02292), [code](https://github.com/imperial-qore/PreGAN)) |
+| **Contact**| Shreshth Tuli ([@shreshthtuli](https://github.com/shreshthtuli))  |
+| **Funding**| Imperial President's scholarship, H2020-825040 (RADON) |
 
 ## Cite this work
-Our work is published in IEEE TPDS journal https://ieeexplore.ieee.org/document/9448450/. The code available with this paper has been peer reviewed (see "Code Reviewed" badge at the IEEE Xplore page).
+Our work is published in IEEE TPDS journal. Cite using the following bibtex entry.
 ```bibtex
 @article{tuli2021cosco,
   author={Tuli, Shreshth and Poojara, Shivananda R. and Srirama, Satish N. and Casale, Giuliano and Jennings, Nicholas R.},
@@ -96,11 +105,6 @@ Our work is published in IEEE TPDS journal https://ieeexplore.ieee.org/document/
   pages={101-116},
 }
 ```
-
-## Other extensions
-
-The COSCO framework has been used for a wide range of research topics including sustainable computing ([JSS '21](https://arxiv.org/abs/2110.05529)), EdgeAI ([SIGMETRICS '21](https://arxiv.org/abs/2110.04841), [NeurIPS '21](https://arxiv.org/abs/2110.02912)) and fault-tolerance ([Infocom '22](https://arxiv.org/abs/2112.02292)).
-
 ## License
 
 BSD-3-Clause. 
