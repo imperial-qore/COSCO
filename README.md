@@ -7,10 +7,10 @@
 ![Docker pulls pocketsphinx](https://img.shields.io/docker/pulls/shreshthtuli/pocketsphinx?label=docker%20pulls%3A%20pocketsphinx)
 ![Docker pulls aeneas](https://img.shields.io/docker/pulls/shreshthtuli/aeneas?label=docker%20pulls%3A%20aeneas)
 
-# Supplementary to the Workflow scheduling submission
+# MCDS
 
 ## Novel Scheduling Algorithms
-We present a novel algorithm in this work: MCDS. MCDS uses a deep surrogate model with monte carlo learning to develop a long-term QoS estimate. MCDS uses gradient based optimization to converge to near-optimal scheduling decisions.
+We present a novel algorithm in this work: MCDS. MCDS uses Monte-Carlo simulations and a deep surrogate model with monte carlo learning to develop a long-term QoS estimate. MCDS uses gradient based optimization to converge to near-optimal scheduling decisions.
 
 ## Quick Start Guide
 To run the COSCO framework, install required packages using
@@ -29,6 +29,17 @@ python3 main.py
 
 ## Wiki
 Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed installation instructions, implementing a custom scheduler and replication of results. All execution traces and training data is available at [Zenodo](https://zenodo.org/record/4897944) under CC License.
+
+## Cite this work
+Our work is published in IEEE TPDS journal. Cite using the following bibtex entry.
+```bibtex
+@article{tuli2021cosco,
+  author={Tuli, Shreshth and Casale, Giuliano and Jennings, Nicholas R.},
+  journal={IEEE Transactions on Parallel and Distributed Systems}, 
+  title={{MCDS: AI Augmented Workflow Scheduling in Mobile Edge Cloud Computing Systems}}, 
+  year={2022},
+}
+```
 
 ## License
 
