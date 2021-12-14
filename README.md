@@ -12,6 +12,10 @@
    <a href="https://github.com/imperial-qore/COSCO/actions">
     <img src="https://github.com/imperial-qore/SimpleFogSim/workflows/DeFog-Benchmarks/badge.svg" alt="Actions Status">
   </a>
+  </a>
+   <a href="https://doi.org/10.5281/zenodo.4897944">
+    <img src="https://zenodo.org/badge/DOI/10.5281/zenodo.4897944.svg" alt="Zenodo">
+  </a>
  <br>
    <a>
     <img src="https://img.shields.io/docker/pulls/shreshthtuli/yolo?label=docker%20pulls%3A%20yolo" alt="Docker pulls yolo">
