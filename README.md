@@ -9,7 +9,7 @@
 
 # MCDS
 
-## Novel Scheduling Algorithms
+## Novel Scheduling Algorithm
 We present a novel algorithm in this work: MCDS. MCDS uses Monte-Carlo simulations and a deep surrogate model with monte carlo learning to develop a long-term QoS estimate. MCDS uses gradient based optimization to converge to near-optimal scheduling decisions.
 
 ## Quick Start Guide
