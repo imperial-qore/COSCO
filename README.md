@@ -51,7 +51,7 @@ The basic architecture of COSCO has two main packages: <br>
 
 Supported workloads: (Simulator) [Bitbrains](http://gwa.ewi.tudelft.nl/datasets/gwa-t-12-bitbrains) and [Azure2017/2019](https://github.com/Azure/AzurePublicDataset); (Framework) [DeFog](https://github.com/qub-blesson/DeFog) and [AIoTBench](https://www.benchcouncil.org/aibench/aiotbench/index.html).
 
-Our main COSCO work uses the Bitbrains and DeFog workloads. An extended work, MCDS (see `workflow` branch), accepted in IEEE TPDS uses scientific workflows. Check [paper]() and [code](https://github.com/imperial-qore/COSCO/tree/workflow).
+Our main COSCO work uses the Bitbrains and DeFog workloads. An extended work, MCDS (see `workflow` branch), accepted in IEEE TPDS uses scientific workflows. Check [paper](https://arxiv.org/abs/2112.07269) and [code](https://github.com/imperial-qore/COSCO/tree/workflow).
 
 ## Novel Scheduling Algorithms
 We present two novel algorithms in this work: GOBI and GOBI*. GOBI uses a neural network as a surrogate model and gradient based optimization using backpropagation of gradients to input. With advances like cosine annealing and momentum allow us to converge to an optima quickly. Moreover, GOBI* leverages a coupled simulation engine like a digital-twin to further improve the surrogate accuracy and subsequently the scheduling decisions. Experiments conducted using real-world data on fog applications using the GOBI and GOBI* methods, show a significant improvement in terms of energy consumption, response time, Service Level Objective and scheduling time by up to 15, 40, 4, and 82 percent respectively when compared to the state-of-the-art algorithms.
