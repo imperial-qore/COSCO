@@ -7,7 +7,7 @@
 ![Docker pulls pocketsphinx](https://img.shields.io/docker/pulls/shreshthtuli/pocketsphinx?label=docker%20pulls%3A%20pocketsphinx)
 ![Docker pulls aeneas](https://img.shields.io/docker/pulls/shreshthtuli/aeneas?label=docker%20pulls%3A%20aeneas)
 
-# Supplementary for th GOSH paper
+# GOSH
 
 ## Novel Scheduling Algorithms
 We present two novel algorithms in this work: GOSH and GOSH*. GOSH uses heteroscedastic deep surrogate model with uncertainty based exploration and higher-order optimization to quickly converge to near optimal scheduling decisions. GOSH* is the co-simulator based extension of GOSH.
@@ -30,6 +30,17 @@ python3 main.py
 
 ## Wiki
 Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed installation instructions, implementing a custom scheduler and replication of results. All execution traces and training data is available at [Zenodo](https://zenodo.org/record/4897944) under CC License.
+
+## Cite this work
+Our work is published in IEEE TPDS journal. Cite using the following bibtex entry.
+```bibtex
+@article{tuli2021gosh,
+  author={Tuli, Shreshth and Casale, Giuliano and Jennings, Nicholas R.},
+  journal={IEEE Transactions on Parallel and Distributed Systems}, 
+  title={{GOSH: Task Scheduling using Deep Surrogate Models in Fog Computing Environments}}, 
+  year={2022},
+}
+```
 
 ## License
 
