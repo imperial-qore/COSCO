@@ -33,7 +33,7 @@ Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed inst
 ## Cite this work
 Our work is published in IEEE TPDS journal. Cite using the following bibtex entry.
 ```bibtex
-@article{tuli2021cosco,
+@article{tuli2021mcds,
   author={Tuli, Shreshth and Casale, Giuliano and Jennings, Nicholas R.},
   journal={IEEE Transactions on Parallel and Distributed Systems}, 
   title={{MCDS: AI Augmented Workflow Scheduling in Mobile Edge Cloud Computing Systems}}, 
