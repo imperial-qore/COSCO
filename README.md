@@ -100,14 +100,11 @@ Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed inst
 ## Cite this work
 Our work is published in IEEE TPDS journal. Cite using the following bibtex entry.
 ```bibtex
-@article{tuli2021cosco,
-  author={Tuli, Shreshth and Poojara, Shivananda R. and Srirama, Satish N. and Casale, Giuliano and Jennings, Nicholas R.},
-  journal={IEEE Transactions on Parallel and Distributed Systems}, 
-  title={{COSCO: Container Orchestration Using Co-Simulation and Gradient Based Optimization for Fog Computing Environments}}, 
-  year={2022},
-  volume={33},
-  number={1},
-  pages={101-116},
+@article{tuli2022tranad,
+  title={TranAD: Deep Transformer Networks for Anomaly Detection in Multivariate Time Series Data},
+  author={Tuli, Shreshth and Casale, Giuliano and Jennings, Nicholas R},
+  journal={arXiv preprint arXiv:2201.07284},
+  year={2022}
 }
 ```
 ## License
