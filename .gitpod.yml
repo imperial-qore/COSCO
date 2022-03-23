@@ -11,3 +11,5 @@ tasks:
 ports:
   - port: 8081
     onOpen: open-preview
+  - port: 8086
+    onOpen: open-preview
