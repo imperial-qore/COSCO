@@ -10,6 +10,6 @@ tasks:
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
 ports:
   - port: 8081
-    onOpen: open-preview
+    onOpen: ignore
   - port: 8086
-    onOpen: open-preview
+    onOpen: ignore
