@@ -6,6 +6,7 @@ tasks:
       pip install torch==1.7.1+cpu torchvision==0.8.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
       pip install ansible
       sudo apt install influxdb
+      sudo service influxdb restart
     command: echo 'start script'
 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
