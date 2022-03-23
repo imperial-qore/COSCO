@@ -111,6 +111,9 @@ def initalizeEnvironment(environment, logger):
 		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
 	else:
 		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
+	
+	# Initialize stats
+	stats = Stats(env, workload, datacenter, scheduler)
 
 	# Execute first step
 	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
@@ -125,8 +128,6 @@ def initalizeEnvironment(environment, logger):
 	print("Schedule:", env.getActiveContainerList())
 	printDecisionAndMigrations(decision, migrations)
 
-	# Initialize stats
-	stats = Stats(env, workload, datacenter, scheduler)
 	stats.saveStats(deployed, migrations, [], deployed, decision, schedulingTime)
 	return datacenter, workload, scheduler, env, stats
 
