@@ -11,5 +11,7 @@ tasks:
 ports:
   - port: 8081
     onOpen: ignore
+    visibility: public
   - port: 8086
     onOpen: ignore
+    visibility: public
