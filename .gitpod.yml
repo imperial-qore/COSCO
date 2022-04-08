@@ -7,6 +7,7 @@ tasks:
       pip install ansible
       sudo apt install influxdb
       sudo service influxdb restart
+      chmod 400 ./framework/install_scripts/ssh_keys/id_rsa
     command: echo 'start script'
 
 # List the ports to expose. Learn more https://www.gitpod.io/docs/config-ports/
