@@ -32,7 +32,7 @@
   </a>
 </div>
 
-COSCO is an AI based coupled-simulation and container orchestration framework for integrated Edge, Fog and Cloud Computing Environments. It's a simple python based software solution, where academics or industrialists can develop, simulate, test and deploy their scheduling policies. Further, this repo presents a novel gradient-based optimization strategy using deep neural networks as surrogate functions and co-simulations to facilitate decision making.
+COSCO is an AI based coupled-simulation and container orchestration framework for integrated Edge, Fog and Cloud Computing Environments. It's a simple python based software solution, where academics or industrialists can develop, simulate, test and deploy their scheduling policies. Further, this repo presents a novel gradient-based optimization strategy using deep neural networks as surrogate functions and co-simulations to facilitate decision making. A tutorial of the COSCO framework was presented at the International Conference of Performance Engineering (ICPE) 2022. Recording available [here](https://youtu.be/osjpaNmkm_w).
 
 <img src="https://github.com/imperial-qore/COSCO/blob/master/wiki/COSCO.jpg" width="900" align="middle">
 
@@ -93,6 +93,7 @@ Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed inst
 | **Documentation** | https://github.com/imperial-qore/COSCO/wiki |
 | **Video** | https://youtu.be/RZOWTj0rfBQ |
 | **Tutorial** | https://www.youtube.com/playlist?list=PLN_nzHzuaOBQijEwy2Fy8c09-dWYVe4XO | 
+| **ICPE Tutorial** | https://youtu.be/osjpaNmkm_w |
 | **Extensions** | QoS aware scheduling ([TPDS'22](https://arxiv.org/abs/2112.07269), [code](https://github.com/imperial-qore/COSCO/tree/workflow)), Energy aware sustainable computing ([JSS'21](https://www.sciencedirect.com/science/article/abs/pii/S0164121221002211), [code](https://github.com/imperial-qore/COSCO/tree/ggcn)), EdgeAI ([SIGMETRICS'21](https://arxiv.org/abs/2110.04841), [NeurIPS'21](https://arxiv.org/abs/2110.02912)) and fault-tolerance ([Infocom'22](https://arxiv.org/abs/2112.02292), [code](https://github.com/imperial-qore/PreGAN)) |
 | **Contact**| Shreshth Tuli ([@shreshthtuli](https://github.com/shreshthtuli))  |
 | **Funding**| Imperial President's scholarship, H2020-825040 (RADON) |
