@@ -94,7 +94,7 @@ Access the [wiki](https://github.com/imperial-qore/COSCO/wiki) for detailed inst
 | **Video** | https://youtu.be/RZOWTj0rfBQ |
 | **Tutorial** | https://www.youtube.com/playlist?list=PLN_nzHzuaOBQijEwy2Fy8c09-dWYVe4XO | 
 | **ICPE Tutorial** | https://youtu.be/osjpaNmkm_w |
-| **Extensions** | QoS aware scheduling ([TPDS'22](https://arxiv.org/abs/2112.07269), [code](https://github.com/imperial-qore/COSCO/tree/workflow)), Energy aware sustainable computing ([JSS'21](https://www.sciencedirect.com/science/article/abs/pii/S0164121221002211), [code](https://github.com/imperial-qore/COSCO/tree/ggcn)), EdgeAI ([SIGMETRICS'21](https://arxiv.org/abs/2110.04841), [NeurIPS'21](https://arxiv.org/abs/2110.02912)) and fault-tolerance ([Infocom'22](https://arxiv.org/abs/2112.02292), [code](https://github.com/imperial-qore/PreGAN)) |
+| **Extensions** | QoS aware scheduling ([TPDS'22](https://arxiv.org/abs/2112.07269), [code](https://github.com/imperial-qore/COSCO/tree/workflow)), Energy aware sustainable computing ([JSS'21](https://www.sciencedirect.com/science/article/abs/pii/S0164121221002211), [code](https://github.com/imperial-qore/COSCO/tree/ggcn)), EdgeAI ([SIGMETRICS'21 Poster](https://arxiv.org/abs/2110.04841), [NeurIPS'21 Workshop](https://arxiv.org/abs/2110.02912)) and fault-tolerance ([INFOCOM'22](https://arxiv.org/abs/2112.02292), [code](https://github.com/imperial-qore/PreGAN)) |
 | **Contact**| Shreshth Tuli ([@shreshthtuli](https://github.com/shreshthtuli))  |
 | **Funding**| Imperial President's scholarship, H2020-825040 (RADON) |
 
