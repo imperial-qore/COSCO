@@ -31,6 +31,8 @@ class Container():
 		hostBaseIPS = self.getHost().getBaseIPS()
 		hostIPSCap = self.getHost().ipsCap
 		canUseIPS = (hostIPSCap - hostBaseIPS) / len(self.env.getContainersOfHost(self.hostid))
+		if canUseIPS < 0:
+			return 0
 		return min(self.ipsmodel.getMaxIPS(), self.getBaseIPS() + canUseIPS)
 
 	def getRAM(self):
