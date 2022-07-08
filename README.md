@@ -27,7 +27,7 @@
     <img src="https://img.shields.io/docker/pulls/shreshthtuli/aeneas?label=docker%20pulls%3A%20aeneas" alt="Docker pulls aeneas">
   </a>
  <br>
-   <a href="https://gitpod.io/#https://github.com/imperial-qore/COSCO/">
+   <a href="https://gitpod.io/#https://github.com/uttkarshraj1/COSCO-uttkarsh/">
     <img src="https://gitpod.io/button/open-in-gitpod.svg" alt="Open in gitpod">
   </a>
 </div>
