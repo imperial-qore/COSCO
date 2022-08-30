@@ -125,9 +125,9 @@ def plot_accuracies(accuracy_list, data_type):
 	plt.clf()
 	plt.xlabel('Epochs')
 	plt.ylabel('Testing Loss')
-	a, b, c = reduce(trainAcc)
+	a, b, c = reduce(testAcc)
 	b2, _, _ = reduce(b); c2, _, _ = reduce(c)
-	plt.fill_between(np.arange(len(trainAcc)), b2, c2, color='lightgreen', alpha=.5)
+	plt.fill_between(np.arange(len(testAcc)), b2, c2, color='lightgreen', alpha=.5)
 	plt.plot(a, label='Testing Loss', alpha = 0.7, color='g',\
 	    linewidth = 1, linestyle='-')
 	plt.savefig('graphs/'+data_type+'/reduced.pdf')
