@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 import scipy
 import warnings
+import scienceplots
 
 warnings.simplefilter("ignore")
 
