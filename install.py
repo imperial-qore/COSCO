@@ -1,7 +1,13 @@
-from sys import version
+from sys import version_info
 from utils.ColorUtils import *
 
-if float(version[0:3]) < 3.6:
+# Check Python major version
+if version_info[0] != 3:
+	print(color.FAIL+'Python 3 is required!'+color.ENDC)
+	exit()
+
+# Check Python minor version
+if version_info[1] < 6:
 	print(color.FAIL+'Python 3.6 or above required!'+color.ENDC)
 	exit()
 

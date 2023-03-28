@@ -183,5 +183,5 @@ class Scheduler():
             maxFullHost = max(hostIPSs)
             decision.append((cid, maxFullHost[1]))
             if len(hostIPSs) > 1:
-                hostIPSs.remove(leastFullHost)
+                hostIPSs.remove(maxFullHost)
         return decision
