@@ -149,17 +149,17 @@ for ylabel in yLabelsStatic:
 		stats = all_stats[model]
 		# Major metrics
 		if ylabel == 'Total Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d), 0
 		if ylabel == 'Average Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = np.sum(d)/np.sum(d2), 0
 		if ylabel == 'Interval Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([0])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d), mean_confidence_interval(d)
 		if ylabel == 'Average Interval Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([0])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = np.mean(d[d2>0]/d2[d2>0]), mean_confidence_interval(d[d2>0]/d2[d2>0])
 		if ylabel == 'Number of completed tasks':
@@ -366,14 +366,14 @@ for ylabel in yLabelsStatic:
 		stats = all_stats[model]
 		# Major metrics
 		if ylabel == 'Average Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = d[d2>0]/d2[d2>0], 0
 		if ylabel == 'Interval Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([0])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 		if ylabel == 'Average Interval Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([0])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = d[d2>0]/d2[d2>0], mean_confidence_interval(d[d2>0]/d2[d2>0])
 		if ylabel == 'Number of completed tasks per interval':
@@ -494,10 +494,10 @@ for ylabel in yLabelsStatic:
 		stats = all_stats[model]
 		# Major metrics
 		if ylabel == 'Interval Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([0])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([0])
 			Data[ylabel][model], CI[ylabel][model] = d, mean_confidence_interval(d)
 		if ylabel == 'Average Interval Energy (Kilowatt-hr)':
-			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000 if stats else np.array([0])
+			d = np.array([i['energytotalinterval'] for i in stats.metrics])/1000/3600 if stats else np.array([0])
 			d2 = np.array([i['numdestroyed'] for i in stats.metrics]) if stats else np.array([1])
 			Data[ylabel][model], CI[ylabel][model] = d/(d2+0.001), mean_confidence_interval(d/(d2+0.001))
 		if ylabel == 'Number of completed tasks':
