@@ -32,7 +32,7 @@ class PONDScheduler(Scheduler):
 		return weight
 
 	def get_last_value(self):
-		if not self.env.stats: return 0
+		if not self.env.stats or not self.env.stats.metrics: return 0
 		energy = self.env.stats.metrics[-1]['energytotalinterval']
 		all_energies = [e['energytotalinterval'] for e in self.env.stats.metrics[-20:]]
 		all_latencies = [e['avgresponsetime'] for e in self.env.stats.metrics[-20:]]
