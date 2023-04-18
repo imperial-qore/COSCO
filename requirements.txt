@@ -13,7 +13,8 @@ pytz==2020.1
 scipy==1.5.2
 six==1.15.0
 wget==3.2
-joblib==0.17.0
+# joblib==0.17.0
+joblib>=1.1.1
 cython
 SciencePlots
 seaborn

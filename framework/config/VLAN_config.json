@@ -3,55 +3,65 @@
 		"ip": "127.0.0.1",
 		"port":8086},
 	"vlan" : {
-		"uname" : "ansible",
+		"uname" : "erfan",
 		"servers" : [
 			{
-				"ip" : "40.120.48.202",
+				"ip" : "87.247.185.177",
+				"pass": "cE19pqlg",
 				"cpu" : 2,
 				"powermodel": "PMB2s"
 			},
 			{
-				"ip" : "52.151.65.50",
+				"ip" : "87.247.185.64",
+				"pass": "1Q9CoHPu",
 				"cpu" : 2,
 				"powermodel": "PMB2s"
 			},
 			{
-				"ip" : "52.151.71.102",
+				"ip" : "87.247.187.152",
+				"pass" : "VHeN9L1X",
 				"cpu" : 2,
 				"powermodel": "PMB2s"
 			},
 			{
-				"ip" : "52.151.70.150",
+				"ip" : "87.247.184.226",
+				"pass" : "5JlpodI2",
 				"cpu" : 2,
 				"powermodel": "PMB2s"
 			},
 			{
-				"ip" : "51.143.158.189",
+				"ip" : "87.247.184.216",
+				"pass" : "w25dUdNq",
 				"cpu" : 4,
 				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "51.141.235.163",
+				"ip" : "87.247.187.189",
+				"pass" : "6HPQqre2",
 				"cpu" : 4,
 				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "40.88.7.64",
+				"ip" : "87.247.187.141",
+				"pass" : "SO1CY5FA",
 				"cpu" : 4,
 				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "40.88.144.160",
+				"ip" : "87.247.184.128",
+				"pass" : "p4LIO8Rd",
 				"cpu" : 4,
 				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "52.142.12.155",
+				"ip" : "87.247.184.197",
+				"pass" : "3kUA4gxY",
 				"cpu" : 8,
 				"powermodel": "PMB8ms"
 			},
 			{
-				"ip" : "40.88.32.92",
+				"ip" : "87.247.188.226",
+				"pass" : "0Ka6ZKNj",
 				"cpu" : 8,
 				"powermodel": "PMB8ms"
 			}

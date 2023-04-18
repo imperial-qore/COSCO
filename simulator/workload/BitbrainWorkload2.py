@@ -48,8 +48,18 @@ class BWGD2(Workload):
 			index = self.possible_indices[randint(0,len(self.possible_indices)-1)]
 			df = pd.read_csv(self.dataset_path+'rnd/'+str(index)+'.csv', sep=';\t')
 			sla = gauss(self.meanSLA, self.sigmaSLA)
-			IPSModel = IPSMBitbrain((ips_multiplier*df['CPU usage [MHZ]']).to_list(), (ips_multiplier*df['CPU capacity provisioned [MHZ]']).to_list()[0], int(1.2*sla), interval + sla)
-			RAMModel = RMBitbrain((df['Memory usage [KB]']/4000).to_list(), (df['Network received throughput [KB/s]']/1000).to_list(), (df['Network transmitted throughput [KB/s]']/1000).to_list())
+			IPSModel = IPSMBitbrain(
+				(ips_multiplier*df['CPU usage [MHZ]']).to_list(),
+				(ips_multiplier*df['CPU capacity provisioned [MHZ]']).to_list()[0],
+				int(1.2*sla), 
+				interval + sla
+			)
+
+			RAMModel = RMBitbrain(
+				(df['Memory usage [KB]']/4000).to_list(), 
+				(df['Network received throughput [KB/s]']/1000).to_list(), 
+				(df['Network transmitted throughput [KB/s]']/1000).to_list()
+			)
 			disk_size  = self.disk_sizes[index % len(self.disk_sizes)]
 			DiskModel = DMBitbrain(disk_size, (df['Disk read throughput [KB/s]']/4000).to_list(), (df['Disk write throughput [KB/s]']/12000).to_list())
 			workloadlist.append((CreationID, interval, IPSModel, RAMModel, DiskModel))

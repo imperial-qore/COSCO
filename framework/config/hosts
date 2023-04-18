@@ -1,11 +1,11 @@
 [agents]
-51.145.102.71 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-20.49.186.194 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-51.11.145.199 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-51.11.145.24 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-51.132.237.3 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-51.11.148.95 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-104.211.28.29 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-40.114.36.185 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-52.249.252.28 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-40.121.43.239 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+87.247.185.177 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.185.64 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.187.152 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.184.226 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.184.216 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.187.189 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.187.141 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.184.128 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.184.197 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
+87.247.188.226 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan
