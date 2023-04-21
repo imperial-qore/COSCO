@@ -45,12 +45,12 @@ def setupVLANEnvironment(cfg, mode):
         with open("framework/config/hosts", "w") as f:
             f.write("[agents]\n")
             for ip in HOST_IPS:
-                # f.write(ip+" ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible\n")
-                f.write(ip+" ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=erfan\n")
+                f.write(ip+" ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible\n")
+                #f.write(ip+" ansible_slssh_private_key_file=~/id_rsa ansible_ssh_user=erfan\n")
         run_cmd_pwd("cp framework/config/hosts /etc/ansible/hosts", password)
         run_cmd_pwd("cp framework/config/ansible.cfg /etc/ansible/ansible.cfg", password)
-        run_cmd("ansible-playbook framework/config/VLAN_ansible.yml")
-    uname = "erfan"
+        run_cmd_pwd("ansible-playbook -i framework/config/hosts framework/config/VLAN_ansible.yml", password)
+    uname = "ansible"
     for ip in HOST_IPS:
         res = os.system("ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa "+uname+"@"+ip+" /home/ansible/agent/scripts/delete.sh > /dev/null 2>&1")  
         res = os.system("ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa "+uname+"@"+ip+" sudo service docker restart > /dev/null 2>&1")

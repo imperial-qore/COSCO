@@ -6,6 +6,12 @@ class Database():
         self.host = influxdb_host
         self.port = influxdb_port
         self.conn = InfluxDBClient(host=self.host, port=self.port)
+
+        print("\n\n\\n\n\n\n\n here \n\n\n\n\n\n\n")
+
+        # while(1):
+        #     print("here is a test")
+
         self.conn.drop_database(self.db_name)
         self.db = self.create(self.conn,self.db_name)
 

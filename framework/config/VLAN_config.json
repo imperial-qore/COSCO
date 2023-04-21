@@ -1,9 +1,9 @@
 {
 	"database" : {
 		"ip": "127.0.0.1",
-		"port":8086},
+		"port":3456},
 	"vlan" : {
-		"uname" : "erfan",
+		"uname" : "ansible",
 		"servers" : [
 			{
 				"ip" : "87.247.185.177",
@@ -48,8 +48,8 @@
 				"powermodel": "PMB4ms"
 			},
 			{
-				"ip" : "87.247.184.128",
-				"pass" : "p4LIO8Rd",
+				"ip" : "87.247.185.73",
+				"pass" : "yw0paxi7",
 				"cpu" : 4,
 				"powermodel": "PMB4ms"
 			},
