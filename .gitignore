@@ -137,3 +137,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 todo.txt
+framework/install_scripts/ssh_keys/id_rsa

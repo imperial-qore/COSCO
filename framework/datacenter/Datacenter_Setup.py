@@ -32,13 +32,18 @@ def run_cmd_pwd(cmd, password):
 def run_cmd(cmd):
     os.system("bash -c \""+cmd+"\"")
 
+def run_cmd_in_venv(cmd: str) -> None:
+    os.system(f"{cmd}")
+
 def setupVLANEnvironment(cfg, mode):
     with open(cfg, "r") as f:
         config = json.load(f)
     HOST_IPS = [server['ip'] for server in config['vlan']['servers']]
     if mode in [0, 1]:
         MAIN_DIR = os.getcwd().replace('\\', '/').replace('C:', '/mnt/c')
-        password = getpass(color.BOLD+'Please enter linux password:'+color.ENDC)
+        
+        # password = getpass(color.BOLD+'Please enter linux password:'+color.ENDC)
+        password = "451379"
         run_cmd_pwd("rm /etc/ansible/hosts", password)
         run_cmd_pwd("cp framework/install_scripts/ssh_keys/id_rsa ~/id_rsa", password)
         run_cmd_pwd("cp framework/install_scripts/ssh_keys/id_rsa.pub ~/id_rsa.pub", password)
@@ -48,7 +53,7 @@ def setupVLANEnvironment(cfg, mode):
                 f.write(ip+" ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible\n")
         run_cmd_pwd("cp framework/config/hosts /etc/ansible/hosts", password)
         run_cmd_pwd("cp framework/config/ansible.cfg /etc/ansible/ansible.cfg", password)
-        run_cmd_pwd("ansible-playbook -i framework/config/hosts framework/config/VLAN_ansible.yml", password)
+        run_cmd_pwd("ansible-playbook -i framework/config/hosts framework/config/VLAN_ansible.yml -v", password)
     uname = "ansible"
     for ip in HOST_IPS:
         res = os.system("ssh -o StrictHostKeyChecking=no -i framework/install_scripts/ssh_keys/id_rsa "+uname+"@"+ip+" /home/ansible/agent/scripts/delete.sh > /dev/null 2>&1")  
