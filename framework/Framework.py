@@ -26,8 +26,6 @@ class Framework():
 		self.logger = logger
 		self.stats = None
 		self.environment = env
-		print("framework setup")
-		exit()
 		self.controller = RequestHandler(self.db, self)
 		self.addHostlistInit(hostinit)
 		self.globalStartTime = time()

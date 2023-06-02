@@ -13,6 +13,7 @@
     become: yes
     wait_for_connection:
       timeout: 200
+      
   # Add id_rsa to authorized keys
   - name: Setup | authorized key upload
     authorized_key: user={{ username }}
