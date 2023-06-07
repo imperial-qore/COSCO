@@ -6,64 +6,54 @@
 		"uname" : "ansible",
 		"servers" : [
 			{
-				"ip" : "87.247.185.177",
-				"pass": "cE19pqlg",
+				"ip" : "91.246.44.159",
 				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.185.64",
-				"pass": "1Q9CoHPu",
+				"ip" : "91.246.44.165",
 				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.187.152",
-				"pass" : "VHeN9L1X",
+				"ip" : "91.246.44.154",
 				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.184.226",
-				"pass" : "5JlpodI2",
+				"ip" : "91.246.44.164",
 				"cpu" : 2,
-				"powermodel": "PMB2s"
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.184.216",
-				"pass" : "w25dUdNq",
-				"cpu" : 4,
-				"powermodel": "PMB4ms"
+				"ip" : "91.246.44.175",
+				"cpu" : 2,
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.187.189",
-				"pass" : "6HPQqre2",
-				"cpu" : 4,
-				"powermodel": "PMB4ms"
+				"ip" : "91.246.44.171",
+				"cpu" : 2,
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.187.141",
-				"pass" : "SO1CY5FA",
-				"cpu" : 4,
-				"powermodel": "PMB4ms"
+				"ip" : "91.246.44.181",
+				"cpu" : 2,
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.185.73",
-				"pass" : "yw0paxi7",
-				"cpu" : 4,
-				"powermodel": "PMB4ms"
+				"ip" : "91.246.44.168",
+				"cpu" : 2,
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.184.197",
-				"pass" : "3kUA4gxY",
-				"cpu" : 8,
-				"powermodel": "PMB8ms"
+				"ip" : "91.246.44.211",
+				"cpu" : 2,
+				"powermodel": "B2s"
 			},
 			{
-				"ip" : "87.247.188.226",
-				"pass" : "0Ka6ZKNj",
-				"cpu" : 8,
-				"powermodel": "PMB8ms"
+				"ip" : "91.246.44.185",
+				"cpu" : 2,
+				"powermodel": "B2s"
 			}
 		]
 	}

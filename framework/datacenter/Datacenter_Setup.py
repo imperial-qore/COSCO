@@ -32,8 +32,8 @@ def run_cmd_pwd(cmd, password):
 def run_cmd(cmd):
     os.system("bash -c \""+cmd+"\"")
 
-def run_cmd_in_venv(cmd: str) -> None:
-    os.system(f"{cmd}")
+def run_cmd_pwd_venv(cmd, password) -> None:
+    os.system("\"echo "+password+" | sudo -S "+cmd+" &> /dev/null\"")
 
 def setupVLANEnvironment(cfg, mode):
     with open(cfg, "r") as f:

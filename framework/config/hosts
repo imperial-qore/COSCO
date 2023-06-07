@@ -1,11 +1,11 @@
 [agents]
-87.247.185.177 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.185.64 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.187.152 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.184.226 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.184.216 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.187.189 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.187.141 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.185.73 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.184.197 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
-87.247.188.226 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.159 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.165 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.154 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.164 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.175 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.171 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.181 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.168 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.211 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
+91.246.44.185 ansible_ssh_private_key_file=~/id_rsa ansible_ssh_user=ansible
