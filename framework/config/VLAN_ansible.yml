@@ -240,14 +240,20 @@
       - sudo systemctl disable systemd-timesyncd
 
   - name: pull yolo
+    tags: ["docker"]
     docker_image:
       name: shreshthtuli/yolo
+      source: pull
   
   - name: pull pocketsphinx
+    tags: ["docker"]
     docker_image:
       name: shreshthtuli/pocketsphinx
+      source: pull
   
   - name: pull aeneas
+    tags: ["docker"]
     docker_image:
       name: shreshthtuli/aeneas
+      source: pull
 
