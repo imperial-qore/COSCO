@@ -50,7 +50,7 @@ class Datacenter():
         for i, data in enumerate(outputHostsData):
             IP = self.hosts[i]
             logging.error("Host details collected from: {}".format(IP))
-            print(color.BOLD+IP+color.ENDC, data)
+            print(color.BOLD+IP+color.ENDC, data)            
             IPS = (instructions * config[self.env.lower()]['servers'][i]['cpu'])/(float(data['clock']) * 1000000) if self.env_type == 'Virtual' else data['MIPS']
             Power = eval(powermodels[i]+"()")
             Ram = RAM(data['Total_Memory'], data['Ram_read'], data['Ram_write'])

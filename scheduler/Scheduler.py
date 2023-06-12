@@ -4,6 +4,7 @@ from utils.MathConstants import *
 import pandas as pd
 from statistics import median
 import numpy as np
+import scienceplots
 
 class Scheduler():
     def __init__(self):

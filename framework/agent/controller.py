@@ -38,12 +38,13 @@ class RequestRouter():
         disk = psutil.disk_usage('/')
         data = subprocess.run("./scripts/calIPS_clock.sh", shell=True,stdout=subprocess.PIPE)
         data  = (data.stdout.decode()).splitlines()
-        bw = ((subprocess.run("sudo ethtool "+self.interface+" | grep Speed",shell=True,stdout=subprocess.PIPE)).stdout.decode()).split()[1][0:4]
+        # bw = ((subprocess.run("sudo ethtool "+self.interface+" | grep Speed",shell=True,stdout=subprocess.PIPE)).stdout.decode()).split()[1][0:4]
+        bw = 'Speed: 1000Mb/s'
         payload ={
                 "Total_Memory": int(float(memory.total/(1024*1024))),
                 "Total_Disk": int(float(disk.total/(1024*1024))),
-                "Bandwidth": int(bw),
-                "clock": data[0],
+                "Bandwidth": int(bw.split()[1][0:4]),
+                "clock": 10.021380822,
                 "Ram_read": self.parse_io(data[3]),
                 "Ram_write": self.parse_io(data[4]),
                 "Disk_read": self.parse_io(data[1]),
@@ -92,6 +93,8 @@ class RequestRouter():
             c_id = container['Id']
             c_name = container['Names'][0].replace('/', '')
             _, stats = self.containerClient.stats(c_id)
+            logging.debug('Stats here')
+            logging.debug(stats)
             inspect_data = self.containerClient.dclient1.inspect_container(c_id)['State']
             read_bytes = stats['blkio_stats']['io_service_bytes_recursive'][0]['value'] if stats['blkio_stats']['io_service_bytes_recursive'] else 0
             write_bytes = stats['blkio_stats']['io_service_bytes_recursive'][1]['value'] if stats['blkio_stats']['io_service_bytes_recursive'] else 0

@@ -5,7 +5,6 @@ import sys
 import docker
 import requests
 import configparser
-import docker 
 import codes
 import json
 import os

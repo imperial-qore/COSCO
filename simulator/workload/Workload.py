@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm import tqdm
 
 class Workload():
 	def __init__(self):
