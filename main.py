@@ -79,77 +79,101 @@ DB_PORT = 0
 HOSTS_IP = []
 logFile = 'COSCO.log'
 
+TRL_TRAINING = True #this boolian is used just for transformer RL training process 
+START_DATA_POINT = 0 if TRL_TRAINING else 250
+END_DATA_POINT = 250 if TRL_TRAINING else 500
+TRL_TRAINING_STEPS = 100000
+
 if len(sys.argv) > 1:
 	with open(logFile, 'w'): os.utime(logFile, None)
 
 def initalizeEnvironment(environment, logger):
-	if environment != '':
-		# Initialize the db
-		db = Database(DB_NAME, DB_HOST, DB_PORT)
-
-	# Initialize simple fog datacenter
-	''' Can be SimpleFog, BitbrainFog, AzureFog // Datacenter '''
-	if environment != '':
-		datacenter = Datacenter(HOSTS_IP, environment, 'Virtual')
-	else:
-		datacenter = AzureFog(HOSTS)
-
-	# Initialize workload
-	''' Can be SWSD, BWGD2, Azure2017Workload, Azure2019Workload // DFW, AIoTW '''
-	if environment != '':
-		workload = DFW(NEW_CONTAINERS, 1.5, db)
-	else: 
-		workload = BWGD2(NEW_CONTAINERS, 1.5)
-	
-	# Initialize scheduler
-	''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
-	scheduler = GOBIScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
-
-	# Initialize Environment
-	hostlist = datacenter.generateHosts()
-	if environment != '':
-		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
-	else:
-		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
-	
-	# Initialize stats
-	stats = Stats(env, workload, datacenter, scheduler)
-
-	# Execute first step
-	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
-	deployed = env.addContainersInit(newcontainerinfos) # Deploy new containers and get container IDs
-	start = time()
-	decision = scheduler.placement(deployed) # Decide placement using container ids
-	schedulingTime = time() - start
-	migrations = env.allocateInit(decision) # Schedule containers
-	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload allocated using creation IDs
-	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
-	print("Containers in host:", env.getContainersInHosts())
-	print("Schedule:", env.getActiveContainerList())
-	printDecisionAndMigrations(decision, migrations)
-
-	stats.saveStats(deployed, migrations, [], deployed, decision, schedulingTime)
-	return datacenter, workload, scheduler, env, stats
+    print(environment)
+    if environment != '':
+   		# Initialize the db
+   		db = Database(DB_NAME, DB_HOST, DB_PORT)
+   
+   	# Initialize simple fog datacenter
+    ''' Can be SimpleFog, BitbrainFog, AzureFog // Datacenter '''
+    if environment != '':
+   		datacenter = Datacenter(HOSTS_IP, environment, 'Virtual')
+    else:
+   		datacenter = AzureFog(HOSTS)
+   
+   	# Initialize workload
+    '''Can be SWSD, BWGD2, Azure2017Workload, Azure2019Workload // DFW, AIoTW '''
+    if environment != '':
+   		workload = DFW(NEW_CONTAINERS, 1.5, db)
+    else: 
+   		workload = BWGD2(NEW_CONTAINERS, 1.5, START_DATA_POINT, END_DATA_POINT)
+   	
+   	# Initialize scheduler
+    ''' Can be LRMMTR, RF, RL, RM, Random, RLRMMTR, TMCR, TMMR, TMMTR, GA, GOBI (arg = 'energy_latency_'+str(HOSTS)) '''
+    scheduler = DRLScheduler('energy_latency_'+str(HOSTS)) # GOBIScheduler('energy_latency_'+str(HOSTS))
+   
+   	# Initialize Environment
+    hostlist = datacenter.generateHosts()
+    if environment != '':
+   		env = Framework(scheduler, CONTAINERS, INTERVAL_TIME, hostlist, db, environment, logger)
+    else:
+   		env = Simulator(TOTAL_POWER, ROUTER_BW, scheduler, CONTAINERS, INTERVAL_TIME, hostlist)
+   	
+   	# Initialize stats
+    stats = Stats(env, workload, datacenter, scheduler)
+   
+   	# Execute first step
+    newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
+    deployed = env.addContainersInit(newcontainerinfos) # Deploy new containers and get container IDs
+    start = time()
+    decision = scheduler.placement(deployed) # Decide placement using container ids
+    schedulingTime = time() - start
+    migrations = env.allocateInit(decision) # Schedule containers
+    workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload allocated using creation IDs
+    print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
+    print("Containers in host:", env.getContainersInHosts())
+    print("Schedule:", env.getActiveContainerList())
+    printDecisionAndMigrations(decision, migrations)
+   
+    stats.saveStats(deployed, migrations, [], deployed, decision, schedulingTime)
+    if TRL_TRAINING: 
+    return datacenter, workload, scheduler, env, stats
 
 def stepSimulation(workload, scheduler, env, stats):
-	newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
-	if opts.env != '': print(newcontainerinfos)
-	deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
-	start = time()
-	selected = scheduler.selection() # Select container IDs for migration
-	decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
-	schedulingTime = time() - start
-	migrations = env.simulationStep(decision) # Schedule containers
-	workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
-	print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
-	print("Deployed:", len(env.getCreationIDs(migrations, deployed)), "of", len(newcontainerinfos), [i[0] for i in newcontainerinfos])
-	print("Destroyed:", len(destroyed), "of", env.getNumActiveContainers())
-	print("Containers in host:", env.getContainersInHosts())
-	print("Num active containers:", env.getNumActiveContainers())
-	print("Host allocation:", [(c.getHostID() if c else -1)for c in env.containerlist])
-	printDecisionAndMigrations(decision, migrations)
+    print('1')
+    newcontainerinfos = workload.generateNewContainers(env.interval) # New containers info
+    print('2')
 
-	stats.saveStats(deployed, migrations, destroyed, selected, decision, schedulingTime)
+    if opts.env != '': print(newcontainerinfos)
+    print('3')
+
+    deployed, destroyed = env.addContainers(newcontainerinfos) # Deploy new containers and get container IDs
+    print('4')
+
+    start = time()
+    print('5')
+
+    selected = scheduler.selection() # Select container IDs for migration
+    print('6')
+
+    decision = scheduler.filter_placement(scheduler.placement(selected+deployed)) # Decide placement for selected container ids
+    print('7')
+
+    schedulingTime = time() - start
+    print('8')
+
+    migrations = env.simulationStep(decision) # Schedule containers
+    print('9')
+
+    workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) # Update workload deployed using creation IDs
+    print("Deployed containers' creation IDs:", env.getCreationIDs(migrations, deployed))
+    print("Deployed:", len(env.getCreationIDs(migrations, deployed)), "of", len(newcontainerinfos), [i[0] for i in newcontainerinfos])
+    print("Destroyed:", len(destroyed), "of", env.getNumActiveContainers())
+    print("Containers in host:", env.getContainersInHosts())
+    print("Num active containers:", env.getNumActiveContainers())
+    print("Host allocation:", [(c.getHostID() if c else -1)for c in env.containerlist])
+    printDecisionAndMigrations(decision, migrations)
+
+    stats.saveStats(deployed, migrations, destroyed, selected, decision, schedulingTime)
 
 def saveStats(stats, datacenter, workload, env, end=True):
 	dirname = "logs/" + datacenter.__class__.__name__
