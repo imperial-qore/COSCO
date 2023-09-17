@@ -148,7 +148,7 @@ class TransformerScheduler (nn.Module):
         step: Optional[int] = None,
     ):
         
-        encoder_embedding = self.en_embed(decoder_in)* math.sqrt(self.output_dim)
+        encoder_embedding = self.en_embed(encoder_in)* math.sqrt(self.output_dim)
         decoder_embedding = self.de_embed(decoder_in)* math.sqrt(self.output_dim)
         self.encoder = self.encoder.to(self.device)
         self.decoder = self.decoder.to(self.device)
@@ -164,11 +164,112 @@ class TransformerScheduler (nn.Module):
         
         return self.softmax(self.outer(out))
     
-    
 
-class CriticNetwork (nn.Module):
-    def __init__ (self, external_max_length, ext_input_dim, internal_max_length,
-                  int_input_dim, device,
+class EncoderScheduler (nn.Module):
+    def __init__(
+        self,
+        encoder_max_length: int,
+        decoder_max_length: int,
+        input_dim: int,
+        output_dim: int,
+        prob_len: int,
+        host_num: int,
+        device: torch.device = torch.device("cpu"),
+        name = 'EncoderScheduler',
+    ):
+        super().__init__()
+        self.name = name
+        self.device = device
+        self.encoder_max_length = encoder_max_length
+        self.decoder_max_length = decoder_max_length
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        self.prob_len = prob_len
+        self.host_num = host_num
+        
+        self.en_embed = nn.Linear(self.config.input_dim, self.config.output_dim).to(self.device)
+        
+        
+        self.en_position_encode = PositionalEncoding(self.output_dim, 
+                                                     self.encoder_max_length,
+                                                     self.device)
+        
+        encoder_layers = TransformerEncoderLayer(
+            d_model= self.output_dim,
+            nhead= 1,
+            dim_feedforward= 16,
+            dropout= .1,
+            batch_first= True,
+        )
+        self.encoder = TransformerEncoder(
+            encoder_layers, 6
+        )
+        
+        self.flatten = nn.Flatten().to(self.device)
+        
+        input_dim = (self.encoder_max_length) * self.output_dim
+        self.outer = nn.Linear(self.output_dim, self.prob_len, device=self.device)
+    
+        self.softmax = nn.Softmax(dim=1).to(self.device)
+    
+    def generateSteps (
+        self,
+        env,
+        encoder_in: torch.tensor,
+        decoder_in: torch.tensor, 
+        step: int,     
+    ):
+        pad=torch.tensor([[0]*encoder_in.size(2)]).unsqueeze(0)
+        actions = np.zeros((0,1), dtype=int)
+        log_probs = np.zeros((0,1), dtype=int)
+        encoder_inputs=[]; decisions=[]; reward_rate = []
+        for s in range(0, self.decoder_max_length-1):
+            next_generate = self.forward(encoder_in)
+            next_dist = Categorical(next_generate)
+            next_decision = next_dist.sample()
+            next_prob = next_dist.log_prob(next_decision).unsqueeze(0).cpu().detach().numpy()
+            log_probs = np.append(log_probs, next_prob, 0)
+            actions = np.append(actions, next_decision, 0)
+            encoder_inputs.append(encoder_in)
+            if next_decision == self.prob_len-1:
+                #TODO
+                reward_rate.append(0)
+                break
+            #TODO check allocated last beacuase of getting the change 
+            cont_dec = int(next_decision / self.host_num) 
+            host_dec = int(next_decision % self.host_num)
+            decisions.append((cont_dec, host_dec))
+            
+            if env.getPlacementPossible(cont_dec, host_dec): 
+                reward_rate.append(1)
+                encoder_in = torch.cat([pad, torch.cat([encoder_in[:,0:cont_dec], 
+                                                        encoder_in[:,cont_dec+1:]],1)], 1)
+                host = env.getHostByID(host_dec)
+                ips = int(host.getApparentIPS() + env.getContainerByID(cont_dec).getApparentIPS())
+                encoder_in[:,-(self.host_num-host_dec+1)] = 100 * (ips / host.ipsCap)
+            else : reward_rate.append(0)
+            
+            
+        return decisions, actions, log_probs, torch.cat(encoder_inputs, 0), None
+            
+    def forward (
+        self,
+        encoder_in: torch.tensor,
+    ):
+        
+        encoder_embedding = self.en_embed(encoder_in)* math.sqrt(self.output_dim)
+        self.encoder = self.encoder.to(self.device)
+        self.decoder = self.decoder.to(self.device)
+        
+        encod = self.encoder(self.en_position_encode(encoder_embedding))
+        flat = self.flatten(encod)
+        
+        return self.softmax(self.outer(flat))
+     
+
+class CriticNetwork1 (nn.Module):
+    def __init__ (self, encoder_max_length, encoder_input_dim, 
+                  decoder_max_length, decoder_input_dim, device,
                   hidden_dims: List = [512, 256, 128, 128, 64, 16],
                   name = 'mlp_cretic'):
         super().__init__()
@@ -179,7 +280,7 @@ class CriticNetwork (nn.Module):
         
         
         modules = []
-        input_dim = (ext_input_dim*external_max_length)+(int_input_dim*internal_max_length)
+        input_dim = (encoder_input_dim*encoder_max_length)+(decoder_input_dim*decoder_max_length)
         for h_dim in hidden_dims:
             modules.append(
                 nn.Sequential(
@@ -195,3 +296,28 @@ class CriticNetwork (nn.Module):
     def forward(self, external, internal):
         input_tensor = torch.cat([external.flatten(start_dim=1),internal.flatten(start_dim=1)],1)
         return self.critic_eo(input_tensor.to(self.device))
+    
+class CriticNetwork2 (nn.Module):
+    def __init__ (self, encoder_max_length, encoder_input_dim, 
+                  decoder_max_length, decoder_input_dim, device,
+                  hidden_dims: List = [256, 128, 128, 64, 16],
+                  name = 'mlp_cretic'):
+        super().__init__()
+        self.name = name
+        self.device = device
+        self.flatten = nn.Flatten().to(device)
+        modules = []
+        input_dim = encoder_max_length*encoder_input_dim,
+        for h_dim in hidden_dims:
+            modules.append(
+                nn.Sequential(
+                    nn.Linear(input_dim, out_features=h_dim),
+                    nn.ReLU())
+            )
+            input_dim = h_dim
+        modules.append(nn.Sequential(nn.Linear(input_dim, 1)))    
+        self.critic = nn.Sequential(*modules).to(device)
+    
+    def forward(self, external, *args):
+        return self.critic(self.flatten(external.to(self.device)))
+    
