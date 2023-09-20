@@ -55,10 +55,10 @@ class TRLScheduler(Scheduler):
                                 requires_grad=True).unsqueeze(0)
         allocateInfo = torch.tensor(allocateInfo, dtype=torch.float32, 
                                     requires_grad=True).unsqueeze(0)
-        decisions, actions, log_probs, encoder_inputs, decoder_inputs = self.model.generateSteps(
-            self.env, mainInfo, allocateInfo, step)
+        decisions, actions, log_probs, encoder_inputs, steps, steps, decoder_inputs = \
+            self.model.generateSteps(self.env, mainInfo, allocateInfo, step)
         
-        return decisions, actions, log_probs, mainInfo, encoder_inputs, decoder_inputs 
+        return decisions, actions, log_probs, mainInfo, encoder_inputs, steps, decoder_inputs 
         
     def padding(self, sequence, final_length, padding_token, pad_left = True):
         pads = [padding_token] * (final_length - len(sequence))
