@@ -4,16 +4,32 @@ import torch
 import os
 from tqdm import tqdm
 
+from .src.ppo_trainer import PPOTRainer
 
-def ppo_train(env, workload, scheduler, train_step):
+def ppo_train(workload, scheduler, train_step):
+    env = scheduler.env
+    trainer = PPOTRainer(scheduler.model, env)
+    train_batch_size = 64
+    
+    best_reward = -1e4
+    reward_history = []; score_history = []; remain_cpu = []
+    n_steps = 0
     for i in tqdm(range(train_step)):
         newcontainerinfos = workload.generateNewContainers(env.interval) 
         deployed, destroyed = env.addContainers(newcontainerinfos) 
-        decisions, actions, log_probs, mainInfo, decoder_inputs = scheduler.run_transformer()
-        decisions = scheduler.filter_placement(decisions)
+        decisions, actions, log_probs, mainInfo, encoder_inputs, steps, decoder_inputs = \
+            scheduler.run_transformer()
+        filter_decisions = scheduler.filter_placement(decisions)
+        trainer.save_mid_step (encoder_inputs, decisions, filter_decisions, actions, 
+                               log_probs, steps, decoder_inputs)
         
-        migrations = env.simulationStep(decisions)
+        migrations, rewards = env.simulationStep(filter_decisions)
+        trainer.save_final_step(rewards)
         workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) 
+        n_steps += len(rewards)
+        if n_steps >= train_batch_size:
+            n_step = trainer.train(train_batch_size)
+            
         
 
     best_reward = -1e4
