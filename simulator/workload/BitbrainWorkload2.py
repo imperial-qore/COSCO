@@ -47,7 +47,7 @@ class BWGD2(Workload):
         workloadlist = []
         for i in range(max(1,int(gauss(self.mean, self.sigma)))):
             CreationID = self.creation_id
-            index = self.possible_indices[randint(self.start_data_point, self.end_data_point-1)]
+            index = self.possible_indices[randint(self.start_data_point, len(self.possible_indices)-1)]
             df = pd.read_csv(self.dataset_path+'rnd/'+str(index)+'.csv', sep=';\t')
             sla = gauss(self.meanSLA, self.sigmaSLA)
             IPSModel = IPSMBitbrain((ips_multiplier*df['CPU usage [MHZ]']).to_list(), (ips_multiplier*df['CPU capacity provisioned [MHZ]']).to_list()[0], int(1.2*sla), interval + sla)
@@ -56,6 +56,6 @@ class BWGD2(Workload):
             DiskModel = DMBitbrain(disk_size, (df['Disk read throughput [KB/s]']/4000).to_list(), (df['Disk write throughput [KB/s]']/12000).to_list())
             workloadlist.append((CreationID, interval, IPSModel, RAMModel, DiskModel))
             self.creation_id += 1
-            self.createdContainers += workloadlist
+        self.createdContainers += workloadlist
         self.deployedContainers += [False] * len(workloadlist)
         return self.getUndeployedContainers()
