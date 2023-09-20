@@ -21,8 +21,37 @@ class PPOTRainer ():
         self.buffer = PPOReplayBuffer
         self.env = env
 
-        return decision
+    
+    def save_mid_step (
+        self, 
+        observation: List[torch.Tensor],
+        decision: List,
+        filtered_decision: List,
+        actions: List,
+        log_probs: List,
+        steps: Optional[List[torch.Tensor]] = None,
+        internalObservations: Optional[List[torch.Tensor]] = None,
+    ):
+        for index in range(len(decision)):
+            if decision[index] not in filtered_decision:
+                observation.pop(index)
+                decision.pop(index)
+                actions.pop(index)
+                log_probs.pop(index)
+                try:
+                    steps.pop(index)
+                    internalObservations.pop(index)
+                except: pass
+        self.critic_model
         
+        buffer.save_mid_memory()#TODO save
+    
+    def save_final_step (
+        self, 
+        rewards
+    ):
+        buffer.save_final_memory(rewards)
+    
     def train_minibatch(self):
         pass
 
