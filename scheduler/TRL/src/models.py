@@ -220,20 +220,20 @@ class EncoderScheduler (nn.Module):
         step: int,     
     ):
         pad=torch.tensor([[0]*encoder_in.size(2)]).unsqueeze(0)
-        actions = np.zeros((0,1), dtype=int)
-        log_probs = np.zeros((0,1), dtype=int)
-        encoder_inputs=[]; decisions=[]; reward_rate = []
+        actions = []# np.zeros((0,1), dtype=int)
+        log_probs = []#np.zeros((0,1), dtype=int)
+        encoder_inputs=[]; decisions=[]; #reward_rate = []
         for s in range(0, self.decoder_max_length-1):
             next_generate = self.forward(encoder_in)
             next_dist = Categorical(next_generate)
             next_decision = next_dist.sample()
             next_prob = next_dist.log_prob(next_decision).unsqueeze(0).cpu().detach().numpy()
-            log_probs = np.append(log_probs, next_prob, 0)
-            actions = np.append(actions, next_decision, 0)
+            log_probs = np.append(next_prob)#log_probs = np.append(log_probs, next_prob, 0)
+            actions.append(next_decision)#actions = np.append(actions, next_decision, 0)
             encoder_inputs.append(encoder_in)
             if next_decision == self.prob_len-1:
                 #TODO
-                reward_rate.append(0)
+                #reward_rate.append(0)
                 break
             #TODO check allocated last beacuase of getting the change 
             cont_dec = int(next_decision / self.host_num) 
@@ -241,16 +241,16 @@ class EncoderScheduler (nn.Module):
             decisions.append((cont_dec, host_dec))
             
             if env.getPlacementPossible(cont_dec, host_dec): 
-                reward_rate.append(1)
+                #reward_rate.append(1)
                 encoder_in = torch.cat([pad, torch.cat([encoder_in[:,0:cont_dec], 
                                                         encoder_in[:,cont_dec+1:]],1)], 1)
                 host = env.getHostByID(host_dec)
                 ips = int(host.getApparentIPS() + env.getContainerByID(cont_dec).getApparentIPS())
                 encoder_in[:,-(self.host_num-host_dec+1)] = 100 * (ips / host.ipsCap)
-            else : reward_rate.append(0)
+            #else : reward_rate.append(0)
             
             
-        return decisions, actions, log_probs, torch.cat(encoder_inputs, 0), None
+        return decisions, actions, log_probs, encoder_inputs, None, None
             
     def forward (
         self,
