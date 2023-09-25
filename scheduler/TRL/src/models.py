@@ -187,7 +187,7 @@ class EncoderScheduler (nn.Module):
         self.prob_len = prob_len
         self.host_num = host_num
         
-        self.en_embed = nn.Linear(self.config.input_dim, self.config.output_dim).to(self.device)
+        self.en_embed = nn.Linear(self.input_dim, self.output_dim).to(self.device)
         
         
         self.en_position_encode = PositionalEncoding(self.output_dim, 
@@ -298,8 +298,7 @@ class CriticNetwork1 (nn.Module):
         return self.critic_eo(input_tensor.to(self.device))
     
 class CriticNetwork2 (nn.Module):
-    def __init__ (self, encoder_max_length, encoder_input_dim, 
-                  decoder_max_length, decoder_input_dim, device,
+    def __init__ (self, encoder_max_length, encoder_input_dim, device,
                   hidden_dims: List = [256, 128, 128, 64, 16],
                   name = 'mlp_cretic'):
         super().__init__()
