@@ -1,90 +1,47 @@
 """
 """
 import torch
+import numpy as np
 import os
 from tqdm import tqdm
 
 from .src.ppo_trainer import PPOTRainer
 
 def ppo_train(workload, scheduler, train_step):
-    env = scheduler.env
-    trainer = PPOTRainer(scheduler.model, env)
-    train_batch_size = 64
+    #env = scheduler.env
+    trainer = PPOTRainer(scheduler.model, scheduler.env)
+    batch_size = 64
     
     best_reward = -1e4
-    reward_history = []; score_history = []; remain_cpu = []
+    reward_history=[]; avgresponsetime_history=[]; energytotalinterval_history=[]
     n_steps = 0
     for i in tqdm(range(train_step)):
-        newcontainerinfos = workload.generateNewContainers(env.interval) 
-        deployed, destroyed = env.addContainers(newcontainerinfos) 
+        newcontainerinfos = workload.generateNewContainers(scheduler.env.interval) 
+        deployed, destroyed = scheduler.env.addContainers(newcontainerinfos) 
         decisions, actions, log_probs, mainInfo, encoder_inputs, steps, decoder_inputs = \
             scheduler.run_transformer()
         filter_decisions = scheduler.filter_placement(decisions)
         trainer.save_mid_step (encoder_inputs, decisions, filter_decisions, actions, 
                                log_probs, steps, decoder_inputs)
         
-        migrations, rewards = env.simulationStep(filter_decisions)
+        migrations, rewards = scheduler.env.simulationStep(filter_decisions)
+        step_reward = sum(rewards.values())
+        reward_history.append(step_reward)
+        avgresponsetime = np.average([c.totalExecTime + c.totalMigrationTime for c in destroyed]) if len(destroyed) > 0 else 0
+        if avgresponsetime != 0: avgresponsetime_history.append(avgresponsetime)
+        energytotalinterval = np.sum([host.getPower()*scheduler.env.intervaltime for host in scheduler.env.hostlist])
+        energytotalinterval_history.append(energytotalinterval)
         trainer.save_final_step(rewards)
-        workload.updateDeployedContainers(env.getCreationIDs(migrations, deployed)) 
+        workload.updateDeployedContainers(scheduler.env.getCreationIDs(migrations, deployed)) 
         n_steps += len(rewards)
-        if n_steps >= train_batch_size:
-            n_step = trainer.train(train_batch_size)
+        if n_steps >= batch_size:
+            n_steps = trainer.train(batch_size)
             
-        
-
-    best_reward = -1e4
-    reward_history = []; score_history = []; remain_cap_history = []
-    n_steps = 0
-    n_steps1 = 0
-    addition_steps = ppoTrainer.config.generat_link_number if flags[0] else 1
-    for i in tqdm(range(N_TRAIN_STEPS)):
-        for batch in range(len(statePrepares)):
-            env.setStatePrepare(statePrepares[0])
-
-            externalObservation, _ = env.reset()
-            done = False
-            episodeNormalReward = torch.tensor (0.0)
-            while not done:
-                internalObservations, actions, accepted_action, probs, values, \
-                    rewards, steps = ppoTrainer.make_steps(externalObservation, 
-                                                           env.statePrepares, flags[0], flags[1])
-                print(torch.cat(rewards,0).sum())
-                episodeNormalReward += torch.cat(rewards,0).sum()
-                externalObservation_, extraReward, done, info = env.step(accepted_action)
-                
-                if episodeNormalReward < -20: done = True
-                ppoTrainer.memory.save_normal_step(externalObservation, actions, \
-                                                   probs, values, rewards, done, \
-                                                   steps, internalObservations)
-                
-                n_steps += addition_steps
-                if n_steps % ppoTrainer.config.normal_batch == 0:
-                    ppoTrainer.train('normal')
-                if ~(accepted_action == [-1,-1]).all():
-                    #print(accepted_action)
-                    n_steps1 += addition_steps
-                    ppoTrainer.memory.save_extra_step(externalObservation, actions, \
-                                                      probs, values, extraReward, \
-                                                      done, steps, internalObservations)   
-                    if n_steps1 % ppoTrainer.config.extra_batch == 0:
-                        ppoTrainer.train('extra')
-                externalObservation = externalObservation_
-                
-            scores, remain_cap_ratios = env.final_score()
-            batch_score_per_grredy = np.mean([s/gs for s,gs in zip(scores, greedyScores[batch])])
-            
-            reward_history.append(float(episodeNormalReward))
-            score_history.append(batch_score_per_grredy)
-            remain_cap_history.append(np.mean(remain_cap_ratios))
-            avg_reward = np.mean(reward_history[-50:])
-            avg_score = np.mean(score_history[-50:])
-            
-            if avg_reward > best_reward:
-                best_reward  = avg_reward
-                ppoTrainer.save_models()
-            print('episode', i, 'score %.3f' % batch_score_per_grredy, 'avg score %.2f' % avg_score,
-                  'time_steps', n_steps, 'remain_cap_ratio %.3f'% np.mean(remain_cap_ratios),
-                  'interanl_reward %.3f'%float(episodeNormalReward), 'avg reward %.3f' %avg_reward)
+        print('interval', scheduler.env.interval, 'step_reward %.3f' % step_reward, 
+              'avgresponsetime %.2f' % avgresponsetime, 'energytotalinterval %.2f' % energytotalinterval, 
+              'reward_history_50avg %.3f'% np.mean(reward_history[-50:]),
+              'responsetime_history_50avg %.3f'% np.mean(avgresponsetime_history[-50:]), 
+              'energytotal_history_50avg %.3f'% np.mean(energytotalinterval_history[-50:]))
     
 
 
