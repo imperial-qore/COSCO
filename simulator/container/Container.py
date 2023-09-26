@@ -63,12 +63,14 @@ class Container():
             lastMigrationTime += self.getContainerSize() / allocBw
             lastMigrationTime += abs(self.env.hostlist[self.hostid].latency - self.env.hostlist[hostID].latency)
         self.hostid = hostID
+        self.ipsmodel.completedAfterMigration = 0
         return lastMigrationTime
     
     def execute(self, lastMigrationTime):
 		# Migration time is the time to migrate to new host
 		# Thus, execution of task takes place for interval
 		# time - migration time with apparent ips
+        if self.hostid == -1: return
         assert self.hostid != -1
         self.totalMigrationTime += lastMigrationTime
         execTime = self.env.intervaltime - lastMigrationTime
@@ -78,8 +80,8 @@ class Container():
         self.ipsmodel.completedInstructions += apparentIPS * min(execTime, requiredExecTime)
         self.ipsmodel.completedAfterMigration += apparentIPS * min(execTime, requiredExecTime)
         
+
     def allocateAndExecute(self, hostID, allocBw):
-        self.ipsmodel.completedAfterMigration = 0
         self.execute(self.allocate(hostID, allocBw))
 
     def destroy(self):
